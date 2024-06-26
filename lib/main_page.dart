@@ -23,6 +23,11 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return GameWidget(
       game: _game,
+      backgroundBuilder: (context) {
+        return Container(
+          color: Colors.grey,
+        );
+      },
     );
   }
 }
