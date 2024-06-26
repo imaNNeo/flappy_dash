@@ -1,8 +1,12 @@
+import 'dart:math';
+
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
-import 'package:flame/parallax.dart';
 import 'package:flappy_dash/components/dash.dart';
+import 'package:flappy_dash/components/pipe.dart';
+
+import 'components/parallax_background.dart';
 
 class FlappyDashGame extends FlameGame<FlappyDashWorld> {
   FlappyDashGame()
@@ -15,15 +19,37 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld> {
         );
 }
 
-class FlappyDashWorld extends World with HasGameRef<FlappyDashGame>, TapCallbacks {
+class FlappyDashWorld extends World
+    with HasGameRef<FlappyDashGame>, TapCallbacks {
   late Dash player;
 
   bool isStarted = false;
+  static const pipeGap = 240;
 
   @override
   Future<void> onLoad() async {
-    await add(MyParallaxComponent());
+    await add(ParallaxBackground());
     await add(player = Dash(position: Vector2.zero()));
+    final gameSize = gameRef.size;
+
+    final pipesMinSize = gameSize.y * 0.25;
+    final available = (gameSize.y - (pipesMinSize * 2));
+    for (int i = 0; i < 30; i++) {
+      final randomVertical =
+          (Random().nextDouble() * available) - (available / 2);
+      await add(
+        Pipe(
+          isBottom: true,
+          position: Vector2(400.0 * i, randomVertical + (pipeGap / 2)),
+        ),
+      );
+      await add(
+        Pipe(
+          isBottom: false,
+          position: Vector2(400.0 * i, randomVertical - (pipeGap / 2)),
+        ),
+      );
+    }
   }
 
   @override
@@ -32,25 +58,5 @@ class FlappyDashWorld extends World with HasGameRef<FlappyDashGame>, TapCallback
     if (!isStarted) {
       isStarted = true;
     }
-  }
-}
-
-class MyParallaxComponent extends ParallaxComponent<FlappyDashGame> {
-  @override
-  Future<void> onLoad() async {
-    anchor = Anchor.center;
-    parallax = await game.loadParallax(
-      [
-        ParallaxImageData('background/layer1-sky.png'),
-        ParallaxImageData('background/layer2-clouds.png'),
-        ParallaxImageData('background/layer3-clouds.png'),
-        ParallaxImageData('background/layer4-clouds.png'),
-        ParallaxImageData('background/layer5-huge-clouds.png'),
-        ParallaxImageData('background/layer6-bushes.png'),
-        ParallaxImageData('background/layer7-bushes.png'),
-      ],
-      baseVelocity: Vector2(1, 0),
-      velocityMultiplierDelta: Vector2(2, 0),
-    );
   }
 }
