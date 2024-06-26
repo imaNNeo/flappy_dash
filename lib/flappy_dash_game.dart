@@ -1,4 +1,5 @@
 import 'package:flame/components.dart';
+import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame/parallax.dart';
 import 'package:flappy_dash/components/dash.dart';
@@ -14,13 +15,23 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld> {
         );
 }
 
-class FlappyDashWorld extends World with HasGameRef<FlappyDashGame> {
+class FlappyDashWorld extends World with HasGameRef<FlappyDashGame>, TapCallbacks {
   late Dash player;
+
+  bool isStarted = false;
 
   @override
   Future<void> onLoad() async {
     await add(MyParallaxComponent());
     await add(player = Dash(position: Vector2.zero()));
+  }
+
+  @override
+  void onTapUp(TapUpEvent event) {
+    player.jump();
+    if (!isStarted) {
+      isStarted = true;
+    }
   }
 }
 
