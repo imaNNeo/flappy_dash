@@ -28,13 +28,6 @@ class Pipe extends PositionComponent {
   }
 
   @override
-  void update(double dt) {
-    position.x -= 200 * dt;
-    super.update(dt);
-  }
-
-
-  @override
   void render(Canvas canvas) {
     super.render(canvas);
     _pipeSprite.render(

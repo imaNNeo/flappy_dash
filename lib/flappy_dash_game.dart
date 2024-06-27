@@ -4,7 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flappy_dash/components/dash.dart';
-import 'package:flappy_dash/components/pipe.dart';
+import 'package:flappy_dash/components/pipe_pair.dart';
 
 import 'components/parallax_background.dart';
 
@@ -24,39 +24,40 @@ class FlappyDashWorld extends World
   late Dash player;
 
   bool isStarted = false;
-  static const pipeGap = 240;
+  static const pipeGap = 240.0;
 
   @override
   Future<void> onLoad() async {
     await add(ParallaxBackground());
     await add(player = Dash(position: Vector2.zero()));
-    final gameSize = gameRef.size;
-
-    final pipesMinSize = gameSize.y * 0.25;
-    final available = (gameSize.y - (pipesMinSize * 2));
-    for (int i = 0; i < 30; i++) {
-      final randomVertical =
-          (Random().nextDouble() * available) - (available / 2);
-      await add(
-        Pipe(
-          isBottom: true,
-          position: Vector2(400.0 * i, randomVertical + (pipeGap / 2)),
-        ),
-      );
-      await add(
-        Pipe(
-          isBottom: false,
-          position: Vector2(400.0 * i, randomVertical - (pipeGap / 2)),
-        ),
-      );
-    }
   }
 
   @override
   void onTapUp(TapUpEvent event) {
     player.jump();
     if (!isStarted) {
-      isStarted = true;
+      _startGame();
+    }
+  }
+
+  void _startGame() async {
+    isStarted = true;
+    final gameSize = gameRef.size;
+    final pipesMinSize = gameSize.y * 0.25;
+    final available = (gameSize.y - (pipesMinSize * 2));
+    final startPos = gameSize.x / 2;
+    for (int i = 0; i < 300; i++) {
+      final randomVertical =
+          (Random().nextDouble() * available) - (available / 2);
+      await add(
+        PipePair(
+          gap: pipeGap,
+          position: Vector2(
+            startPos + 400.0 * i,
+            randomVertical,
+          ),
+        ),
+      );
     }
   }
 }
