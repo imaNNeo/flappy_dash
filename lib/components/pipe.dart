@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
 class Pipe extends PositionComponent {
@@ -9,6 +10,7 @@ class Pipe extends PositionComponent {
   }) : super(
           size: Vector2(100, 100),
           anchor: Anchor.center,
+          priority: 10,
         );
 
   late Sprite _pipeSprite;
@@ -25,6 +27,9 @@ class Pipe extends PositionComponent {
     if (!isBottom) {
       flipVertically();
     }
+    add(RectangleHitbox(
+      collisionType: CollisionType.passive,
+    ));
   }
 
   @override

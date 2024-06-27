@@ -1,10 +1,14 @@
 import 'package:flame/components.dart';
 import 'package:flame/parallax.dart';
+import 'package:flame_bloc/flame_bloc.dart';
+import 'package:flappy_dash/cubit/game/game_cubit.dart';
 import 'package:flappy_dash/flappy_dash_game.dart';
 
-class ParallaxBackground extends ParallaxComponent<FlappyDashGame> {
+class ParallaxBackground extends ParallaxComponent<FlappyDashGame>
+    with FlameBlocReader<GameCubit, GameState> {
   @override
   Future<void> onLoad() async {
+    super.onLoad();
     anchor = Anchor.center;
     parallax = await game.loadParallax(
       [
@@ -19,5 +23,18 @@ class ParallaxBackground extends ParallaxComponent<FlappyDashGame> {
       baseVelocity: Vector2(1, 0),
       velocityMultiplierDelta: Vector2(1.7, 0),
     );
+  }
+
+  @override
+  void update(double dt) {
+    switch (bloc.state.playingState) {
+      case PlayingState.playing:
+      case PlayingState.none:
+        super.update(dt);
+        break;
+
+      case PlayingState.gameOver:
+        break;
+    }
   }
 }

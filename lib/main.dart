@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'main_page.dart';
+import 'cubit/game/game_cubit.dart';
+import 'pages/main_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,8 +13,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: MainPage(),
+    return BlocProvider(
+      create: (_) => GameCubit(),
+      child: const MaterialApp(home: MainPage()),
     );
   }
 }
