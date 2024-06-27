@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flame/game.dart';
 import 'package:flappy_dash/cubit/game/game_cubit.dart';
 import 'package:flutter/material.dart';
@@ -54,8 +56,61 @@ class _MainPageState extends State<MainPage> {
               ),
             ),
           ),
+          BlocBuilder<GameCubit, GameState>(builder: (context, state) {
+            return state.playingState.isGameOver
+                ? const GameOverWidget()
+                : const SizedBox();
+          }),
         ],
       ),
+    );
+  }
+}
+
+class GameOverWidget extends StatelessWidget {
+  const GameOverWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          child: Container(
+            color: Colors.black.withOpacity(0.7),
+          ),
+        ),
+        Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Game Over',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 42,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Score: ${context.watch<GameCubit>().state.currentScore}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+              const SizedBox(height: 42),
+              ElevatedButton(
+                onPressed: () {
+                  context.read<GameCubit>().playAgain();
+                },
+                child: const Text('Restart'),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

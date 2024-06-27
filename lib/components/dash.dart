@@ -82,6 +82,9 @@ class Dash extends PositionComponent
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
+    if (!bloc.state.playingState.isPlaying) {
+      return;
+    }
     if (other is Pipe) {
       bloc.gameOver();
     } else if (other is HiddenCoin) {

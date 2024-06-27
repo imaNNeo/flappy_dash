@@ -23,13 +23,26 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld> {
 
 class FlappyDashWorld extends World
     with HasGameRef<FlappyDashGame>, TapCallbacks, HasCollisionDetection {
-  late GameRoot _gameRoot;
+  GameRoot? _gameRoot;
 
   @override
   Future<void> onLoad() async {
+    await super.onLoad();
+    await _initializeGame();
+    game.gameCubit.restartNotifier.addListener(_restartGame);
+  }
+
+  void _restartGame() async {
+    if (game.gameCubit.restartNotifier.value) {
+      removeAll(children);
+      await _initializeGame();
+    }
+  }
+
+  Future<void> _initializeGame() async {
     await add(
-      FlameBlocProvider<GameCubit, GameState>(
-        create: () => game.gameCubit,
+      FlameBlocProvider<GameCubit, GameState>.value(
+        value: game.gameCubit,
         children: [
           _gameRoot = GameRoot(),
         ],
@@ -40,6 +53,12 @@ class FlappyDashWorld extends World
   @override
   void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
-    _gameRoot.onTapDown(event);
+    _gameRoot!.onTapDown(event);
+  }
+
+  @override
+  void onRemove() {
+    game.gameCubit.restartNotifier.removeListener(_restartGame);
+    super.onRemove();
   }
 }

@@ -1,10 +1,13 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 
 part 'game_state.dart';
 
 class GameCubit extends Cubit<GameState> {
   GameCubit() : super(const GameState());
+
+  ValueNotifier<bool> restartNotifier = ValueNotifier(false);
 
   void startPlaying() {
     emit(state.copyWith(
@@ -27,5 +30,7 @@ class GameCubit extends Cubit<GameState> {
 
   void playAgain() {
     emit(const GameState());
+    restartNotifier.value = true;
+    restartNotifier.value = false;
   }
 }
