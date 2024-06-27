@@ -22,7 +22,13 @@ class MyApp extends StatelessWidget {
       create: (_) => GameCubit(
         audioHelper,
       ),
-      child: const MaterialApp(home: MainPage()),
+      child: MaterialApp(
+        home: const MainPage(),
+        theme: ThemeData(
+          fontFamily: 'Chewy',
+          colorSchemeSeed: const Color(0xFF30CBF9),
+        ),
+      ),
     );
   }
 }
