@@ -32,7 +32,7 @@ class PipePair extends PositionComponent
           -(gap / 2),
         ),
       ),
-      HiddenCoin(position: Vector2(60, 0)),
+      HiddenCoin(position: Vector2(40, 0)),
     ]);
   }
 

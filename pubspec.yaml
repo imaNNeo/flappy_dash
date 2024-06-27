@@ -40,6 +40,7 @@ dependencies:
   flutter_bloc: ^8.1.6
   flame_bloc: ^1.12.0
   equatable: ^2.0.5
+  flutter_soloud: ^2.0.2
 
 dev_dependencies:
   flutter_test:
@@ -67,6 +68,7 @@ flutter:
   assets:
    - assets/images/
    - assets/images/background/
+   - assets/audio/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
