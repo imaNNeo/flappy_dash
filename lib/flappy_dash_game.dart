@@ -4,11 +4,13 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame_bloc/flame_bloc.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'components/game_root.dart';
 import 'cubit/game/game_cubit.dart';
 
-class FlappyDashGame extends FlameGame<FlappyDashWorld> {
+class FlappyDashGame extends FlameGame<FlappyDashWorld> with KeyboardEvents {
   FlappyDashGame(this.gameCubit)
       : super(
           world: FlappyDashWorld(),
@@ -19,6 +21,13 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld> {
         );
 
   final GameCubit gameCubit;
+
+  @override
+  KeyEventResult onKeyEvent(
+    KeyEvent event,
+    Set<LogicalKeyboardKey> keysPressed,
+  ) =>
+      world.onKeyEvent(event, keysPressed);
 }
 
 class FlappyDashWorld extends World
@@ -61,4 +70,7 @@ class FlappyDashWorld extends World
     game.gameCubit.restartNotifier.removeListener(_restartGame);
     super.onRemove();
   }
+
+  onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) =>
+      _gameRoot!.onKeyEvent(event, keysPressed);
 }

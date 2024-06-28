@@ -7,6 +7,9 @@ import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flappy_dash/components/guide_texts.dart';
 import 'package:flappy_dash/cubit/game/game_cubit.dart';
 import 'package:flappy_dash/flappy_dash_game.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/src/services/hardware_keyboard.dart';
+import 'package:flutter/src/services/keyboard_key.g.dart';
 
 import 'dash.dart';
 import 'parallax_background.dart';
@@ -109,6 +112,22 @@ class GameRoot extends Component
   }
 
   void onTapDown(TapDownEvent event) {
+    startAndJump();
+  }
+
+  onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+    final isKeyDown = event is KeyDownEvent;
+
+    final isSpace = keysPressed.contains(LogicalKeyboardKey.space);
+
+    if (isSpace && isKeyDown) {
+      startAndJump();
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  void startAndJump() {
     player.jump();
     if (game.gameCubit.state.playingState.isNone) {
       game.gameCubit.startPlaying();
