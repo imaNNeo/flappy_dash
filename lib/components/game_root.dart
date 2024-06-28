@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame_bloc/flame_bloc.dart';
+import 'package:flappy_dash/components/guide_texts.dart';
 import 'package:flappy_dash/cubit/game/game_cubit.dart';
 import 'package:flappy_dash/flappy_dash_game.dart';
 
@@ -24,19 +25,17 @@ class GameRoot extends Component
 
   @override
   Future<void> onLoad() async {
-    addAll([
-      ParallaxBackground(),
-      player = Dash(position: Vector2.zero()),
-    ]);
+    await initializeGame();
   }
 
   Future<void> initializeGame() async {
     await add(
-      FlameBlocProvider<GameCubit, GameState>(
-        create: () => game.gameCubit,
+      FlameBlocProvider<GameCubit, GameState>.value(
+        value: game.gameCubit,
         children: [
           ParallaxBackground(),
           player = Dash(position: Vector2.zero()),
+          GuideTexts(),
         ],
       ),
     );
