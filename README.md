@@ -5,7 +5,5 @@ You can [find this tutorial here in my YouTube channel](https://www.youtube.com/
 [<img src="https://github.com/imaNNeo/flappy_dash/blob/main/repo_files/thumbnails/overview.png" width=600>](https://youtu.be/WAMN4KEIZdk)
 
 ## Episodes:
-|  |  |  |
-| ----------- | ----------- | ----------- |
 | <img src="https://github.com/imaNNeo/flappy_dash/blob/main/repo_files/thumbnails/overview.png" width=600> | <img src="https://github.com/imaNNeo/flappy_dash/blob/main/repo_files/thumbnails/overview.png" width=600> | <img src="https://github.com/imaNNeo/flappy_dash/blob/main/repo_files/thumbnails/overview.png" width=600> |
 | <img src="https://github.com/imaNNeo/flappy_dash/blob/main/repo_files/thumbnails/overview.png" width=600> | <img src="https://github.com/imaNNeo/flappy_dash/blob/main/repo_files/thumbnails/overview.png" width=600> | <img src="https://github.com/imaNNeo/flappy_dash/blob/main/repo_files/thumbnails/overview.png" width=600> |
