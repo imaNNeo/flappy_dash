@@ -1,16 +1,11 @@
-# flappy_dash
+# How to Build a Flappy Dash Game Using Flutter and Flame Tutorial
+It is the result of my tutorial on how we can build the Flappy Dash game using [Flutter](https://flutter.dev) and [Flame game engine](https://flame-engine.org) step by step.
+You can [find this tutorial here in my YouTube channel](https://www.youtube.com/playlist?list=PL1-_rCwRcnbMVXe7jyCvZixrMRbvLTXG3) ([@imaNNeo](https://youtube.com/@imaNNeO))
 
-A new Flutter project.
+[<img src="https://github.com/imaNNeo/flappy_dash/blob/main/repo_files/thumbnails/overview.png" width=600>](https://youtu.be/WAMN4KEIZdk)
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Episodes:
+|  |  |  |
+| ----------- | ----------- | ----------- |
+| <img src="https://github.com/imaNNeo/flappy_dash/blob/main/repo_files/thumbnails/overview.png" width=600> | <img src="https://github.com/imaNNeo/flappy_dash/blob/main/repo_files/thumbnails/overview.png" width=600> | <img src="https://github.com/imaNNeo/flappy_dash/blob/main/repo_files/thumbnails/overview.png" width=600> |
+| <img src="https://github.com/imaNNeo/flappy_dash/blob/main/repo_files/thumbnails/overview.png" width=600> | <img src="https://github.com/imaNNeo/flappy_dash/blob/main/repo_files/thumbnails/overview.png" width=600> | <img src="https://github.com/imaNNeo/flappy_dash/blob/main/repo_files/thumbnails/overview.png" width=600> |
