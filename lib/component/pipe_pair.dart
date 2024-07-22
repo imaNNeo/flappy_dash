@@ -1,6 +1,8 @@
 import 'package:flame/components.dart';
 import 'package:flappy_dash/component/pipe.dart';
 
+import 'hidden_coin.dart';
+
 class PipePair extends PositionComponent {
   PipePair({
     required super.position,
@@ -22,6 +24,9 @@ class PipePair extends PositionComponent {
       Pipe(
         isFlipped: true,
         position: Vector2(0, -(gap / 2)),
+      ),
+      HiddenCoin(
+        position: Vector2(30, 0),
       ),
     ]);
   }
