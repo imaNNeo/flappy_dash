@@ -1,5 +1,7 @@
+import 'package:flappy_dash/bloc/game/game_cubit.dart';
 import 'package:flappy_dash/main_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,9 +12,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Flappy Dash',
-      home: MainPage(),
+    return BlocProvider(
+      create: (BuildContext context) => GameCubit(),
+      child: const MaterialApp(
+        title: 'Flappy Dash',
+        home: MainPage(),
+      ),
     );
   }
 }
