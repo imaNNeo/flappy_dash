@@ -14,9 +14,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (BuildContext context) => GameCubit(),
-      child: const MaterialApp(
+      child: MaterialApp(
         title: 'Flappy Dash',
-        home: MainPage(),
+        theme: ThemeData(fontFamily: 'Chewy'),
+        home: const MainPage(),
       ),
     );
   }

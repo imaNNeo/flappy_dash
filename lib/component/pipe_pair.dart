@@ -39,7 +39,7 @@ class PipePair extends PositionComponent
     switch (bloc.state.currentPlayingState) {
       case PlayingState.paused:
       case PlayingState.gameOver:
-      case PlayingState.none:
+      case PlayingState.idle:
         // We don't move it
         break;
       case PlayingState.playing:
