@@ -28,7 +28,7 @@ class DashParallaxBackground extends ParallaxComponent<FlappyDashGame>
   @override
   void update(double dt) {
     switch (bloc.state.currentPlayingState) {
-      case PlayingState.none:
+      case PlayingState.idle:
       case PlayingState.playing:
         super.update(dt);
         break;

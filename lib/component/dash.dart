@@ -43,7 +43,7 @@ class Dash extends PositionComponent
   @override
   void update(double dt) {
     super.update(dt);
-    if (bloc.state.currentPlayingState != PlayingState.playing) {
+    if (bloc.state.currentPlayingState.isNotPlaying) {
       return;
     }
     _velocity += _gravity * dt;
@@ -51,7 +51,7 @@ class Dash extends PositionComponent
   }
 
   void jump() {
-    if (bloc.state.currentPlayingState != PlayingState.playing) {
+    if (bloc.state.currentPlayingState.isNotPlaying) {
       return;
     }
     _velocity = _jumpForce;
@@ -67,9 +67,9 @@ class Dash extends PositionComponent
   }
 
   @override
-  void onCollision(Set<Vector2> points, PositionComponent other) {
-    super.onCollision(points, other);
-    if (bloc.state.currentPlayingState != PlayingState.playing) {
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollision(intersectionPoints, other);
+    if (bloc.state.currentPlayingState.isNotPlaying) {
       return;
     }
     if (other is HiddenCoin) {

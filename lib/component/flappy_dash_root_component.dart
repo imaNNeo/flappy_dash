@@ -1,4 +1,3 @@
-
 import 'dart:math';
 
 import 'package:flame/components.dart';
@@ -16,7 +15,6 @@ class FlappyDashRootComponent extends Component
   late Dash _dash;
   late PipePair _lastPipe;
   static const _pipesDistance = 400.0;
-  late TextComponent _scoreText;
 
   @override
   Future<void> onLoad() async {
@@ -25,11 +23,6 @@ class FlappyDashRootComponent extends Component
     add(_dash = Dash());
     _generatePipes(
       fromX: 350,
-    );
-    game.camera.viewfinder.add(
-      _scoreText = TextComponent(
-        position: Vector2(0, -(game.size.y / 2)),
-      ),
     );
   }
 
@@ -46,7 +39,7 @@ class FlappyDashRootComponent extends Component
     }
   }
 
-  void _removePipes() {
+  void _removeLastPipes() {
     final pipes = children.whereType<PipePair>();
     final shouldBeRemoved = max(pipes.length - 5, 0);
     pipes.take(shouldBeRemoved).forEach((pipe) {
@@ -65,7 +58,7 @@ class FlappyDashRootComponent extends Component
   }
 
   void _checkToStart() {
-    if (bloc.state.currentPlayingState == PlayingState.none) {
+    if (bloc.state.currentPlayingState.isIdle) {
       bloc.startPlaying();
     }
   }
@@ -73,12 +66,11 @@ class FlappyDashRootComponent extends Component
   @override
   void update(double dt) {
     super.update(dt);
-    _scoreText.text = bloc.state.currentScore.toString();
     if (_dash.x >= _lastPipe.x) {
       _generatePipes(
         fromX: _pipesDistance,
       );
-      _removePipes();
+      _removeLastPipes();
     }
     game.camera.viewfinder.zoom = 1.0;
   }
