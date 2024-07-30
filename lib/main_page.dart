@@ -1,8 +1,10 @@
 import 'dart:ui';
 
 import 'package:flame/game.dart';
+import 'package:flappy_dash/audio_helper.dart';
 import 'package:flappy_dash/bloc/game/game_cubit.dart';
 import 'package:flappy_dash/flappy_dash_game.dart';
+import 'package:flappy_dash/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

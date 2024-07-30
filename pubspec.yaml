@@ -40,6 +40,8 @@ dependencies:
   equatable: ^2.0.5
   flutter_bloc: ^8.1.6
   flutter_animate: ^4.5.0
+  flutter_soloud: ^2.0.2
+  get_it: ^7.7.0
 
 dev_dependencies:
   flutter_test:
@@ -67,6 +69,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/background/
+    - assets/audio/
 
   fonts:
     - family: Chewy
