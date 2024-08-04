@@ -1,15 +1,18 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flappy_dash/audio_helper.dart';
+import 'package:flappy_dash/domain/game_repository.dart';
+import 'package:flappy_dash/presentation/audio_helper.dart';
 
 part 'game_state.dart';
 
 class GameCubit extends Cubit<GameState> {
   GameCubit(
     this._audioHelper,
+    this._gameRepository,
   ) : super(const GameState());
 
   final AudioHelper _audioHelper;
+  final GameRepository _gameRepository;
 
   void startPlaying() {
     _audioHelper.playBackgroundAudio();
@@ -27,6 +30,7 @@ class GameCubit extends Cubit<GameState> {
   }
 
   void gameOver() {
+    _gameRepository.submitScore(state.currentScore);
     _audioHelper.stopBackgroundAudio();
     emit(state.copyWith(
       currentPlayingState: PlayingState.gameOver,
