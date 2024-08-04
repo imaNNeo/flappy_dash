@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:flappy_dash/bloc/game/game_cubit.dart';
+import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

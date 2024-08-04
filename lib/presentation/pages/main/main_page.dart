@@ -1,17 +1,12 @@
-import 'dart:ui';
 
 import 'package:flame/game.dart';
-import 'package:flappy_dash/audio_helper.dart';
-import 'package:flappy_dash/bloc/game/game_cubit.dart';
-import 'package:flappy_dash/flappy_dash_game.dart';
-import 'package:flappy_dash/service_locator.dart';
+import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
+import 'package:flappy_dash/presentation/flappy_dash_game.dart';
+import 'package:flappy_dash/presentation/widget/game_over_widget.dart';
+import 'package:flappy_dash/presentation/widget/tap_to_play.dart';
+import 'package:flappy_dash/presentation/widget/top_score.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'widget/game_over_widget.dart';
-import 'widget/tap_to_play.dart';
-import 'widget/top_score.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
