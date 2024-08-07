@@ -20,7 +20,7 @@ class GameRepository {
     return session;
   }
 
-  void submitScore(int score) async {
+  Future<void> submitScore(int score) async {
     await _nakamaDataSource.submitScore(_mainLeaderboard, score);
   }
 

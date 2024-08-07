@@ -4,24 +4,29 @@ class GameState with EquatableMixin {
   const GameState({
     this.currentScore = 0,
     this.currentPlayingState = PlayingState.idle,
+    this.leaderboard,
   });
 
   final int currentScore;
   final PlayingState currentPlayingState;
+  final LeaderboardRecordList? leaderboard;
 
   GameState copyWith({
     int? currentScore,
     PlayingState? currentPlayingState,
+    ValueWrapper<LeaderboardRecordList>? leaderboard,
   }) =>
       GameState(
         currentScore: currentScore ?? this.currentScore,
         currentPlayingState: currentPlayingState ?? this.currentPlayingState,
+        leaderboard: leaderboard != null ? leaderboard.value : this.leaderboard,
       );
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         currentScore,
         currentPlayingState,
+        leaderboard,
       ];
 }
 

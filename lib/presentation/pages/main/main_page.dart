@@ -1,8 +1,8 @@
-
 import 'package:flame/game.dart';
 import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flappy_dash/presentation/widget/game_over_widget.dart';
+import 'package:flappy_dash/presentation/widget/leaderboard_top_n.dart';
 import 'package:flappy_dash/presentation/widget/tap_to_play.dart';
 import 'package:flappy_dash/presentation/widget/top_score.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +26,7 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     gameCubit = BlocProvider.of<GameCubit>(context);
     _flappyDashGame = FlappyDashGame(gameCubit);
+    gameCubit.onPageOpen();
     super.initState();
   }
 
@@ -54,6 +55,13 @@ class _MainPageState extends State<MainPage> {
                   child: TapToPlay(),
                 ),
               if (state.currentPlayingState.isNotGameOver) const TopScore(),
+              if (state.leaderboard != null)
+                Align(
+                  alignment: Alignment.topRight,
+                  child: LeaderboardTopN(
+                    leaderboard: state.leaderboard!,
+                  ),
+                ),
             ],
           ),
         );
