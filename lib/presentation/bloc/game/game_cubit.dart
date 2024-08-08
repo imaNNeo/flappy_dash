@@ -1,4 +1,7 @@
+import 'dart:collection';
+
 import 'package:equatable/equatable.dart';
+import 'package:flappy_dash/domain/entities/other_dash_entity.dart';
 import 'package:flappy_dash/domain/entities/value_wrapper.dart';
 import 'package:flappy_dash/domain/game_repository.dart';
 import 'package:flappy_dash/presentation/audio_helper.dart';
@@ -11,12 +14,13 @@ class GameCubit extends Cubit<GameState> {
   GameCubit(
     this._audioHelper,
     this._gameRepository,
-  ) : super(const GameState());
+  ) : super(GameState());
 
   final AudioHelper _audioHelper;
   final GameRepository _gameRepository;
 
   void onPageOpen() async {
+    await _initMatch();
     await _refreshLeaderboard();
   }
 
@@ -25,6 +29,18 @@ class GameCubit extends Cubit<GameState> {
     emit(state.copyWith(
       leaderboard: ValueWrapper(leaderboard),
     ));
+  }
+
+  Future<void> _initMatch() async {
+    final (match, matchDataStream, matchPresenceStream) =
+        await _gameRepository.initMainMatch();
+    emit(state.copyWith(
+      currentMatch: ValueWrapper(match),
+    ));
+
+    matchDataStream.listen((matchData) {
+      matchData.data -> we need to convert it to x and y (utf8decode and jsonDecode)
+    });
   }
 
   void startPlaying() {
@@ -56,5 +72,12 @@ class GameCubit extends Cubit<GameState> {
       currentPlayingState: PlayingState.idle,
       currentScore: 0,
     ));
+  }
+
+  void updatePlayerPosition(double x, double y) {
+    if (state.currentMatch == null) {
+      return;
+    }
+    _gameRepository.updatePlayerPosition(state.currentMatch!.matchId, x, y);
   }
 }

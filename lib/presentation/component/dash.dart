@@ -51,6 +51,7 @@ class Dash extends PositionComponent
     _velocity += _gravity * dt;
     position += _velocity * dt;
     position.x += speed * dt;
+    bloc.updatePlayerPosition(position.x, position.y);
   }
 
   void jump() {
