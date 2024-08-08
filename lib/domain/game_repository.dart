@@ -29,4 +29,19 @@ class GameRepository {
       _mainLeaderboard,
     );
   }
+
+  Future<(Match, Stream<MatchData>, Stream<MatchPresenceEvent>)>
+      initMainMatch() => _nakamaDataSource.initMainMatch();
+
+  Future<void> updatePlayerPosition(
+    String matchId,
+    double x,
+    double y,
+  ) async {
+    await _nakamaDataSource.updatePlayerPositionOnMatch(
+      matchId,
+      x,
+      y,
+    );
+  }
 }
