@@ -10,11 +10,9 @@ class PipePair extends PositionComponent
   PipePair({
     required super.position,
     this.gap = 200.0,
-    this.speed = 200.0,
   });
 
   final double gap;
-  final double speed;
 
   @override
   Future<void> onLoad() async {
@@ -32,20 +30,5 @@ class PipePair extends PositionComponent
         position: Vector2(30, 0),
       ),
     ]);
-  }
-
-  @override
-  void update(double dt) {
-    switch (bloc.state.currentPlayingState) {
-      case PlayingState.paused:
-      case PlayingState.gameOver:
-      case PlayingState.idle:
-        // We don't move it
-        break;
-      case PlayingState.playing:
-        position.x -= speed * dt;
-        break;
-    }
-    super.update(dt);
   }
 }
