@@ -32,40 +32,44 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<GameCubit, GameState>(
-      listener: (context, state) {
-        if (state.currentPlayingState.isIdle &&
-            _latestState == PlayingState.gameOver) {
-          setState(() {
-            _flappyDashGame = FlappyDashGame(gameCubit);
-          });
-        }
-
-        _latestState = state.currentPlayingState;
-      },
-      builder: (context, state) {
-        return Scaffold(
-          body: Stack(
-            children: [
-              GameWidget(game: _flappyDashGame),
-              if (state.currentPlayingState.isGameOver) const GameOverWidget(),
-              if (state.currentPlayingState.isIdle)
-                const Align(
-                  alignment: Alignment(0, 0.2),
-                  child: TapToPlay(),
-                ),
-              if (state.currentPlayingState.isNotGameOver) const TopScore(),
-              if (state.leaderboard != null)
-                Align(
-                  alignment: Alignment.topRight,
-                  child: LeaderboardTopN(
-                    leaderboard: state.leaderboard!,
-                  ),
-                ),
-            ],
-          ),
-        );
-      },
+    return Scaffold(
+      body: Stack(
+        children: [
+          GameWidget(game: _flappyDashGame),
+          BlocConsumer<GameCubit, GameState>(
+            listener: (context, state) {
+              if (state.currentPlayingState.isIdle &&
+                  _latestState == PlayingState.gameOver) {
+                setState(() {
+                  _flappyDashGame = FlappyDashGame(gameCubit);
+                });
+              }
+              _latestState = state.currentPlayingState;
+            },
+            builder: (context, state) {
+              return Stack(
+                children: [
+                  if (state.currentPlayingState.isGameOver)
+                    const GameOverWidget(),
+                  if (state.currentPlayingState.isIdle)
+                    const Align(
+                      alignment: Alignment(0, 0.2),
+                      child: TapToPlay(),
+                    ),
+                  if (state.currentPlayingState.isNotGameOver) const TopScore(),
+                  if (state.leaderboard != null)
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: LeaderboardTopN(
+                        leaderboard: state.leaderboard!,
+                      ),
+                    ),
+                ],
+              );
+            },
+          )
+        ],
+      ),
     );
   }
 }
