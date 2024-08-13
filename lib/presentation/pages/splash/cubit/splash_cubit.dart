@@ -13,16 +13,20 @@ class SplashCubit extends Cubit<SplashState> {
   final GameRepository _gameRepository;
 
   void onPageOpen() async {
-    final startTime = DateTime.now();
-    await _gameRepository.initSession();
+    try {
+      final startTime = DateTime.now();
+      await _gameRepository.initSession();
 
-    final endTime = DateTime.now();
-    final difference = endTime.difference(startTime);
-    if (difference < _splashDuration) {
-      await Future.delayed(_splashDuration - difference);
+      final endTime = DateTime.now();
+      final difference = endTime.difference(startTime);
+      if (difference < _splashDuration) {
+            await Future.delayed(_splashDuration - difference);
+          }
+
+      _openHomePage();
+    } catch (e, stack) {
+      print('error: $e, $stack');
     }
-
-    _openHomePage();
   }
 
   void _openHomePage() async {

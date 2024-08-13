@@ -6,6 +6,7 @@ import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
 import 'package:flappy_dash/presentation/component/pipe.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
+import 'package:flutter/material.dart';
 
 import 'hidden_coin.dart';
 
@@ -32,7 +33,19 @@ class Dash extends PositionComponent
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    _dashSprite = await Sprite.load('dash.png');
+    final index = bloc.state.currentUserId == null
+        ? 0
+        : bloc.state.currentUserId.hashCode % 7;
+    _dashSprite = await Sprite.load(switch (index) {
+      0 => 'dash.png',
+      1 => 'dash_black.png',
+      2 => 'dash_cyan.png',
+      3 => 'dash_green.png',
+      4 => 'dash_orange.png',
+      5 => 'dash_pink.png',
+      6 => 'dash_yellow.png',
+      _ => throw Exception('Invalid index'),
+    });
     final radius = size.x / 2;
     final center = size / 2;
     add(CircleHitbox(
@@ -51,6 +64,11 @@ class Dash extends PositionComponent
     _velocity += _gravity * dt;
     position += _velocity * dt;
     position.x += speed * dt;
+    bloc.updatePlayerPosition(position.x, position.y);
+
+    if (position.y.abs() >= gameRef.size.y) {
+      bloc.gameOver();
+    }
   }
 
   void jump() {

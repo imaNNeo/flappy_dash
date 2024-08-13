@@ -11,6 +11,7 @@ class NakamaDataSource {
   );
 
   late Session currentSession;
+  NakamaWebsocketClient? websocket;
 
   Future<Session> initSession(
     String deviceId,
@@ -18,8 +19,6 @@ class NakamaDataSource {
     currentSession = await client.authenticateDevice(
       deviceId: deviceId,
     );
-
-    // refresh if needed
     return currentSession;
   }
 
@@ -37,4 +36,32 @@ class NakamaDataSource {
         session: currentSession,
         leaderboardName: leaderboardName,
       );
+
+  Future<(Match, Stream<MatchData>, Stream<MatchPresenceEvent>)>
+      initMainMatch() async {
+    if (websocket != null) {
+      await websocket!.close();
+    }
+    websocket = NakamaWebsocketClient.init(
+      host: '188.166.38.155',
+      ssl: false,
+      token: currentSession.token,
+    );
+    return (
+      await websocket!.createMatch('main_match'),
+      websocket!.onMatchData,
+      websocket!.onMatchPresence,
+    );
+  }
+
+  Future<void> sendMatchData(String matchId, Int64 opCode, List<int> data) async {
+    if (websocket == null) {
+      await initMainMatch();
+    }
+    websocket!.sendMatchData(
+      matchId: matchId,
+      opCode: opCode,
+      data: data,
+    );
+  }
 }

@@ -35,7 +35,14 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       body: Stack(
         children: [
-          GameWidget(game: _flappyDashGame),
+          GameWidget(
+            game: _flappyDashGame,
+            errorBuilder: (context, error) {
+              return const Center(
+                child: Text('Error loading game'),
+              );
+            },
+          ),
           BlocConsumer<GameCubit, GameState>(
             listener: (context, state) {
               if (state.currentPlayingState.isIdle &&
