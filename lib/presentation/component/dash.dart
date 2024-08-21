@@ -15,14 +15,19 @@ class Dash extends PositionComponent
         CollisionCallbacks,
         HasGameRef<FlappyDashGame>,
         FlameBlocReader<GameCubit, GameState> {
-  Dash({this.speed = 200.0})
-      : super(
-          position: Vector2(0, 0),
+  Dash({
+    required super.position,
+    required this.isMe,
+    required this.userId,
+    this.speed = 200.0,
+  }) : super(
           size: Vector2.all(80.0),
           anchor: Anchor.center,
-          priority: 10,
+          priority: isMe ? 10 : 9,
         );
 
+  final bool isMe;
+  final String userId;
   late Sprite _dashSprite;
 
   final Vector2 _gravity = Vector2(0, 1400.0);
@@ -30,13 +35,25 @@ class Dash extends PositionComponent
   final Vector2 _jumpForce = Vector2(0, -500);
   final double speed;
 
+  static const _correctPositionEvery = 0.1;
+  double correctPositionAfter = _correctPositionEvery;
+
+
+  static const _printTestLogEvery = 1.0;
+  double printTestLogAfter = _printTestLogEvery;
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    final index = bloc.state.currentUserId == null
-        ? 0
-        : bloc.state.currentUserId.hashCode % 7;
-    _dashSprite = await Sprite.load(switch (index) {
+    int colorIndex = 0;
+    if (isMe) {
+      colorIndex = bloc.state.currentUserId == null
+          ? 0
+          : bloc.state.currentUserId.hashCode % 7;
+    } else {
+      colorIndex = userId.hashCode % 7;
+    }
+    _dashSprite = await Sprite.load(switch (colorIndex) {
       0 => 'dash.png',
       1 => 'dash_black.png',
       2 => 'dash_cyan.png',
@@ -58,24 +75,47 @@ class Dash extends PositionComponent
   @override
   void update(double dt) {
     super.update(dt);
-    if (bloc.state.currentPlayingState.isNotPlaying) {
-      return;
-    }
-    _velocity += _gravity * dt;
-    position += _velocity * dt;
-    position.x += speed * dt;
-    bloc.updatePlayerPosition(position.x, position.y);
+    if (isMe) {
+      if (bloc.state.currentPlayingState.isNotPlaying) {
+        return;
+      }
+      _velocity += _gravity * dt;
+      position += _velocity * dt;
+      position.x += speed * dt;
+      bloc.updateMyPosition(position);
+      if (position.y.abs() >= gameRef.size.y) {
+        bloc.gameOver();
+      }
 
-    if (position.y.abs() >= gameRef.size.y) {
-      bloc.gameOver();
+      correctPositionAfter -= dt;
+      if (correctPositionAfter <= 0) {
+        correctPositionAfter = _correctPositionEvery;
+        bloc.sendCorrectPositionEvent(position);
+      }
+    } else {
+      // Others
+      printTestLogAfter -= dt;
+      if (printTestLogAfter <= 0) {
+        printTestLogAfter = _printTestLogEvery;
+      }
+      if (bloc.state.otherDashes[userId]!.playingState.isNotPlaying) {
+        return;
+      }
+      _velocity += _gravity * dt;
+      position += _velocity * dt;
+      position.x += speed * dt;
     }
   }
 
   void jump() {
-    if (bloc.state.currentPlayingState.isNotPlaying) {
+    if (isMe && bloc.state.currentPlayingState.isNotPlaying) {
       return;
     }
     _velocity = _jumpForce;
+
+    if (isMe) {
+      bloc.sendJumpEvent(position);
+    }
   }
 
   @override
@@ -90,6 +130,9 @@ class Dash extends PositionComponent
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
+    if (!isMe) {
+      return;
+    }
     if (bloc.state.currentPlayingState.isNotPlaying) {
       return;
     }

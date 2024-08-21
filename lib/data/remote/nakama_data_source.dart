@@ -37,7 +37,7 @@ class NakamaDataSource {
         leaderboardName: leaderboardName,
       );
 
-  Future<(Match, Stream<MatchData>, Stream<MatchPresenceEvent>)>
+  Future<(RealtimeMatch, Stream<MatchData>, Stream<MatchPresenceEvent>)>
       initMainMatch() async {
     if (websocket != null) {
       await websocket!.close();
@@ -48,16 +48,13 @@ class NakamaDataSource {
       token: currentSession.token,
     );
     return (
-      await websocket!.createMatch('main_match'),
+      await websocket!.createMatch('main_match') as RealtimeMatch,
       websocket!.onMatchData,
       websocket!.onMatchPresence,
     );
   }
 
   Future<void> sendMatchData(String matchId, Int64 opCode, List<int> data) async {
-    if (websocket == null) {
-      await initMainMatch();
-    }
     websocket!.sendMatchData(
       matchId: matchId,
       opCode: opCode,

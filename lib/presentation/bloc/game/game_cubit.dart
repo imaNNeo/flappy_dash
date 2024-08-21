@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:collection';
-
 import 'package:equatable/equatable.dart';
+import 'package:flame/components.dart';
 import 'package:flappy_dash/domain/entities/game_config_entity.dart';
-import 'package:flappy_dash/domain/entities/other_dash_entity.dart';
+import 'package:flappy_dash/domain/entities/game_event.dart';
 import 'package:flappy_dash/domain/entities/value_wrapper.dart';
+import 'package:flappy_dash/domain/extensions/map_extensions.dart';
 import 'package:flappy_dash/domain/game_repository.dart';
 import 'package:flappy_dash/presentation/audio_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,7 +22,14 @@ class GameCubit extends Cubit<GameState> {
   final AudioHelper _audioHelper;
   final GameRepository _gameRepository;
 
-  late StreamSubscription _matchStreamSubscription;
+  late StreamSubscription _gameDataStreamSubscription;
+  late StreamSubscription _matchPresenceStreamSubscription;
+
+  final StreamController<(UserPresence, GameEvent)> _gameEventStreamController =
+      StreamController<(UserPresence, GameEvent)>.broadcast();
+
+  Stream<(UserPresence, GameEvent)> get otherDashesEventStream =>
+      _gameEventStreamController.stream;
 
   void onPageOpen() async {
     emit(state.copyWith(
@@ -39,25 +47,139 @@ class GameCubit extends Cubit<GameState> {
   }
 
   Future<void> _initMatch() async {
-    final (match, subscription) = await _gameRepository.initMainMatch();
+    final (match, gameEventStream, matchPresenceStream) =
+        await _gameRepository.initMainMatch();
     emit(state.copyWith(
       currentMatch: ValueWrapper(match),
     ));
+    _gameDataStreamSubscription = gameEventStream.listen(
+      (data) {
+        final (presence, event) = data;
+        switch (event) {
+          case StartGameEventData():
+            final newOtherDashes = state.otherDashes.updateAndReturn(
+              presence.userId,
+              state.otherDashes[presence.userId]!.copyWith(
+                playingState: OtherDashPlayingState.playing,
+              ),
+            );
 
-    _matchStreamSubscription = subscription;
-    _gameRepository.otherPlayerPositionDataStream.listen((newData) {
-      final (presence, position) = newData;
-      final newOtherDashes = Map.of(state.otherDashes);
-      newOtherDashes[presence.userId] = OtherDashData(
-        userId: presence.userId,
-        x: position.x,
-        y: position.y,
-        userName: presence.username,
+            final newLastKnownPosition =
+                state.otherDashesLastKnownPosition.updateAndReturn(
+              presence.userId,
+              Vector2(event.x, event.y),
+            );
+            emit(state.copyWith(
+              otherDashes: newOtherDashes,
+              otherDashesLastKnownPosition: newLastKnownPosition,
+            ));
+            break;
+          case LetsTryAgainEventData():
+            final newMap = state.otherDashes.updateAndReturn(
+              presence.userId,
+              state.otherDashes[presence.userId]!.copyWith(
+                playingState: OtherDashPlayingState.idle,
+              ),
+            );
+            emit(state.copyWith(otherDashes: newMap));
+            break;
+          case JumpEventData():
+            final newLastKnownPosition =
+                state.otherDashesLastKnownPosition.updateAndReturn(
+              presence.userId,
+              Vector2(event.x, event.y),
+            );
+            emit(state.copyWith(
+              otherDashesLastKnownPosition: newLastKnownPosition,
+            ));
+            break;
+          case CorrectPositionEventData():
+            final newLastKnownPosition =
+                state.otherDashesLastKnownPosition.updateAndReturn(
+              presence.userId,
+              Vector2(event.x, event.y),
+            );
+            emit(state.copyWith(
+              otherDashesLastKnownPosition: newLastKnownPosition,
+            ));
+            break;
+          case UpdateScoreEventData():
+            final newMap = state.otherDashes.updateAndReturn(
+              presence.userId,
+              state.otherDashes[presence.userId]!.copyWith(
+                score: event.score,
+              ),
+            );
+            emit(state.copyWith(otherDashes: newMap));
+            break;
+          case LooseEventData():
+            final newMap = state.otherDashes.updateAndReturn(
+              presence.userId,
+              state.otherDashes[presence.userId]!.copyWith(
+                playingState: OtherDashPlayingState.gameOver,
+              ),
+            );
+
+            final newLastKnownPosition =
+                state.otherDashesLastKnownPosition.updateAndReturn(
+              presence.userId,
+              Vector2(event.x, event.y),
+            );
+            emit(state.copyWith(
+              otherDashes: newMap,
+              otherDashesLastKnownPosition: newLastKnownPosition,
+            ));
+            break;
+        }
+        _gameEventStreamController.add(data);
+      },
+    );
+
+    _initPresencesInMatch(match);
+    _matchPresenceStreamSubscription =
+        matchPresenceStream.listen(_handlePresenceEvent);
+  }
+
+  void _initPresencesInMatch(RealtimeMatch match) {
+    final newOtherDashes = Map.of(state.otherDashes);
+    for (var element in match.presences) {
+      if (element.userId == state.currentUserId) {
+        continue;
+      }
+      newOtherDashes[element.userId] = OtherDashState(
+        score: 0,
+        name: element.username,
+        playingState: OtherDashPlayingState.idle,
       );
-      emit(state.copyWith(
-        otherDashes: newOtherDashes,
-      ));
-    });
+    }
+    emit(state.copyWith(otherDashes: newOtherDashes));
+  }
+
+  void _handlePresenceEvent(MatchPresenceEvent event) {
+    final newOtherDashes = Map.of(state.otherDashes);
+    for (var element in event.leaves) {
+      if (element.userId == state.currentUserId) {
+        continue;
+      }
+      newOtherDashes.remove(element.userId);
+    }
+    for (var element in event.joins) {
+      if (element.userId == state.currentUserId) {
+        continue;
+      }
+      newOtherDashes[element.userId] = OtherDashState(
+        score: 0,
+        name: element.username,
+        playingState: OtherDashPlayingState.idle,
+      );
+    }
+    emit(state.copyWith(otherDashes: newOtherDashes));
+  }
+
+  void updateMyPosition(Vector2 position) {
+    emit(state.copyWith(
+      myPosition: ValueWrapper(position),
+    ));
   }
 
   void startPlaying() {
@@ -66,6 +188,7 @@ class GameCubit extends Cubit<GameState> {
       currentPlayingState: PlayingState.playing,
       currentScore: 0,
     ));
+    _sendStartGameEvent(Vector2.zero());
   }
 
   void increaseScore() {
@@ -73,9 +196,11 @@ class GameCubit extends Cubit<GameState> {
     emit(state.copyWith(
       currentScore: state.currentScore + 1,
     ));
+    _sendUpdateScoreEvent(state.currentScore);
   }
 
   void gameOver() async {
+    _sendLooseEvent(state.myPosition!);
     _audioHelper.stopBackgroundAudio();
     emit(state.copyWith(
       currentPlayingState: PlayingState.gameOver,
@@ -89,18 +214,56 @@ class GameCubit extends Cubit<GameState> {
       currentPlayingState: PlayingState.idle,
       currentScore: 0,
     ));
+    _sendLetsTryAgainEvent(Vector2.zero());
   }
 
-  void updatePlayerPosition(double x, double y) {
-    if (state.currentMatch == null) {
-      return;
-    }
-    _gameRepository.updatePlayerPosition(state.currentMatch!.matchId, x, y);
+  void _sendStartGameEvent(Vector2 position) {
+    _gameRepository.sendGameEvent(
+      state.currentMatch!.matchId,
+      StartGameEventData(x: position.x, y: position.y, score: 0),
+    );
+  }
+
+  void _sendLetsTryAgainEvent(Vector2 position) {
+    _gameRepository.sendGameEvent(
+      state.currentMatch!.matchId,
+      LetsTryAgainEventData(x: position.x, y: position.y, score: 0),
+    );
+  }
+
+  void sendJumpEvent(Vector2 position) {
+    _gameRepository.sendGameEvent(
+      state.currentMatch!.matchId,
+      JumpEventData(x: position.x, y: position.y),
+    );
+  }
+
+  void sendCorrectPositionEvent(Vector2 position) {
+    _gameRepository.sendGameEvent(
+      state.currentMatch!.matchId,
+      CorrectPositionEventData(x: position.x, y: position.y),
+    );
+  }
+
+  void _sendUpdateScoreEvent(int score) {
+    _gameRepository.sendGameEvent(
+      state.currentMatch!.matchId,
+      UpdateScoreEventData(score: score),
+    );
+  }
+
+  void _sendLooseEvent(Vector2 position) {
+    _gameRepository.sendGameEvent(
+      state.currentMatch!.matchId,
+      LooseEventData(x: position.x, y: position.y),
+    );
   }
 
   @override
   Future<void> close() async {
     super.close();
-    _matchStreamSubscription.cancel();
+    _gameDataStreamSubscription.cancel();
+    _matchPresenceStreamSubscription.cancel();
+    _gameEventStreamController.close();
   }
 }
