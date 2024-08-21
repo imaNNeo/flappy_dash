@@ -84,69 +84,74 @@ class _OtherDashesWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<GameCubit, GameState>(
       builder: (context, state) {
+        final userItems = <(bool isMe, String name, int score)>[];
+        userItems.addAll(
+          state.otherDashes.entries.map(
+            (entry) {
+              final otherDash = entry.value;
+              return (false, otherDash.name, otherDash.score);
+            },
+          ),
+        );
+        userItems.add((true, 'You', state.currentScore));
+        userItems.sort((a, b) => b.$3.compareTo(a.$3));
+
+
         return SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 12.0),
             child: Column(
-              children: state.otherDashes.keys.toList().asMap().entries.map(
+              children: userItems.asMap().entries.map(
                 (entry) {
                   final index = entry.key;
-                  final otherDashKey = entry.value;
-                  final otherDash = state.otherDashes[otherDashKey]!;
-                  return Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.green),
-                      color: Colors.black12,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "${index + 1}.",
-                          style: const TextStyle(
-                            color: Color(0xFFE76802),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                  final (isMe, name, score) = entry.value;
+                  return ConstrainedBox(
+                    constraints: const BoxConstraints(minWidth: 240, maxWidth: 240),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.green),
+                        color: Colors.black12,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "${index + 1}.",
+                            style: const TextStyle(
+                              color: Color(0xFFE76802),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          otherDash.name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            fontFamily: 'RobotoMono',
+                          const SizedBox(width: 6),
+                          Text(
+                            name,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              fontFamily: 'RobotoMono',
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 18),
-                        Text(
-                          otherDash.playingState.name,
-                          style: const TextStyle(
-                            color: Color(0xFF2387FC),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            fontFamily: 'RobotoMono',
-                          ),
-                        ),
-                        const SizedBox(width: 18),
-                        Text(
-                          otherDash.score.toString(),
-                          style: const TextStyle(
-                            color: Color(0xFF2387FC),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        )
-                      ],
+                          Expanded(child: Container()),
+                          Text(
+                            score.toString(),
+                            style: const TextStyle(
+                              color: Color(0xFF2387FC),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   );
                 },

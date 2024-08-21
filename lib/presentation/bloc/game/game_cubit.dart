@@ -186,7 +186,6 @@ class GameCubit extends Cubit<GameState> {
     _audioHelper.playBackgroundAudio();
     emit(state.copyWith(
       currentPlayingState: PlayingState.playing,
-      currentScore: 0,
     ));
     _sendStartGameEvent(Vector2.zero());
   }
@@ -212,7 +211,6 @@ class GameCubit extends Cubit<GameState> {
   void restartGame() {
     emit(state.copyWith(
       currentPlayingState: PlayingState.idle,
-      currentScore: 0,
     ));
     _sendLetsTryAgainEvent(Vector2.zero());
   }
