@@ -124,12 +124,8 @@ class FlappyDashRootComponent extends Component
   }
 
   @override
-  bool listenWhen(GameState previousState, GameState newState) {
-    final result = !mapEquals(previousState.otherDashes, newState.otherDashes);
-    print(
-        'check listenWhen, ${previousState.otherDashes}, ${newState.otherDashes}, $result');
-    return result;
-  }
+  bool listenWhen(GameState previousState, GameState newState) =>
+      !mapEquals(previousState.otherDashes, newState.otherDashes);
 
   @override
   void onNewState(GameState state) {
