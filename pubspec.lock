@@ -77,10 +77,10 @@ packages:
     dependency: transitive
     description:
       name: ffi
-      sha256: "493f37e7df1804778ff3a53bd691d8692ddf69702cf4c1c1096a2e41b4779e21"
+      sha256: "16ed7b077ef01ad6170a3d0c57caa4a112a38d7a2ed5602e0aca9ca6f3d98da6"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.2"
+    version: "2.1.3"
   flame:
     dependency: "direct main"
     description:
@@ -138,10 +138,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_soloud
-      sha256: "4d40f1561c184615393a08db6a569f230675bf2207d274e6e12c6f830bd08eed"
+      sha256: f4034e1cc6b8e0e43fb74343867b16a729b9d3274bfd7e6a688f248cac866b42
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.2"
+    version: "2.1.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
