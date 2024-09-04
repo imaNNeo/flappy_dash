@@ -2,7 +2,7 @@ import 'package:nakama/nakama.dart';
 
 class NakamaDataSource {
   final client = getNakamaClient(
-    host: '188.166.65.224',
+    host: 'api.flappydash.com',
     ssl: false,
     serverKey: const String.fromEnvironment('NAKAMA_SERVER_KEY'),
     grpcPort: 7349,
@@ -43,7 +43,7 @@ class NakamaDataSource {
       await websocket!.close();
     }
     websocket = NakamaWebsocketClient.init(
-      host: '188.166.65.224',
+      host: 'api.flappydash.com',
       ssl: false,
       token: currentSession.token,
     );
