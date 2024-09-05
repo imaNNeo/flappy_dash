@@ -143,7 +143,7 @@ class FlappyDashRootComponent extends Component
     print('Syncing other dashes2');
 
     // remove old dashes
-    for (final key in currentOtherDashes.keys) {
+    for (final key in currentOtherDashes.keys.toList()) {
       if (!newOtherDashes.containsKey(key)) {
         currentOtherDashes[key]!.removeFromParent();
         currentOtherDashes.remove(key);
