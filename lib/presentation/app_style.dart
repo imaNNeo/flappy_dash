@@ -4,8 +4,11 @@ class AppColors {
   static const backgroundColor = Color(0xFF0F8B8D);
 
   static const boxBgColor = Color(0x66000000);
+  static const dialogBgColor = Color(0xFF16425B);
   static const mainColor = Color(0xFF00FBFF);
+  static const blueColor = Color(0xFF26CBFE);
   static const whiteTextColor = Color(0xFFF1F1F1);
+  static const whiteTextColor2 = Color(0xFFDAD2D8);
 
   static const leaderboardGoldenColor = Color(0xFFFFD700);
   static const leaderboardGoldenColorText = Color(0xFF1C1B1F);
