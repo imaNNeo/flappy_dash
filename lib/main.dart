@@ -1,9 +1,10 @@
 import 'package:flappy_dash/audio_helper.dart';
-import 'package:flappy_dash/bloc/game/game_cubit.dart';
-import 'package:flappy_dash/main_page.dart';
+import 'package:flappy_dash/presentation/pages/main_page.dart';
 import 'package:flappy_dash/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'presentation/bloc/game/game_cubit.dart';
 
 void main() async {
   await setupServiceLocator();

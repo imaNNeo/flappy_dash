@@ -1,12 +1,13 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame_bloc/flame_bloc.dart';
-import 'package:flappy_dash/bloc/game/game_cubit.dart';
-import 'package:flappy_dash/component/hidden_coin.dart';
-import 'package:flappy_dash/component/pipe.dart';
-import 'package:flappy_dash/flappy_dash_game.dart';
+import 'package:flappy_dash/presentation/flappy_dash_game.dart';
+import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
+
+import 'hidden_coin.dart';
 
 class Dash extends PositionComponent
     with
