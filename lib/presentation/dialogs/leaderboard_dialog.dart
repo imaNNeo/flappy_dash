@@ -1,7 +1,7 @@
 import 'package:flappy_dash/presentation/app_style.dart';
+import 'package:flappy_dash/presentation/dialogs/app_dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 
 class LeaderBoardDialog extends StatelessWidget {
   const LeaderBoardDialog({super.key});
@@ -67,6 +67,7 @@ class LeaderBoardDialog extends StatelessWidget {
                     name: 'Player ${index + 1}',
                     score: index * 12,
                     isMine: index == 2,
+                    onMyProfileTap: () => AppDialogs.nicknameDialog(context),
                   );
                 },
                 separatorBuilder: (context, index) => Container(
@@ -90,19 +91,21 @@ class LeaderboardRow extends StatelessWidget {
     required this.name,
     required this.score,
     required this.isMine,
+    required this.onMyProfileTap,
   });
 
   final int rank;
   final String name;
   final int score;
   final bool isMine;
+  final VoidCallback? onMyProfileTap;
 
   @override
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: isMine ? () {} : null,
+        onTap: isMine ? onMyProfileTap : null,
         child: Container(
           color: isMine ? Colors.white10 : Colors.transparent,
           height: 64,
@@ -111,13 +114,13 @@ class LeaderboardRow extends StatelessWidget {
             children: [
               rank <= 3
                   ? ScoreTrophy(
-                size: 38,
-                rank: rank,
-              )
+                      size: 38,
+                      rank: rank,
+                    )
                   : NormalScore(
-                size: 38,
-                rank: rank,
-              ),
+                      size: 38,
+                      rank: rank,
+                    ),
               const SizedBox(width: 16),
               Text(
                 name,
