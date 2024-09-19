@@ -13,8 +13,8 @@ class AppDialogs {
     );
   }
 
-  static Future<void> nicknameDialog(BuildContext context) {
-    return showDialog(
+  static Future<String?> nicknameDialog(BuildContext context) {
+    return showDialog<String?>(
       context: context,
       builder: (context) {
         return const NicknameDialog();

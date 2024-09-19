@@ -1,5 +1,9 @@
+import 'package:flame/game.dart';
+import 'package:flame/game.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
+import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'box_overlay.dart';
@@ -18,12 +22,16 @@ class ProfileOverlay extends StatelessWidget {
             height: 32,
           ),
           const SizedBox(width: 12),
-          const Text(
-            'My Profile',
-            style: TextStyle(
-              color: AppColors.mainColor,
-              fontSize: 24,
-            ),
+          BlocBuilder<GameCubit, GameState>(
+            builder: (context, state) {
+              return Text(
+                state.currentUserAccount?.user.username ?? 'My Profile',
+                style: const TextStyle(
+                  color: AppColors.mainColor,
+                  fontSize: 24,
+                ),
+              );
+            },
           ),
         ],
       ),

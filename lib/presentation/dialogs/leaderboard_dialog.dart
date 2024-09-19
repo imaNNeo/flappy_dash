@@ -1,10 +1,24 @@
 import 'package:flappy_dash/presentation/app_style.dart';
+import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
 import 'package:flappy_dash/presentation/dialogs/app_dialogs.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class LeaderBoardDialog extends StatelessWidget {
+class LeaderBoardDialog extends StatefulWidget {
   const LeaderBoardDialog({super.key});
+
+  @override
+  State<LeaderBoardDialog> createState() => _LeaderBoardDialogState();
+}
+
+class _LeaderBoardDialogState extends State<LeaderBoardDialog> {
+
+  @override
+  void initState() {
+    context.read<GameCubit>().refreshLeaderboard();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,23 +73,37 @@ class LeaderBoardDialog extends StatelessWidget {
             ),
             SizedBox(
               height: 400,
-              child: ListView.separated(
-                padding: const EdgeInsets.only(top: 18, bottom: 12),
-                itemBuilder: (context, index) {
-                  return LeaderboardRow(
-                    rank: index + 1,
-                    name: 'Player ${index + 1}',
-                    score: index * 12,
-                    isMine: index == 2,
-                    onMyProfileTap: () => AppDialogs.nicknameDialog(context),
-                  );
-                },
-                separatorBuilder: (context, index) => Container(
-                  height: 1,
-                  color: Colors.white10,
-                ),
-                itemCount: 20,
-              ),
+              child:
+                  BlocBuilder<GameCubit, GameState>(builder: (context, state) {
+                return ListView.separated(
+                  padding: const EdgeInsets.only(top: 18, bottom: 12),
+                  itemBuilder: (context, index) {
+                    final record = state.leaderboardRecordList!.records[index];
+                    return LeaderboardRow(
+                      rank: record.rank ?? 9999,
+                      name: record.username ?? record.ownerId ?? '',
+                      score: record.score ?? 0,
+                      isMine: record.username ==
+                          state.currentUserAccount?.user.username,
+                      onMyProfileTap: () async {
+                        final result = await AppDialogs.nicknameDialog(context);
+                        if (!context.mounted) {
+                          return;
+                        }
+                        if (result != null && result.isNotEmpty) {
+                          final gameCubit = context.read<GameCubit>();
+                          gameCubit.updateUserName(result);
+                        }
+                      },
+                    );
+                  },
+                  separatorBuilder: (context, index) => Container(
+                    height: 1,
+                    color: Colors.white10,
+                  ),
+                  itemCount: state.leaderboardRecordList?.records.length ?? 0,
+                );
+              }),
             ),
           ],
         ),
