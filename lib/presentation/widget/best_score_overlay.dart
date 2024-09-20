@@ -1,6 +1,6 @@
 import 'package:flappy_dash/presentation/app_style.dart';
+import 'package:flappy_dash/presentation/dialogs/leaderboard_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'box_overlay.dart';
 
@@ -16,37 +16,12 @@ class BestScoreOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     return BoxOverlay(
       onTap: onTap,
-      child: Row(
+      child: const Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            width: 32,
-            height: 32,
-            child: Stack(
-              children: [
-                SvgPicture.asset(
-                  'assets/icons/ic_trophy.svg',
-                  height: 32,
-                  colorFilter: const ColorFilter.mode(
-                    AppColors.leaderboardGoldenColor,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                const Align(
-                  alignment: Alignment(0.0, -0.8),
-                  child: Text(
-                    '2',
-                    style: TextStyle(
-                      color: AppColors.leaderboardGoldenColorText,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 18),
-          const Column(
+          ScoreTrophy(size: 32, rank: 1),
+          SizedBox(width: 18),
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
