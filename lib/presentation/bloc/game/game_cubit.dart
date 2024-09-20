@@ -33,12 +33,13 @@ class GameCubit extends Cubit<GameState> {
     ));
   }
 
-  void gameOver() {
-    _gameRepository.submitScore(state.currentScore);
+  void gameOver() async {
     _audioHelper.stopBackgroundAudio();
     emit(state.copyWith(
       currentPlayingState: PlayingState.gameOver,
     ));
+    await _gameRepository.submitScore(state.currentScore);
+    await _refreshLeaderboard();
   }
 
   void restartGame() {
