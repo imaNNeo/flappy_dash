@@ -1,5 +1,4 @@
-import 'package:flame/game.dart';
-import 'package:flame/game.dart';
+import 'package:flappy_dash/domain/extensions/string_extension.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
 import 'package:flutter/material.dart';
@@ -24,8 +23,10 @@ class ProfileOverlay extends StatelessWidget {
           const SizedBox(width: 12),
           BlocBuilder<GameCubit, GameState>(
             builder: (context, state) {
+              final displayName = state.currentUserAccount?.user.displayName;
+
               return Text(
-                state.currentUserAccount?.user.username ?? 'My Profile',
+                displayName.isNotNullOrBlank ? displayName! : 'My Profile',
                 style: const TextStyle(
                   color: AppColors.mainColor,
                   fontSize: 24,

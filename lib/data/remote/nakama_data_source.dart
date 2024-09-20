@@ -16,8 +16,7 @@ class NakamaDataSource {
     String deviceId,
   ) async {
     _currentSession = await client.authenticateDevice(
-      deviceId: 'test-device-id',
-      username: 'iman_neo',
+      deviceId: deviceId,
     );
     return _currentSession;
   }
@@ -47,10 +46,23 @@ class NakamaDataSource {
 
   Future<Account> getAccount() => client.getAccount(_currentSession);
 
-  void updateUserName(String newUserName) {
-    client.updateAccount(
+  Future<List<User>> getUsers(List<String> userIds) => client.getUsers(
+        session: _currentSession,
+        ids: userIds,
+      );
+
+  Future<void> updateUserDisplayName(String newDisplayName) =>
+      client.updateAccount(
+        session: _currentSession,
+        displayName: newDisplayName,
+      );
+
+  Future<LeaderboardRecordList> listLeaderboardRecordsAroundOwner(
+      String leaderboardName) {
+    return client.listLeaderboardRecordsAroundOwner(
       session: _currentSession,
-      username: newUserName,
+      ownerId: _currentSession.userId,
+      leaderboardName: leaderboardName,
     );
   }
 }

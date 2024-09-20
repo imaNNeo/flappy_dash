@@ -4,26 +4,25 @@ class GameState with EquatableMixin {
   const GameState({
     this.currentScore = 0,
     this.currentPlayingState = PlayingState.idle,
-    this.leaderboardRecordList,
+    this.leaderboardEntity,
     this.currentUserAccount,
   });
 
   final int currentScore;
   final PlayingState currentPlayingState;
-  final LeaderboardRecordList? leaderboardRecordList;
+  final LeaderboardEntity? leaderboardEntity;
   final Account? currentUserAccount;
 
   GameState copyWith({
     int? currentScore,
     PlayingState? currentPlayingState,
-    LeaderboardRecordList? leaderboardRecordList,
+    LeaderboardEntity? leaderboardEntity,
     Account? currentUserAccount,
   }) =>
       GameState(
         currentScore: currentScore ?? this.currentScore,
         currentPlayingState: currentPlayingState ?? this.currentPlayingState,
-        leaderboardRecordList:
-            leaderboardRecordList ?? this.leaderboardRecordList,
+        leaderboardEntity: leaderboardEntity ?? this.leaderboardEntity,
         currentUserAccount: currentUserAccount ?? this.currentUserAccount,
       );
 
@@ -31,7 +30,7 @@ class GameState with EquatableMixin {
   List<Object?> get props => [
         currentScore,
         currentPlayingState,
-        leaderboardRecordList,
+        leaderboardEntity,
         currentUserAccount,
       ];
 }

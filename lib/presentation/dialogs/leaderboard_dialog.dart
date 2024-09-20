@@ -13,7 +13,6 @@ class LeaderBoardDialog extends StatefulWidget {
 }
 
 class _LeaderBoardDialogState extends State<LeaderBoardDialog> {
-
   @override
   void initState() {
     context.read<GameCubit>().refreshLeaderboard();
@@ -78,13 +77,13 @@ class _LeaderBoardDialogState extends State<LeaderBoardDialog> {
                 return ListView.separated(
                   padding: const EdgeInsets.only(top: 18, bottom: 12),
                   itemBuilder: (context, index) {
-                    final record = state.leaderboardRecordList!.records[index];
+                    final (record, name) = state.leaderboardEntity![index];
                     return LeaderboardRow(
                       rank: record.rank ?? 9999,
-                      name: record.username ?? record.ownerId ?? '',
+                      name: name,
                       score: record.score ?? 0,
-                      isMine: record.username ==
-                          state.currentUserAccount?.user.username,
+                      isMine: record.ownerId ==
+                          state.currentUserAccount?.user.id,
                       onMyProfileTap: () async {
                         final result = await AppDialogs.nicknameDialog(context);
                         if (!context.mounted) {
@@ -92,7 +91,7 @@ class _LeaderBoardDialogState extends State<LeaderBoardDialog> {
                         }
                         if (result != null && result.isNotEmpty) {
                           final gameCubit = context.read<GameCubit>();
-                          gameCubit.updateUserName(result);
+                          gameCubit.updateUserDisplayName(result);
                         }
                       },
                     );
@@ -101,7 +100,7 @@ class _LeaderBoardDialogState extends State<LeaderBoardDialog> {
                     height: 1,
                     color: Colors.white10,
                   ),
-                  itemCount: state.leaderboardRecordList?.records.length ?? 0,
+                  itemCount: state.leaderboardEntity?.length ?? 0,
                 );
               }),
             ),

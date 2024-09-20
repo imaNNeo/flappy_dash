@@ -1,4 +1,5 @@
-import 'package:bloc/bloc.dart';
+import 'package:flappy_dash/domain/entities/leaderboard_entity.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flappy_dash/audio_helper.dart';
 import 'package:flappy_dash/domain/repositories/game_repository.dart';
@@ -49,22 +50,24 @@ class GameCubit extends Cubit<GameState> {
 
   void _init() async {
     await _updateLeaderboard();
+    await _refreshCurrentUserAccount();
+  }
+
+  Future<void> _refreshCurrentUserAccount() async {
     final account = await _gameRepository.getCurrentUserAccount();
-    emit(state.copyWith(
-      currentUserAccount: account,
-    ));
+    emit(state.copyWith(currentUserAccount: account));
   }
 
   Future<void> _updateLeaderboard() async {
     final leaderboard = await _gameRepository.getLeaderboard();
-    print(leaderboard.records.map((e) => e.username));
     emit(state.copyWith(
-      leaderboardRecordList: leaderboard,
+      leaderboardEntity: leaderboard,
     ));
   }
 
-  void updateUserName(String newUserName) {
-    _gameRepository.updateUserName(newUserName);
+  void updateUserDisplayName(String newUserDisplayName) async {
+    await _gameRepository.updateUserDisplayName(newUserDisplayName);
+    await _refreshCurrentUserAccount();
   }
 
   void refreshLeaderboard() async {
