@@ -50,9 +50,12 @@ class GameRepository {
     return _nakamaDataSource.getAccount();
   }
 
-  Future<LeaderboardRecord> submitScore(int score) async {
+  Future<void> submitScore(int score) async {
     await _initializationCompleter.future;
-    return _nakamaDataSource.submitScore(score, _mainLeaderboard);
+    if (score == 0) {
+      return;
+    }
+    await _nakamaDataSource.submitScore(score, _mainLeaderboard);
   }
 
   Future<void> updateUserDisplayName(String newUserDisplayName) async {
