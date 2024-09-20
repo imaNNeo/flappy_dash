@@ -79,9 +79,9 @@ class _LeaderBoardDialogState extends State<LeaderBoardDialog> {
                   itemBuilder: (context, index) {
                     final (record, name) = state.leaderboardEntity![index];
                     return LeaderboardRow(
-                      rank: record.rank ?? 9999,
+                      rank: int.parse(record.rank ?? '9999'),
                       name: name,
-                      score: record.score ?? 0,
+                      score: int.parse(record.score ?? '0'),
                       isMine: record.ownerId ==
                           state.currentUserAccount?.user.id,
                       onMyProfileTap: () => AppDialogs.nicknameDialog(context),

@@ -57,14 +57,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.0"
-  chopper:
-    dependency: transitive
-    description:
-      name: chopper
-      sha256: "1b6280ec22841b844448bec8ef2644d9cbe9ea8dfce13ec9cab9e8d3aac3830d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "7.4.0"
   clock:
     dependency: transitive
     description:
@@ -113,6 +105,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.1"
+  dio:
+    dependency: transitive
+    description:
+      name: dio
+      sha256: "5598aa796bbf4699afd5c67c0f5f6e2ed542afc956884b9cd58c306966efc260"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.7.0"
+  dio_web_adapter:
+    dependency: transitive
+    description:
+      name: dio_web_adapter
+      sha256: "33259a9276d6cea88774a0000cfae0d861003497755969c92faa223108620dc8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   equatable:
     dependency: "direct main"
     description:
@@ -379,10 +387,11 @@ packages:
   nakama:
     dependency: "direct main"
     description:
-      name: nakama
-      sha256: "69baed63158c160e1bd039e751c14de1d443bf86bd11f35f27fe424149fde0c3"
-      url: "https://pub.dev"
-    source: hosted
+      path: nakama
+      ref: HEAD
+      resolved-ref: "06c60cb31ebbd34309ee9a19dc0c3c4bcefa6e58"
+      url: "https://github.com/heroiclabs/nakama-dart.git"
+    source: git
     version: "1.1.0"
   nested:
     dependency: transitive
@@ -504,22 +513,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.2"
-  qs_dart:
+  retrofit:
     dependency: transitive
     description:
-      name: qs_dart
-      sha256: "8dddeaf1d32fe407e253840b2c25c9ab5bf347d2761d82cb4ce010096565c9ff"
+      name: retrofit
+      sha256: "3c9885ef3dbc5dc4b3fb0a40c972ab52e4dad04d52dac9bba24dfa76cf100451"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.3"
-  recursive_regex:
-    dependency: transitive
-    description:
-      name: recursive_regex
-      sha256: f7252e3d3dfd1665e594d9fe035eca6bc54139b1f2fee38256fa427ea41adc60
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
+    version: "4.4.1"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -693,14 +694,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "14.2.5"
-  weak_map:
-    dependency: transitive
-    description:
-      name: weak_map
-      sha256: "95ca338f0cdf5f0022cc283dfa4d97f6f6b03752f67eca85ebe6d7a679ffe3ed"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.1"
   web:
     dependency: transitive
     description:

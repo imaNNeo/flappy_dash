@@ -18,12 +18,20 @@ class BestScoreOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<GameCubit, GameState>(builder: (context, state) {
       final record = state.leaderboardEntity?.ownerRecord;
+      int? rank = int.tryParse(record?.rank ?? '');
+      int score = int.tryParse(record?.score ?? '') ?? 0;
       return BoxOverlay(
         onTap: onTap,
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ScoreTrophy(size: 32, rank: record?.rank),
+            switch (rank) {
+              null || <= 3 => ScoreTrophy(size: 32, rank: rank),
+              _ => NormalScore(
+                  size: 38,
+                  rank: rank,
+                ),
+            },
             const SizedBox(width: 18),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,7 +45,7 @@ class BestScoreOverlay extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  record?.score.toString() ?? '-',
+                  score.toString(),
                   style: const TextStyle(
                     color: AppColors.mainColor,
                     fontSize: 22,

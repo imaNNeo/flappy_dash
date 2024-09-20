@@ -29,7 +29,7 @@ class GameRepository {
   Future<LeaderboardEntity> getLeaderboard() async {
     await _initializationCompleter.future;
     final recordList = await _nakamaDataSource.getLeaderboard(_mainLeaderboard);
-    final ids = recordList.records.map((record) => record.ownerId!).toList();
+    final ids = recordList.records!.map((record) => record.ownerId!).toList();
     final users = await _nakamaDataSource.getUsers(ids);
     final usersMap = Map.fromEntries(
       users.map((user) => MapEntry(user.id, user)),
