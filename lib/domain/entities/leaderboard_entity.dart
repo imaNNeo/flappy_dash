@@ -5,27 +5,38 @@ import 'package:nakama/nakama.dart';
 class LeaderboardEntity with EquatableMixin {
   final LeaderboardRecordList _recordList;
   final Map<String, User> _userProfiles;
+  final String _currentUserId;
 
-  LeaderboardRecord? get ownerRecord => _recordList.records.firstOrNull;
+  LeaderboardRecord? get ownerRecord {
+    if (_recordList.records == null) {
+      return null;
+    }
+    for (final record in _recordList.records!) {
+      if (record.ownerId == _currentUserId) {
+        return record;
+      }
+    }
+    return null;
+  }
 
-  int get length => _recordList.records.length;
+  int get length => _recordList.records!.length;
 
   (LeaderboardRecord record, String name) operator [](int index) {
-    final record = _recordList.records[index];
+    final record = _recordList.records![index];
     final user = _userProfiles[record.ownerId!]!;
     return (record, user.showingName);
   }
 
-  LeaderboardEntity({
-    required LeaderboardRecordList recordList,
-    required Map<String, User> userProfiles,
-  })  : _userProfiles = userProfiles,
-        _recordList = recordList,
-        assert(recordList.records.length == userProfiles.length);
+  LeaderboardEntity(
+    this._recordList,
+    this._userProfiles,
+    this._currentUserId,
+  ) : assert(_recordList.records!.length == _userProfiles.length);
 
   @override
   List<Object?> get props => [
         _recordList,
         _userProfiles,
+        _currentUserId,
       ];
 }

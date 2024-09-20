@@ -34,9 +34,11 @@ class GameRepository {
     final usersMap = Map.fromEntries(
       users.map((user) => MapEntry(user.id, user)),
     );
+    final currentUserId = await getCurrentUserId();
     return LeaderboardEntity(
-      recordList: recordList,
-      userProfiles: usersMap,
+      recordList,
+      usersMap,
+      currentUserId,
     );
   }
 
