@@ -6,6 +6,8 @@ class LeaderboardEntity with EquatableMixin {
   final LeaderboardRecordList _recordList;
   final Map<String, User> _userProfiles;
 
+  LeaderboardRecord? get ownerRecord => _recordList.records.firstOrNull;
+
   int get length => _recordList.records.length;
 
   (LeaderboardRecord record, String name) operator [](int index) {

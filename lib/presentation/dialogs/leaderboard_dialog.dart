@@ -183,7 +183,7 @@ class ScoreTrophy extends StatelessWidget {
   });
 
   final double size;
-  final int rank;
+  final int? rank;
 
   @override
   Widget build(BuildContext context) {
@@ -197,7 +197,7 @@ class ScoreTrophy extends StatelessWidget {
             height: size,
             colorFilter: ColorFilter.mode(
               switch (rank) {
-                1 => AppColors.leaderboardGoldenColor,
+                null || 1 => AppColors.leaderboardGoldenColor,
                 2 => AppColors.leaderboardSilverColor,
                 3 => AppColors.leaderboardBronzeColor,
                 _ => throw StateError('Invalid rank: $rank'),
@@ -208,10 +208,10 @@ class ScoreTrophy extends StatelessWidget {
           Align(
             alignment: const Alignment(0.0, -0.8),
             child: Text(
-              rank.toString(),
+              rank == null ? '?' : rank.toString(),
               style: TextStyle(
                 color: switch (rank) {
-                  1 => AppColors.leaderboardGoldenColorText,
+                  null || 1 => AppColors.leaderboardGoldenColorText,
                   2 => AppColors.leaderboardSilverColorText,
                   3 => AppColors.leaderboardBronzeColorText,
                   _ => throw StateError('Invalid rank: $rank'),
