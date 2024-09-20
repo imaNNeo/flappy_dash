@@ -1,6 +1,5 @@
 import 'package:flappy_dash/audio_helper.dart';
 import 'package:flappy_dash/domain/repositories/game_repository.dart';
-import 'package:flappy_dash/presentation/pages/main_page.dart';
 import 'package:flappy_dash/presentation/pages/splash/splash_page.dart';
 import 'package:flappy_dash/service_locator.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +22,7 @@ class MyApp extends StatelessWidget {
         getIt.get<AudioHelper>(),
         getIt.get<GameRepository>(),
       ),
+      lazy: false,
       child: MaterialApp(
         title: 'Flappy Dash',
         theme: ThemeData(fontFamily: 'Chewy'),
