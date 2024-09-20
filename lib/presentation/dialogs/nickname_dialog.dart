@@ -63,8 +63,7 @@ class _NicknameDialogState extends State<NicknameDialog> {
               SizedBox(
                 width: 240,
                 child: FilledButton.tonal(
-                  onPressed: () =>
-                      Navigator.of(context).pop(_textEditingController.text),
+                  onPressed: _onSaveClicked,
                   child: const Text('SAVE'),
                 ),
               ),
@@ -73,6 +72,13 @@ class _NicknameDialogState extends State<NicknameDialog> {
         ),
       ),
     );
+  }
+
+  void _onSaveClicked() {
+    final gameCubit = context.read<GameCubit>();
+    final newName = _textEditingController.text;
+    gameCubit.updateUserDisplayName(newName);
+    Navigator.of(context).pop();
   }
 
   @override

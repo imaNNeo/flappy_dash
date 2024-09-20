@@ -1,6 +1,7 @@
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
+import 'package:flappy_dash/presentation/dialogs/app_dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -13,6 +14,7 @@ class ProfileOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BoxOverlay(
+      onTap: () => AppDialogs.nicknameDialog(context),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

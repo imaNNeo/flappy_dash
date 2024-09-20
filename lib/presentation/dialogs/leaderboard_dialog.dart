@@ -84,16 +84,7 @@ class _LeaderBoardDialogState extends State<LeaderBoardDialog> {
                       score: record.score ?? 0,
                       isMine: record.ownerId ==
                           state.currentUserAccount?.user.id,
-                      onMyProfileTap: () async {
-                        final result = await AppDialogs.nicknameDialog(context);
-                        if (!context.mounted) {
-                          return;
-                        }
-                        if (result != null && result.isNotEmpty) {
-                          final gameCubit = context.read<GameCubit>();
-                          gameCubit.updateUserDisplayName(result);
-                        }
-                      },
+                      onMyProfileTap: () => AppDialogs.nicknameDialog(context),
                     );
                   },
                   separatorBuilder: (context, index) => Container(
