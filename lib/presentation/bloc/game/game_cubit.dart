@@ -67,6 +67,7 @@ class GameCubit extends Cubit<GameState> {
 
   void updateUserDisplayName(String newUserDisplayName) async {
     await _gameRepository.updateUserDisplayName(newUserDisplayName);
+    await _refreshLeaderboard();
     await _refreshCurrentUserAccount();
   }
 
