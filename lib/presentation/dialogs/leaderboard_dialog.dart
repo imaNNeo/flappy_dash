@@ -15,7 +15,7 @@ class LeaderBoardDialog extends StatefulWidget {
 class _LeaderBoardDialogState extends State<LeaderBoardDialog> {
   @override
   void initState() {
-    context.read<GameCubit>().refreshLeaderboard();
+    context.read<GameCubit>().onLeaderboardPageOpen();
     super.initState();
   }
 

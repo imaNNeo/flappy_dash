@@ -49,7 +49,7 @@ class GameCubit extends Cubit<GameState> {
   }
 
   void _init() async {
-    await _updateLeaderboard();
+    await _refreshLeaderboard();
     await _refreshCurrentUserAccount();
   }
 
@@ -58,7 +58,7 @@ class GameCubit extends Cubit<GameState> {
     emit(state.copyWith(currentUserAccount: account));
   }
 
-  Future<void> _updateLeaderboard() async {
+  Future<void> _refreshLeaderboard() async {
     final leaderboard = await _gameRepository.getLeaderboard();
     emit(state.copyWith(
       leaderboardEntity: leaderboard,
@@ -70,7 +70,7 @@ class GameCubit extends Cubit<GameState> {
     await _refreshCurrentUserAccount();
   }
 
-  void refreshLeaderboard() async {
-    await _updateLeaderboard();
+  void onLeaderboardPageOpen() async {
+    await _refreshLeaderboard();
   }
 }
