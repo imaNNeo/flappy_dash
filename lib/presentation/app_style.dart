@@ -7,6 +7,7 @@ class AppColors {
   static const dialogBgColor = Color(0xFF16425B);
   static const mainColor = Color(0xFF00FBFF);
   static const blueColor = Color(0xFF26CBFE);
+  static const darkBlueColor = Color(0xFF2487FC);
   static const whiteTextColor = Color(0xFFF1F1F1);
   static const whiteTextColor2 = Color(0xFFDAD2D8);
 
@@ -16,4 +17,21 @@ class AppColors {
   static const leaderboardSilverColorText = Color(0xFF1C1B1F);
   static const leaderboardBronzeColor = Color(0xFFCD7F32);
   static const leaderboardBronzeColorText = Color(0xFF1C1B1F);
+
+  static const blueButtonBgColor = Color(0x802288FA);
+  static const blueButtonStrokeColor = darkBlueColor;
+
+  static const greenButtonBgColor = Color(0x800F8B8D);
+  static const greenButtonStrokeColor = Color(0xFF052727);
+
+  static const multiColorGradient = [
+    Color(0xFFFF25B2),
+    Color(0xFFFF5D27),
+    Color(0xFFAE0089),
+    Color(0xFF0073FF),
+  ];
+}
+
+class PresentationConstants {
+  static const defaultBorderRadius = 16.0;
 }
