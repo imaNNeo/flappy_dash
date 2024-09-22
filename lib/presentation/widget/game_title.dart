@@ -19,8 +19,8 @@ class GameTitle extends StatelessWidget {
         'Flappy Dash',
         style: TextStyle(
           fontSize: switch(screenSize) {
-            ScreenSize.extraSmall => 32,
-            ScreenSize.small => 48,
+            ScreenSize.extraSmall => 28,
+            ScreenSize.small => 42,
             ScreenSize.medium => 76,
             ScreenSize.large || ScreenSize.extraLarge => 112,
           },
