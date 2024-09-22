@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'presentation/app_routes.dart';
+import 'presentation/app_style.dart';
 import 'presentation/bloc/game/game_cubit.dart';
 
 void main() async {
@@ -26,7 +27,12 @@ class MyApp extends StatelessWidget {
       child: MaterialApp.router(
         routerConfig: AppRoutes.router,
         title: 'Flappy Dash',
-        theme: ThemeData(fontFamily: 'Chewy'),
+        theme: ThemeData(
+          fontFamily: 'Chewy',
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: AppColors.blueColor,
+          ),
+        ),
       ),
     );
   }
