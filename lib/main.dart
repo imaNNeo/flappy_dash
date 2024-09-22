@@ -1,10 +1,10 @@
 import 'package:flappy_dash/audio_helper.dart';
 import 'package:flappy_dash/domain/repositories/game_repository.dart';
-import 'package:flappy_dash/presentation/pages/splash/splash_page.dart';
 import 'package:flappy_dash/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'presentation/app_routes.dart';
 import 'presentation/bloc/game/game_cubit.dart';
 
 void main() async {
@@ -23,10 +23,10 @@ class MyApp extends StatelessWidget {
         getIt.get<GameRepository>(),
       ),
       lazy: false,
-      child: MaterialApp(
+      child: MaterialApp.router(
+        routerConfig: AppRoutes.router,
         title: 'Flappy Dash',
         theme: ThemeData(fontFamily: 'Chewy'),
-        home: const SplashPage(),
       ),
     );
   }

@@ -7,19 +7,19 @@ import 'package:flappy_dash/presentation/widget/profile_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/game/game_cubit.dart';
-import '../widget/game_over_widget.dart';
-import '../widget/tap_to_play.dart';
-import '../widget/top_score.dart';
+import '../../bloc/game/game_cubit.dart';
+import '../../widget/game_over_widget.dart';
+import '../../widget/tap_to_play.dart';
+import '../../widget/top_score.dart';
 
-class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+class SinglePlayerGamePage extends StatefulWidget {
+  const SinglePlayerGamePage({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  State<SinglePlayerGamePage> createState() => _SinglePlayerGamePageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _SinglePlayerGamePageState extends State<SinglePlayerGamePage> {
   late FlappyDashGame _flappyDashGame;
 
   late GameCubit gameCubit;

@@ -1,8 +1,8 @@
 import 'package:flappy_dash/domain/repositories/game_repository.dart';
-import 'package:flappy_dash/presentation/pages/main_page.dart';
 import 'package:flappy_dash/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import 'cubit/splash_cubit.dart';
 
@@ -38,11 +38,7 @@ class _SplashPageContentState extends State<SplashPageContent> {
     return BlocConsumer<SplashCubit, SplashState>(
       listener: (context, state) {
         if (state.openHomePage) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => const MainPage(),
-            ),
-          );
+          GoRouter.of(context).replace('/');
         }
       },
       builder: (context, state) {
