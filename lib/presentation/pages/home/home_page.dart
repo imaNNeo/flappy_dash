@@ -1,4 +1,5 @@
 import 'package:flappy_dash/presentation/app_style.dart';
+import 'package:flappy_dash/presentation/responsive/screen_size.dart';
 import 'package:flappy_dash/presentation/widget/big_button.dart';
 import 'package:flappy_dash/presentation/widget/blurred_background.dart';
 import 'package:flappy_dash/presentation/widget/game_title.dart';
@@ -16,6 +17,9 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final screenSize = ScreenSize.fromContext(context);
+    print('width: ${MediaQuery.of(context).size.width}, size: $screenSize');
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
@@ -28,14 +32,14 @@ class HomePage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const SizedBox(height: 18),
-                  const GameTitle(),
+                  GameTitle(screenSize: screenSize),
                   Expanded(child: Container()),
                   const SinglePlayerButton(),
                   const SizedBox(height: 18),
                   const MultiPlayerButton(),
                   const SizedBox(height: 8),
                   Expanded(child: Container()),
-                  const WatchOnYoutubeWidget(),
+                  WatchOnYoutubeWidget(screenSize: screenSize),
                   const SizedBox(height: 16),
                 ],
               ),
