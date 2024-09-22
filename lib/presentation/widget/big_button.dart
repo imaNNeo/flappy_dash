@@ -1,4 +1,5 @@
 import 'package:flappy_dash/presentation/app_style.dart';
+import 'package:flappy_dash/presentation/responsive/screen_size.dart';
 import 'package:flutter/material.dart';
 
 class BigButton extends StatelessWidget {
@@ -17,8 +18,13 @@ class BigButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = ScreenSize.fromContext(context);
     return SizedBox(
-      width: 340,
+      width: switch(screenSize) {
+        ScreenSize.extraSmall => 280,
+        ScreenSize.small => 300,
+        ScreenSize.medium || ScreenSize.large || ScreenSize.extraLarge => 340,
+      },
       height: 76,
       child: OutlinedButton(
         onPressed: onPressed,

@@ -21,10 +21,10 @@ class GithubButton extends StatelessWidget {
       ScreenSize.medium || ScreenSize.large || ScreenSize.extraLarge => 48.0,
     };
 
-    final padding = switch (screenSize) {
-      ScreenSize.extraSmall => 6.0,
-      ScreenSize.small => 12.0,
-      ScreenSize.medium || ScreenSize.large || ScreenSize.extraLarge => 24.0,
+    final margin = switch (screenSize) {
+      ScreenSize.extraSmall => 4.0,
+      ScreenSize.small => 8.0,
+      ScreenSize.medium || ScreenSize.large || ScreenSize.extraLarge => 16.0,
     };
 
     final fontSize = switch (screenSize) {
@@ -32,8 +32,14 @@ class GithubButton extends StatelessWidget {
       ScreenSize.small => 14.0,
       ScreenSize.medium || ScreenSize.large || ScreenSize.extraLarge => 16.0,
     };
+
+    final padding = switch (screenSize) {
+      ScreenSize.extraSmall => 4.0,
+      ScreenSize.small => 8.0,
+      ScreenSize.medium || ScreenSize.large || ScreenSize.extraLarge => 12.0,
+    };
     return Padding(
-      padding: EdgeInsets.all(padding),
+      padding: EdgeInsets.all(margin),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -42,7 +48,7 @@ class GithubButton extends StatelessWidget {
           ),
           onTap: () => PresentationUtils.openUrl(AppConstants.gitHubUrl),
           child: Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: EdgeInsets.all(padding),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
