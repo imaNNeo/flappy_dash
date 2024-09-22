@@ -9,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'presentation/app_routes.dart';
 import 'presentation/app_style.dart';
+import 'domain/repositories/multiplayer_repository.dart';
 import 'presentation/bloc/game/game_cubit.dart';
 
 void main() async {
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
       create: (BuildContext context) => GameCubit(
         getIt.get<AudioHelper>(),
         getIt.get<GameRepository>(),
+        getIt.get<MultiplayerRepository>(),
       ),
       lazy: false,
       child: MaterialApp.router(

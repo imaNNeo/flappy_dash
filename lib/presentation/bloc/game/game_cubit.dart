@@ -1,4 +1,5 @@
 import 'package:flappy_dash/domain/entities/leaderboard_entity.dart';
+import 'package:flappy_dash/domain/repositories/multiplayer_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flappy_dash/audio_helper.dart';
@@ -11,12 +12,14 @@ class GameCubit extends Cubit<GameState> {
   GameCubit(
     this._audioHelper,
     this._gameRepository,
+    this._multiplayerRepository,
   ) : super(const GameState()) {
     _init();
   }
 
   final AudioHelper _audioHelper;
   final GameRepository _gameRepository;
+  final MultiplayerRepository _multiplayerRepository;
 
   void startPlaying() {
     _audioHelper.playBackgroundAudio();
@@ -52,6 +55,7 @@ class GameCubit extends Cubit<GameState> {
   void _init() async {
     await _refreshLeaderboard();
     await _refreshCurrentUserAccount();
+    await Future.delayed(const Duration(seconds: 2));
   }
 
   Future<void> _refreshCurrentUserAccount() async {
@@ -73,6 +77,7 @@ class GameCubit extends Cubit<GameState> {
   }
 
   void onLeaderboardPageOpen() async {
-    await _refreshLeaderboard();
+    // await _refreshLeaderboard();
+    _multiplayerRepository.getWaitingMatchId();
   }
 }

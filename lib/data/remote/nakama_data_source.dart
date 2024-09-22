@@ -1,13 +1,15 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:nakama/nakama.dart';
 
 class NakamaDataSource {
   final client = getNakamaClient(
-    host: 'api.flappydash.com',
-    ssl: true,
+    host: kDebugMode ? 'localhost' : 'api.flappydash.com',
+    ssl: !kDebugMode,
     serverKey: const String.fromEnvironment('NAKAMA_SERVER_KEY'),
-    grpcPort: 7349,
-    // optional
-    httpPort: 7350, // optional
+    grpcPort: kDebugMode ? 8349 : 7349,
+    httpPort: kDebugMode ? 8350 : 7350,
   );
 
   late Session _currentSession;
@@ -64,5 +66,70 @@ class NakamaDataSource {
       ownerId: _currentSession.userId,
       leaderboardName: leaderboardName,
     );
+  }
+
+  // NakamaWebsocketClient? _websocketClient;
+  // Completer<NakamaWebsocketClient>? _websocketClientCompleter;
+  // Future<NakamaWebsocketClient> getWebsocketClient() async {
+  //   if (_websocketClient != null) {
+  //     return _websocketClient!;
+  //   }
+  //   if (_websocketClientCompleter != null) {
+  //     return _websocketClientCompleter!.future;
+  //   }
+  //   _websocketClientCompleter = Completer();
+  //   final websocketClient = NakamaWebsocketClient.init(
+  //     host: kDebugMode ? 'localhost' : 'api.flappydash.com',
+  //     ssl: !kDebugMode,
+  //     port: kDebugMode ? 8350 : 7350,
+  //     token: _currentSession.token,
+  //     onError: (error) {
+  //       _websocketClientCompleter!.completeError(error);
+  //     },
+  //     onDone: () {
+  //       _websocketClientCompleter!.complete();
+  //     },
+  //   );
+  //   return websocketClient;
+  // }
+
+  Future<String?> getWaitingMatchId() async {
+    try {
+      final websocketClient = NakamaWebsocketClient.init(
+        host: kDebugMode ? 'localhost' : 'api.flappydash.com',
+        ssl: !kDebugMode,
+        port: kDebugMode ? 8350 : 7350,
+        token: _currentSession.token,
+      );
+
+      final matchId = await client.rpc(
+            session: _currentSession,
+            id: 'get_waiting_match',
+          );
+      if (matchId == null) {
+            return null;
+          }
+
+      print(_currentSession.token);
+      //join match
+      websocketClient.onMatchData.listen((onData) {
+            if (onData.matchId != matchId) {
+              return;
+            }
+            print('onMatchData: $onData');
+          });
+      websocketClient.onMatchPresence.listen((onData) {
+            if (onData.matchId != matchId) {
+              return;
+            }
+            print('onMatchPresence: $onData');
+          });
+
+      final match = await websocketClient.joinMatch(matchId);
+      return matchId;
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
   }
 }
