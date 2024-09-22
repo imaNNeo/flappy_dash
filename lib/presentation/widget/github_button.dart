@@ -1,4 +1,6 @@
+import 'package:flappy_dash/domain/app_constants.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
+import 'package:flappy_dash/presentation/presentation_utils.dart';
 import 'package:flappy_dash/presentation/responsive/screen_size.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -38,7 +40,7 @@ class GithubButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(
             PresentationConstants.defaultBorderRadius,
           ),
-          onTap: () {},
+          onTap: () => PresentationUtils.openUrl(AppConstants.gitHubUrl),
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: Column(
