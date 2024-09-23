@@ -1,13 +1,22 @@
 part of '../home_page.dart';
 
 class MultiPlayerButton extends StatelessWidget {
-  const MultiPlayerButton({super.key});
+  const MultiPlayerButton({
+    super.key,
+    required this.onPressed,
+    this.showLoading = false,
+  });
+
+  final VoidCallback onPressed;
+  final bool showLoading;
 
   @override
   Widget build(BuildContext context) {
     return BigButton(
       bgColor: AppColors.greenButtonBgColor,
       strokeColor: AppColors.greenButtonStrokeColor,
+      showLoading: showLoading,
+      onPressed: onPressed,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -29,7 +38,6 @@ class MultiPlayerButton extends StatelessWidget {
           ),
         ],
       ),
-      onPressed: () {},
     );
   }
 }

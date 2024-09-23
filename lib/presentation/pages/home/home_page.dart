@@ -34,9 +34,13 @@ class HomePage extends StatelessWidget {
                   const SizedBox(height: 18),
                   GameTitle(screenSize: screenSize),
                   Expanded(child: Container()),
-                  const SinglePlayerButton(),
+                  SinglePlayerButton(
+                    onPressed: () {},
+                  ),
                   const SizedBox(height: 18),
-                  const MultiPlayerButton(),
+                  MultiPlayerButton(
+                    onPressed: () {},
+                  ),
                   const SizedBox(height: 8),
                   Expanded(child: Container()),
                   WatchOnYoutubeWidget(screenSize: screenSize),
