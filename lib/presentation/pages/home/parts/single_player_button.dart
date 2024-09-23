@@ -1,11 +1,17 @@
 part of '../home_page.dart';
 
 class SinglePlayerButton extends StatelessWidget {
-  const SinglePlayerButton({super.key});
+  const SinglePlayerButton({
+    super.key,
+    required this.onPressed,
+  });
+
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
     return BigButton(
+      onPressed: onPressed,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -29,7 +35,6 @@ class SinglePlayerButton extends StatelessWidget {
           ),
         ],
       ),
-      onPressed: () {},
     );
   }
 }
