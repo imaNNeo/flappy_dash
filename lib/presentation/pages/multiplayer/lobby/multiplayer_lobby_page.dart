@@ -3,6 +3,7 @@ import 'package:flappy_dash/presentation/responsive/screen_size.dart';
 import 'package:flappy_dash/presentation/widget/big_button.dart';
 import 'package:flappy_dash/presentation/widget/blurred_background.dart';
 import 'package:flappy_dash/presentation/widget/dash_player_box.dart';
+import 'package:flappy_dash/presentation/widget/game_back_button.dart';
 import 'package:flappy_dash/presentation/widget/game_title.dart';
 import 'package:flappy_dash/presentation/widget/github_button.dart';
 import 'package:flappy_dash/presentation/widget/transparent_content_box.dart';
@@ -29,6 +30,7 @@ class MultiPlayerLobbyPage extends StatelessWidget {
       ScreenSize.medium => 22.0,
       ScreenSize.large || ScreenSize.extraLarge => 28.0,
     };
+
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
@@ -59,11 +61,17 @@ class MultiPlayerLobbyPage extends StatelessWidget {
             ),
           ),
           Align(
-            alignment: Alignment.topRight,
-            child: GithubButton(
-              screenSize: screenSize,
+            alignment: Alignment.topCenter,
+            child: Row(
+              children: [
+                const GameBackButton(),
+                Expanded(child: Container(height: 0,)),
+                GithubButton(
+                  screenSize: screenSize,
+                ),
+              ],
             ),
-          )
+          ),
         ],
       ),
     );
