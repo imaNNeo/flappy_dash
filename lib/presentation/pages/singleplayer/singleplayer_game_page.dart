@@ -3,6 +3,7 @@ import 'package:flappy_dash/presentation/dialogs/app_dialogs.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flappy_dash/presentation/widget/best_score_overlay.dart';
+import 'package:flappy_dash/presentation/widget/game_back_button.dart';
 import 'package:flappy_dash/presentation/widget/profile_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -65,17 +66,37 @@ class _SinglePlayerGamePageState extends State<SinglePlayerGamePage> {
                   child: TapToPlay(),
                 ),
               if (state.currentPlayingState.isNotGameOver) const TopScore(),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const ProfileOverlay(),
-                    const SizedBox(height: 8),
-                    BestScoreOverlay(
-                      onTap: () => AppDialogs.showLeaderboard(context),
-                    ),
-                  ],
+              Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    top: 16.0,
+                    right: 16.0,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const GameBackButton(),
+                      Expanded(
+                        child: Container(
+                          height: 0,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const ProfileOverlay(),
+                            const SizedBox(height: 8),
+                            BestScoreOverlay(
+                              onTap: () => AppDialogs.showLeaderboard(context),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

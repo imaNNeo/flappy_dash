@@ -36,11 +36,11 @@ class HomePage extends StatelessWidget {
                   GameTitle(screenSize: screenSize),
                   Expanded(child: Container()),
                   SinglePlayerButton(
-                    onPressed: () => context.go('/single_player'),
+                    onPressed: () => context.push('/single_player'),
                   ),
                   const SizedBox(height: 18),
                   MultiPlayerButton(
-                    onPressed: () => context.go('/lobby:test-match-id'),
+                    onPressed: () => context.push('/lobby:test-match-id'),
                   ),
                   const SizedBox(height: 8),
                   Expanded(child: Container()),
