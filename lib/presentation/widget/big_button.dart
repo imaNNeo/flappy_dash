@@ -7,7 +7,7 @@ class BigButton extends StatelessWidget {
     super.key,
     required this.child,
     this.onPressed,
-    this.bgColor = AppColors.blueButtonBgColor,
+    this.bgColor = AppColors.blueButtonBgColor50,
     this.strokeColor = AppColors.blueButtonStrokeColor,
     this.showLoading = false,
   });

@@ -2,6 +2,7 @@ import 'dart:ui';
 
 class AppColors {
   static const backgroundColor = Color(0xFF0F8B8D);
+  static const backgroundColor60 = Color(0x800F8B8D);
 
   static const boxBgColor = Color(0x66000000);
   static const dialogBgColor = Color(0xFF16425B);
@@ -18,11 +19,13 @@ class AppColors {
   static const leaderboardBronzeColor = Color(0xFFCD7F32);
   static const leaderboardBronzeColorText = Color(0xFF1C1B1F);
 
-  static const blueButtonBgColor = Color(0x802288FA);
+  static const blueButtonBgColor = Color(0xFF2288FA);
+  static const blueButtonBgColor50 = Color(0x802288FA);
   static const blueButtonStrokeColor = darkBlueColor;
 
-  static const greenButtonBgColor = Color(0x800F8B8D);
+  static const greenButtonBgColor = backgroundColor60;
   static const greenButtonStrokeColor = Color(0xFF052727);
+  static const playerBoxStrokeColor = Color(0x8016425B);
 
   static const multiColorGradient = [
     Color(0xFFFF25B2),
@@ -34,4 +37,5 @@ class AppColors {
 
 class PresentationConstants {
   static const defaultBorderRadius = 16.0;
+  static const defaultBorderRadiusSmall = 8.0;
 }
