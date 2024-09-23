@@ -9,6 +9,7 @@ import 'package:flappy_dash/presentation/widget/outline_text.dart';
 import 'package:flappy_dash/presentation/widget/watch_on_youtube_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 
 part 'parts/single_player_button.dart';
 
@@ -35,11 +36,11 @@ class HomePage extends StatelessWidget {
                   GameTitle(screenSize: screenSize),
                   Expanded(child: Container()),
                   SinglePlayerButton(
-                    onPressed: () {},
+                    onPressed: () => context.go('/single_player'),
                   ),
                   const SizedBox(height: 18),
                   MultiPlayerButton(
-                    onPressed: () {},
+                    onPressed: () => context.go('/lobby:test-match-id'),
                   ),
                   const SizedBox(height: 8),
                   Expanded(child: Container()),
