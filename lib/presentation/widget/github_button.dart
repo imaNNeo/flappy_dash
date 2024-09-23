@@ -16,15 +16,15 @@ class GithubButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final iconSize = switch (screenSize) {
-      ScreenSize.extraSmall => 28.0,
-      ScreenSize.small => 32.0,
-      ScreenSize.medium || ScreenSize.large || ScreenSize.extraLarge => 48.0,
+      ScreenSize.extraSmall => 24.0,
+      ScreenSize.small => 28.0,
+      ScreenSize.medium || ScreenSize.large || ScreenSize.extraLarge => 38.0,
     };
 
     final margin = switch (screenSize) {
       ScreenSize.extraSmall => 4.0,
       ScreenSize.small => 8.0,
-      ScreenSize.medium || ScreenSize.large || ScreenSize.extraLarge => 16.0,
+      ScreenSize.medium || ScreenSize.large || ScreenSize.extraLarge => 12.0,
     };
 
     final fontSize = switch (screenSize) {
