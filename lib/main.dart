@@ -4,6 +4,7 @@ import 'package:flappy_dash/domain/repositories/game_repository.dart';
 import 'package:flappy_dash/service_locator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'presentation/app_routes.dart';
@@ -12,6 +13,10 @@ import 'presentation/bloc/game/game_cubit.dart';
 
 void main() async {
   await setupServiceLocator();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   runApp(DevicePreview(
     enabled: !kReleaseMode,
     builder: (context) => const MyApp(),
