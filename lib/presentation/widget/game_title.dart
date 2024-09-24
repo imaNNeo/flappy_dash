@@ -18,8 +18,8 @@ class GameTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fontSize = switch (screenSize) {
-      ScreenSize.extraSmall => 34.0,
-      ScreenSize.small => 42.0,
+      ScreenSize.extraSmall => 58.0,
+      ScreenSize.small => 66.0,
       ScreenSize.medium => 76.0,
       ScreenSize.large || ScreenSize.extraLarge => 112.0,
     };

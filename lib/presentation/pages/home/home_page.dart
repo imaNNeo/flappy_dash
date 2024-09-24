@@ -6,6 +6,7 @@ import 'package:flappy_dash/presentation/widget/game_title.dart';
 import 'package:flappy_dash/presentation/widget/github_button.dart';
 import 'package:flappy_dash/presentation/widget/gradient_text.dart';
 import 'package:flappy_dash/presentation/widget/outline_text.dart';
+import 'package:flappy_dash/presentation/widget/profile_overlay.dart';
 import 'package:flappy_dash/presentation/widget/watch_on_youtube_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -21,6 +22,13 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenSize = ScreenSize.fromContext(context);
+    final titleBottomSpace = switch (screenSize) {
+      ScreenSize.extraSmall => 16.0,
+      ScreenSize.small => 24.0,
+      ScreenSize.medium => 32.0,
+      ScreenSize.large => 40.0,
+      ScreenSize.extraLarge => 48.0,
+    };
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
@@ -33,9 +41,12 @@ class HomePage extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 18),
+                  Expanded(
+                    flex: 2,
+                    child: Container(),
+                  ),
                   GameTitle(screenSize: screenSize),
-                  Expanded(child: Container()),
+                  SizedBox(height: titleBottomSpace),
                   SinglePlayerButton(
                     onPressed: () => context.push('/single_player'),
                   ),
@@ -44,19 +55,42 @@ class HomePage extends StatelessWidget {
                     onPressed: () => context.push('/lobby:test-match-id'),
                   ),
                   const SizedBox(height: 8),
-                  Expanded(child: Container()),
+                  Expanded(
+                    flex: 3,
+                    child: Container(),
+                  ),
                   WatchOnYoutubeWidget(screenSize: screenSize),
                   const SizedBox(height: 16),
                 ],
               ),
             ),
           ),
-          Align(
-            alignment: Alignment.topRight,
-            child: GithubButton(
-              screenSize: screenSize,
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  top: PresentationConstants.defaultPadding,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    GithubButton(
+                      screenSize: screenSize,
+                    ),
+                    Expanded(
+                        child: Container(
+                      height: 0,
+                    )),
+                    const ProfileOverlay(),
+                    const SizedBox(
+                      width: PresentationConstants.defaultPadding,
+                    ),
+                  ],
+                ),
+              ),
             ),
-          )
+          ),
         ],
       ),
     );
