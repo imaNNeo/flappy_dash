@@ -65,37 +65,43 @@ class _SinglePlayerGamePageState extends State<SinglePlayerGamePage> {
                   alignment: Alignment(0, 0.2),
                   child: TapToPlay(),
                 ),
-              if (state.currentPlayingState.isNotGameOver) const TopScore(),
+              if (state.currentPlayingState.isNotGameOver)
+                const SafeArea(
+                  child: TopScore(),
+                ),
               Align(
                 alignment: Alignment.topCenter,
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    top: 16.0,
-                    right: 16.0,
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const GameBackButton(),
-                      Expanded(
-                        child: Container(
-                          height: 0,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      top: PresentationConstants.defaultPadding,
+                      right: PresentationConstants.defaultPadding,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const GameBackButton(),
+                        Expanded(
+                          child: Container(
+                            height: 0,
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const ProfileOverlay(),
-                            const SizedBox(height: 8),
-                            BestScoreOverlay(
-                              onTap: () => AppDialogs.showLeaderboard(context),
-                            ),
-                          ],
+                        Padding(
+                          padding: const EdgeInsets.all(0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const ProfileOverlay(),
+                              const SizedBox(height: 8),
+                              BestScoreOverlay(
+                                onTap: () =>
+                                    AppDialogs.showLeaderboard(context),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

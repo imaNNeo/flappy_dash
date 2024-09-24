@@ -216,7 +216,7 @@ class ScoreTrophy extends StatelessWidget {
                   3 => AppColors.leaderboardBronzeColorText,
                   _ => throw StateError('Invalid rank: $rank'),
                 },
-                fontSize: 18,
+                fontSize: size * 0.6,
               ),
             ),
           ),
