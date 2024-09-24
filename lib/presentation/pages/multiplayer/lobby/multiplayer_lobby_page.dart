@@ -36,6 +36,7 @@ class MultiPlayerLobbyPage extends StatelessWidget {
       ScreenSize.large || ScreenSize.extraLarge => 18.0,
     };
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         fit: StackFit.expand,
         children: [
