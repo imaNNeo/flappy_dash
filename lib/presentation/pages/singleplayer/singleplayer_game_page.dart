@@ -49,6 +49,7 @@ class _SinglePlayerGamePageState extends State<SinglePlayerGamePage> {
       },
       builder: (context, state) {
         return Scaffold(
+          resizeToAvoidBottomInset: false,
           body: Stack(
             children: [
               GameWidget(

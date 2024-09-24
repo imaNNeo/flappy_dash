@@ -22,6 +22,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenSize = ScreenSize.fromContext(context);
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         fit: StackFit.expand,
         children: [
