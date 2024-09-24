@@ -6,31 +6,35 @@ class BoxOverlay extends StatelessWidget {
     super.key,
     required this.child,
     this.onTap,
+    this.padding = const EdgeInsets.symmetric(
+      horizontal: 18.0,
+      vertical: 12.0,
+    ),
+    this.borderRadius = PresentationConstants.defaultBorderRadiusSmall,
   });
 
   final Widget child;
   final VoidCallback? onTap;
+  final EdgeInsets padding;
+  final double borderRadius;
 
   @override
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(16),
+        borderRadius: BorderRadius.all(
+          Radius.circular(borderRadius),
         ),
         onTap: onTap,
         child: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppColors.boxBgColor,
             borderRadius: BorderRadius.all(
-              Radius.circular(16.0),
+              Radius.circular(borderRadius),
             ),
           ),
-          padding: const EdgeInsets.symmetric(
-            horizontal: 18.0,
-            vertical: 12.0,
-          ),
+          padding: padding,
           child: child,
         ),
       ),

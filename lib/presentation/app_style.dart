@@ -36,6 +36,7 @@ class AppColors {
 }
 
 class PresentationConstants {
+  static const defaultPadding = 16.0;
   static const defaultBorderRadius = 16.0;
   static const defaultBorderRadiusSmall = 8.0;
 }

@@ -82,8 +82,8 @@ class _LeaderBoardDialogState extends State<LeaderBoardDialog> {
                       rank: record.rank ?? 9999,
                       name: name,
                       score: record.score ?? 0,
-                      isMine: record.ownerId ==
-                          state.currentUserAccount?.user.id,
+                      isMine:
+                          record.ownerId == state.currentUserAccount?.user.id,
                       onMyProfileTap: () => AppDialogs.nicknameDialog(context),
                     );
                   },
@@ -216,7 +216,7 @@ class ScoreTrophy extends StatelessWidget {
                   3 => AppColors.leaderboardBronzeColorText,
                   _ => throw StateError('Invalid rank: $rank'),
                 },
-                fontSize: 18,
+                fontSize: size * 0.6,
               ),
             ),
           ),

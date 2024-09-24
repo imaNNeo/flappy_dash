@@ -1,6 +1,8 @@
+import 'package:device_preview/device_preview.dart';
 import 'package:flappy_dash/audio_helper.dart';
 import 'package:flappy_dash/domain/repositories/game_repository.dart';
 import 'package:flappy_dash/service_locator.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -10,7 +12,10 @@ import 'presentation/bloc/game/game_cubit.dart';
 
 void main() async {
   await setupServiceLocator();
-  runApp(const MyApp());
+  runApp(DevicePreview(
+    enabled: !kReleaseMode,
+    builder: (context) => const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -27,6 +32,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp.router(
         routerConfig: AppRoutes.router,
         title: 'Flappy Dash',
+        builder: DevicePreview.appBuilder,
         theme: ThemeData(
           fontFamily: 'Chewy',
           colorScheme: ColorScheme.fromSeed(
