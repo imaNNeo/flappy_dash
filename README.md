@@ -3,7 +3,7 @@ It is the result of my tutorial on how we can build the Flappy Dash game using [
 You can [find this tutorial here in my YouTube channel](https://www.youtube.com/playlist?list=PL1-_rCwRcnbMVXe7jyCvZixrMRbvLTXG3) ([@imaNNeo](https://youtube.com/@imaNNeO))
 
 ## 🕹️ Play it now!
-The game is live at: play.flappydash.com
+The game is live at: [play.flappydash.com](https://play.flappydash.com)
 
 ## 🎬 Episodes:
 | [<img src="https://github.com/imaNNeo/flappy_dash/raw/main/repo_files/thumbnails/part1.png" width=600>](https://www.youtube.com/watch?v=WAMN4KEIZdk&list=PL1-_rCwRcnbMVXe7jyCvZixrMRbvLTXG3)    | [<img src="https://github.com/imaNNeo/flappy_dash/raw/main/repo_files/thumbnails/part2.png" width=600>](https://www.youtube.com/watch?v=82BBvGoGy1s&list=PL1-_rCwRcnbMVXe7jyCvZixrMRbvLTXG3&index=2)   | [<img src="https://github.com/imaNNeo/flappy_dash/raw/main/repo_files/thumbnails/part3.png" width=600>](https://www.youtube.com/watch?v=ftjMwGLvI1c&list=PL1-_rCwRcnbMVXe7jyCvZixrMRbvLTXG3&index=3)    |
