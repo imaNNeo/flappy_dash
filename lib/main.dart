@@ -12,6 +12,7 @@ import 'presentation/app_style.dart';
 import 'presentation/bloc/game/game_cubit.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await setupServiceLocator();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
