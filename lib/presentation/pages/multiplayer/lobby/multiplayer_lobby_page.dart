@@ -13,7 +13,12 @@ import 'package:flutter/material.dart';
 part 'parts/pending_match_box.dart';
 
 class MultiPlayerLobbyPage extends StatelessWidget {
-  const MultiPlayerLobbyPage({super.key});
+  const MultiPlayerLobbyPage({
+    super.key,
+    required this.matchId,
+  });
+
+  final String matchId;
 
   @override
   Widget build(BuildContext context) {

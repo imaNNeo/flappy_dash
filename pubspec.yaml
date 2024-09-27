@@ -54,6 +54,7 @@ dependencies:
   go_router: ^14.2.7
   url_launcher: ^6.3.0
   device_preview: ^1.2.0
+  toastification: ^2.3.0
 
 dev_dependencies:
   flutter_test:
