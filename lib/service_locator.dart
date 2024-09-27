@@ -1,4 +1,5 @@
 import 'package:flappy_dash/audio_helper.dart';
+import 'package:flappy_dash/domain/repositories/multiplayer_repository.dart';
 import 'package:get_it/get_it.dart';
 
 import 'data/local/device_data_source.dart';
@@ -25,4 +26,10 @@ Future<void> setupServiceLocator() async {
       getIt.get<NakamaDataSource>(),
     ),
   );
+  getIt.registerLazySingleton<MultiplayerRepository>(
+    () => MultiplayerRepository(
+      getIt.get<NakamaDataSource>(),
+    ),
+  );
+
 }
