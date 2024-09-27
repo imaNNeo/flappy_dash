@@ -1,13 +1,15 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:nakama/nakama.dart';
 
 class NakamaDataSource {
   final client = getNakamaClient(
-    host: 'api.flappydash.com',
-    ssl: true,
+    host: kDebugMode ? 'localhost' : 'api.flappydash.com',
+    ssl: !kDebugMode,
     serverKey: const String.fromEnvironment('NAKAMA_SERVER_KEY'),
-    grpcPort: 7349,
-    // optional
-    httpPort: 7350, // optional
+    grpcPort: kDebugMode ? 8349 : 7349,
+    httpPort: kDebugMode ? 8350 : 7350,
   );
 
   late Session _currentSession;
