@@ -65,4 +65,16 @@ class NakamaDataSource {
       leaderboardName: leaderboardName,
     );
   }
+
+  Future<String> getWaitingMatchId() async {
+    final matchId = await client.rpc(
+      session: _currentSession,
+      id: 'get_waiting_match',
+    );
+    if (matchId == null) {
+      throw Exception('Failed to get match id');
+    }
+    return matchId;
+  }
+
 }
