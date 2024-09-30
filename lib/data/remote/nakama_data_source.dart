@@ -1,16 +1,39 @@
 import 'dart:async';
 
+import 'package:flappy_dash/domain/entities/dispatching_match_event.dart';
+import 'package:flappy_dash/domain/entities/match_event.dart';
 import 'package:flutter/foundation.dart';
 import 'package:nakama/nakama.dart';
 
+import 'match_event_op_code.dart';
+
 class NakamaDataSource {
+  static const _host = kDebugMode ? 'localhost' : 'api.flappydash.com';
+  static const _grpcPort = kDebugMode ? 8349 : 7349;
+  static const _httpPort = kDebugMode ? 8350 : 7350;
   final client = getNakamaClient(
-    host: kDebugMode ? 'localhost' : 'api.flappydash.com',
+    host: _host,
     ssl: !kDebugMode,
     serverKey: const String.fromEnvironment('NAKAMA_SERVER_KEY'),
-    grpcPort: kDebugMode ? 8349 : 7349,
-    httpPort: kDebugMode ? 8350 : 7350,
+    grpcPort: _grpcPort,
+    httpPort: _httpPort,
   );
+
+  NakamaWebsocketClient _initWebsocketClient(String token) =>
+      NakamaWebsocketClient.init(
+        host: _host,
+        ssl: !kDebugMode,
+        port: _httpPort,
+        token: token,
+        onError: (error) {
+          debugPrint('websocket error: $error');
+        },
+        onDone: () {
+          debugPrint('websocket done');
+        },
+      );
+
+  late NakamaWebsocketClient _websocketClient;
 
   late Session _currentSession;
 
@@ -20,6 +43,7 @@ class NakamaDataSource {
     _currentSession = await client.authenticateDevice(
       deviceId: deviceId,
     );
+    _websocketClient = _initWebsocketClient(_currentSession.token);
     return _currentSession;
   }
 
@@ -79,4 +103,33 @@ class NakamaDataSource {
     return matchId;
   }
 
+  Stream<MatchEvent> onMatchEvent(String matchId) =>
+      _websocketClient.onMatchData
+          .where((event) => event.matchId == matchId)
+          .map((event) {
+        final index = MatchEventOpCode.values
+            .indexWhere((element) => element.opCode == event.opCode);
+        if (index == -1) {
+          // opCode is not defined in the client
+          throw Exception('Unknown event type with opCode: ${event.opCode}');
+        }
+        final opCode = MatchEventOpCode.values[index];
+        return opCode.parseIncomingEvent(event);
+      });
+
+  Future<Match> joinMatch(String matchId) async {
+    final match = await _websocketClient.joinMatch(matchId);
+    if (match.matchId.isEmpty) {
+      throw Exception('Failed to join match');
+    }
+    return match;
+  }
+
+  void sendDispatchingEvent(String matchId, DispatchingMatchEvent event) {
+    _websocketClient.sendMatchData(
+      matchId: matchId,
+      opCode: MatchEventOpCode.fromDispatchingEvent(event).opCode,
+      data: event.toBytes(),
+    );
+  }
 }
