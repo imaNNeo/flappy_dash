@@ -1,4 +1,6 @@
 import 'package:flappy_dash/presentation/app_style.dart';
+import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
+import 'package:flappy_dash/presentation/presentation_utils.dart';
 import 'package:flappy_dash/presentation/responsive/screen_size.dart';
 import 'package:flappy_dash/presentation/widget/big_button.dart';
 import 'package:flappy_dash/presentation/widget/blurred_background.dart';
@@ -9,16 +11,30 @@ import 'package:flappy_dash/presentation/widget/profile_overlay.dart';
 import 'package:flappy_dash/presentation/widget/transparent_content_box.dart';
 import 'package:flappy_dash/presentation/widget/watch_on_youtube_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'parts/pending_match_box.dart';
 
-class MultiPlayerLobbyPage extends StatelessWidget {
+class MultiPlayerLobbyPage extends StatefulWidget {
   const MultiPlayerLobbyPage({
     super.key,
     required this.matchId,
   });
 
   final String matchId;
+
+  @override
+  State<MultiPlayerLobbyPage> createState() =>
+      _MultiPlayerLobbyPageContentState();
+}
+
+class _MultiPlayerLobbyPageContentState extends State<MultiPlayerLobbyPage> {
+
+  @override
+  void initState() {
+    context.read<MultiplayerCubit>().joinMatch(widget.matchId);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
