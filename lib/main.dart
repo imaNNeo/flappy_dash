@@ -43,6 +43,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => MultiplayerCubit(
             getIt.get<MultiplayerRepository>(),
+            getIt.get<GameRepository>(),
           ),
         )
       ],
