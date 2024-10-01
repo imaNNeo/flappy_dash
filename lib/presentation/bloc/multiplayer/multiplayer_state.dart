@@ -11,6 +11,7 @@ class MultiplayerState with EquatableMixin {
     this.matchWaitingRemainingSeconds,
     this.inLobbyPlayers = const [],
     this.joinedInLobby = false,
+    this.currentAccount,
   });
 
   final String currentUserId;
@@ -22,6 +23,7 @@ class MultiplayerState with EquatableMixin {
   final int? matchWaitingRemainingSeconds;
   final List<PlayerState> inLobbyPlayers;
   final bool joinedInLobby;
+  final Account? currentAccount;
 
   MultiplayerState copyWith({
     String? currentUserId,
@@ -33,6 +35,7 @@ class MultiplayerState with EquatableMixin {
     int? matchWaitingRemainingSeconds,
     List<PlayerState>? inLobbyPlayers,
     bool? joinedInLobby,
+    Account? currentAccount,
   }) =>
       MultiplayerState(
         currentUserId: currentUserId ?? this.currentUserId,
@@ -45,6 +48,7 @@ class MultiplayerState with EquatableMixin {
             matchWaitingRemainingSeconds ?? this.matchWaitingRemainingSeconds,
         inLobbyPlayers: inLobbyPlayers ?? this.inLobbyPlayers,
         joinedInLobby: joinedInLobby ?? this.joinedInLobby,
+        currentAccount: currentAccount ?? this.currentAccount,
       );
 
   @override
@@ -58,5 +62,6 @@ class MultiplayerState with EquatableMixin {
         matchWaitingRemainingSeconds,
         inLobbyPlayers,
         joinedInLobby,
+        currentAccount,
       ];
 }

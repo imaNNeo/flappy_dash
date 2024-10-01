@@ -92,3 +92,10 @@ class DispatchingPlayerKickedFromLobbyEvent extends DispatchingMatchEvent {
         'positionX': positionX,
       });
 }
+
+class DispatchingUserDisplayNameUpdatedEvent extends DispatchingMatchEvent {
+  DispatchingUserDisplayNameUpdatedEvent();
+
+  @override
+  List<int> toBytes() => [];
+}

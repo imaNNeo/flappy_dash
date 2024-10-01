@@ -18,7 +18,8 @@ enum MatchEventOpCode {
   playerIsIdle(205),
   playerStartedAgain(206),
   playerKickedFromTheLobby(207),
-  playerCorrectPosition(208);
+  playerCorrectPosition(208),
+  playerDisplayNameUpdated(209);
 
   final int opCode;
 
@@ -43,6 +44,8 @@ enum MatchEventOpCode {
           PlayerKickedFromTheLobbyEvent(data),
         MatchEventOpCode.playerCorrectPosition =>
           PlayerCorrectPositionEvent(data),
+        MatchEventOpCode.playerDisplayNameUpdated =>
+          throw UnimplementedError('It is not an incoming event'),
       };
 
   static MatchEventOpCode fromDispatchingEvent(DispatchingMatchEvent event) =>
@@ -58,5 +61,7 @@ enum MatchEventOpCode {
           MatchEventOpCode.playerStartedAgain,
         DispatchingPlayerKickedFromLobbyEvent() =>
           MatchEventOpCode.playerKickedFromTheLobby,
+        DispatchingUserDisplayNameUpdatedEvent() =>
+          MatchEventOpCode.playerDisplayNameUpdated,
       };
 }
