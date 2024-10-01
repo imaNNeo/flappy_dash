@@ -50,18 +50,19 @@ class PendingMatchBox extends StatelessWidget {
                               mainAxisSpacing: 12,
                               childAspectRatio: 3,
                             ),
-                            itemCount: 17,
+                            itemCount: state.inLobbyPlayers.length,
                             itemBuilder: (context, index) {
                               return DashPlayerBox(
-                                playerName: 'Player $index',
+                                playerName:
+                                    state.inLobbyPlayers[index].displayName,
                               );
                             },
                           ),
                           Transform.translate(
                             offset: Offset(horizontalPadding, -32),
-                            child: const Text(
-                              '17 Joined',
-                              style: TextStyle(
+                            child: Text(
+                              '${state.inLobbyPlayers.length} Joined',
+                              style: const TextStyle(
                                 color: AppColors.whiteTextColor,
                                 fontSize: 18,
                               ),
@@ -78,7 +79,11 @@ class PendingMatchBox extends StatelessWidget {
                     child: BigButton(
                       strokeColor: Colors.white,
                       bgColor: AppColors.blueButtonBgColor,
-                      onPressed: () {},
+                      onPressed: state.joinedInLobby
+                          ? null
+                          : () {
+                              context.read<MultiplayerCubit>().joinLobby();
+                            },
                       child: const Text(
                         'JOIN',
                         style: TextStyle(

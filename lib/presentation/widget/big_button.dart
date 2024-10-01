@@ -21,6 +21,7 @@ class BigButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenSize = ScreenSize.fromContext(context);
+    final disabled = onPressed == null;
     return SizedBox(
       width: switch (screenSize) {
         ScreenSize.extraSmall => 280,
@@ -41,9 +42,10 @@ class BigButton extends StatelessWidget {
                 ),
               ),
               side: BorderSide(
-                color: strokeColor,
+                color: disabled ? strokeColor.withOpacity(0.3) : strokeColor,
                 width: 2.5,
               ),
+              disabledBackgroundColor: bgColor.withOpacity(0.3),
               backgroundColor: bgColor,
             ),
             child: child,

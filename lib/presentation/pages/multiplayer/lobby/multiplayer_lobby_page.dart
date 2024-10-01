@@ -30,9 +30,11 @@ class MultiPlayerLobbyPage extends StatefulWidget {
 
 class _MultiPlayerLobbyPageContentState extends State<MultiPlayerLobbyPage> {
 
+  late MultiplayerCubit _multiplayerCubit;
   @override
   void initState() {
-    context.read<MultiplayerCubit>().joinMatch(widget.matchId);
+    _multiplayerCubit = context.read<MultiplayerCubit>();
+    _multiplayerCubit.joinMatch(widget.matchId);
     super.initState();
   }
 
@@ -113,5 +115,11 @@ class _MultiPlayerLobbyPageContentState extends State<MultiPlayerLobbyPage> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _multiplayerCubit.onLobbyClosed();
+    super.dispose();
   }
 }
