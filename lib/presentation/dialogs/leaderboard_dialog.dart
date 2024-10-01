@@ -1,5 +1,5 @@
 import 'package:flappy_dash/presentation/app_style.dart';
-import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
+import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
 import 'package:flappy_dash/presentation/dialogs/app_dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,7 +15,7 @@ class LeaderBoardDialog extends StatefulWidget {
 class _LeaderBoardDialogState extends State<LeaderBoardDialog> {
   @override
   void initState() {
-    context.read<GameCubit>().onLeaderboardPageOpen();
+    context.read<LeaderboardCubit>().onLeaderboardPageOpen();
     super.initState();
   }
 
@@ -72,8 +72,8 @@ class _LeaderBoardDialogState extends State<LeaderBoardDialog> {
             ),
             SizedBox(
               height: 400,
-              child:
-                  BlocBuilder<GameCubit, GameState>(builder: (context, state) {
+              child: BlocBuilder<LeaderboardCubit, LeaderboardState>(
+                  builder: (context, state) {
                 return ListView.separated(
                   padding: const EdgeInsets.only(top: 18, bottom: 12),
                   itemBuilder: (context, index) {
@@ -82,8 +82,7 @@ class _LeaderBoardDialogState extends State<LeaderBoardDialog> {
                       rank: int.parse(record.rank ?? '9999'),
                       name: name,
                       score: int.parse(record.score ?? '0'),
-                      isMine: record.ownerId ==
-                          state.currentUserAccount?.user.id,
+                      isMine: record.ownerId == state.currentAccount?.user.id,
                       onMyProfileTap: () => AppDialogs.nicknameDialog(context),
                     );
                   },

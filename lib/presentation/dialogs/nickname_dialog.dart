@@ -1,5 +1,5 @@
 import 'package:flappy_dash/domain/extensions/user_extension.dart';
-import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
+import 'package:flappy_dash/presentation/bloc/account/account_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -16,7 +16,7 @@ class _NicknameDialogState extends State<NicknameDialog> {
   @override
   void initState() {
     final name =
-        context.read<GameCubit>().state.currentUserAccount?.user.showingName;
+        context.read<AccountCubit>().state.currentAccount?.user.showingName;
     _textEditingController = TextEditingController(text: name);
     super.initState();
   }
@@ -75,9 +75,9 @@ class _NicknameDialogState extends State<NicknameDialog> {
   }
 
   void _onSaveClicked() {
-    final gameCubit = context.read<GameCubit>();
+    final accountCubit = context.read<AccountCubit>();
     final newName = _textEditingController.text;
-    gameCubit.updateUserDisplayName(newName);
+    accountCubit.updateUserDisplayName(newName);
     Navigator.of(context).pop();
   }
 

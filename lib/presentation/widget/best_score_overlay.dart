@@ -1,5 +1,5 @@
 import 'package:flappy_dash/presentation/app_style.dart';
-import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
+import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
 import 'package:flappy_dash/presentation/dialogs/leaderboard_dialog.dart';
 import 'package:flappy_dash/presentation/responsive/screen_size.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +27,8 @@ class BestScoreOverlay extends StatelessWidget {
     };
     double relative(double value) => value * multiplier;
 
-    return BlocBuilder<GameCubit, GameState>(builder: (context, state) {
+    return BlocBuilder<LeaderboardCubit, LeaderboardState>(
+        builder: (context, state) {
       final record = state.leaderboardEntity?.ownerRecord;
       int? rank = int.tryParse(record?.rank ?? '');
       int score = int.tryParse(record?.score ?? '') ?? 0;
@@ -43,9 +44,9 @@ class BestScoreOverlay extends StatelessWidget {
             switch (rank) {
               null || <= 3 => ScoreTrophy(size: 32, rank: rank),
               _ => NormalScore(
-                size: 38,
-                rank: rank,
-              ),
+                  size: 38,
+                  rank: rank,
+                ),
             },
             SizedBox(width: relative(18)),
             Column(
