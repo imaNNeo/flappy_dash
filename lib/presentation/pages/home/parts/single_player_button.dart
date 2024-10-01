@@ -16,7 +16,7 @@ class SinglePlayerButton extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           SvgPicture.asset(
-            "assets/images/dash.svg",
+            "assets/images/dashes/flutter_dash.svg",
             height: 58,
           ),
           const SizedBox(width: 8),
