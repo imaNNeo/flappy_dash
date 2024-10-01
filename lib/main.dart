@@ -2,6 +2,8 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flappy_dash/audio_helper.dart';
 import 'package:flappy_dash/domain/repositories/game_repository.dart';
 import 'package:flappy_dash/domain/repositories/multiplayer_repository.dart';
+import 'package:flappy_dash/presentation/bloc/account/account_cubit.dart';
+import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/service_locator.dart';
 import 'package:flutter/foundation.dart';
@@ -38,14 +40,24 @@ class MyApp extends StatelessWidget {
             getIt.get<AudioHelper>(),
             getIt.get<GameRepository>(),
           ),
-          lazy: false,
         ),
         BlocProvider(
           create: (context) => MultiplayerCubit(
             getIt.get<MultiplayerRepository>(),
             getIt.get<GameRepository>(),
           ),
-        )
+        ),
+        BlocProvider(
+          create: (context) => AccountCubit(
+            getIt.get<GameRepository>(),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => LeaderboardCubit(
+            getIt.get<GameRepository>(),
+          ),
+          lazy: false,
+        ),
       ],
       child: MaterialApp.router(
         routerConfig: AppRoutes.router,

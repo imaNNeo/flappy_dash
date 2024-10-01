@@ -1,7 +1,7 @@
 import 'package:flappy_dash/domain/entities/dash_type.dart';
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
-import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
+import 'package:flappy_dash/presentation/bloc/account/account_cubit.dart';
 import 'package:flappy_dash/presentation/dialogs/app_dialogs.dart';
 import 'package:flappy_dash/presentation/responsive/screen_size.dart';
 import 'package:flappy_dash/presentation/widget/outline_text.dart';
@@ -25,10 +25,10 @@ class ProfileOverlay extends StatelessWidget {
       ScreenSize.extraLarge => 1.2,
     };
     double relative(double value) => value * multiplier;
-    return BlocBuilder<GameCubit, GameState>(
+    return BlocBuilder<AccountCubit, AccountState>(
       builder: (context, state) {
-        final displayName = state.currentUserAccount?.user.displayName;
-        final userId = state.currentUserAccount?.user.id;
+        final displayName = state.currentAccount?.user.displayName;
+        final userId = state.currentAccount?.user.id;
         final dashType =
             userId == null ? DashType.flutterDash : DashType.fromUserId(userId);
         return BoxOverlay(
