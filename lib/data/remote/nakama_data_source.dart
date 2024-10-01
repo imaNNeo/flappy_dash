@@ -37,6 +37,8 @@ class NakamaDataSource {
 
   late Session _currentSession;
 
+  final _accountUpdateStreamController = StreamController<Account>.broadcast();
+
   Future<Session> initSession(
     String deviceId,
   ) async {
@@ -70,18 +72,31 @@ class NakamaDataSource {
 
   String getCurrentUserId() => _currentSession.userId;
 
-  Future<Account> getAccount() => client.getAccount(_currentSession);
+  Future<Account> getAccount() async {
+    final account = await client.getAccount(_currentSession);
+    _accountUpdateStreamController.add(account);
+    return account;
+  }
+
+  Stream<Account> getAccountUpdateStream() async* {
+    yield await getAccount();
+    yield* _accountUpdateStreamController.stream;
+  }
 
   Future<List<User>> getUsers(List<String> userIds) => client.getUsers(
         session: _currentSession,
         ids: userIds,
       );
 
-  Future<void> updateUserDisplayName(String newDisplayName) =>
-      client.updateAccount(
-        session: _currentSession,
-        displayName: newDisplayName,
-      );
+  Future<Account> updateUserDisplayName(String newDisplayName) async {
+    await client.updateAccount(
+      session: _currentSession,
+      displayName: newDisplayName,
+    );
+    final account = await client.getAccount(_currentSession);
+    _accountUpdateStreamController.add(account);
+    return account;
+  }
 
   Future<LeaderboardRecordList> listLeaderboardRecordsAroundOwner(
       String leaderboardName) {

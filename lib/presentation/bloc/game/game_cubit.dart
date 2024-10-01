@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flappy_dash/domain/entities/leaderboard_entity.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -17,6 +19,18 @@ class GameCubit extends Cubit<GameState> {
 
   final AudioHelper _audioHelper;
   final GameRepository _gameRepository;
+
+  late StreamSubscription<Account> _accountUpdateStreamSubscription;
+
+  void _init() async {
+    await _refreshLeaderboard();
+    _accountUpdateStreamSubscription =
+        _gameRepository.getUserAccountUpdateStream().listen((account) {
+      emit(state.copyWith(
+        currentUserAccount: account,
+      ));
+    });
+  }
 
   void startPlaying() {
     _audioHelper.playBackgroundAudio();
@@ -49,16 +63,6 @@ class GameCubit extends Cubit<GameState> {
     ));
   }
 
-  void _init() async {
-    await _refreshLeaderboard();
-    await _refreshCurrentUserAccount();
-  }
-
-  Future<void> _refreshCurrentUserAccount() async {
-    final account = await _gameRepository.getCurrentUserAccount();
-    emit(state.copyWith(currentUserAccount: account));
-  }
-
   Future<void> _refreshLeaderboard() async {
     final leaderboard = await _gameRepository.getLeaderboard();
     emit(state.copyWith(
@@ -69,10 +73,15 @@ class GameCubit extends Cubit<GameState> {
   void updateUserDisplayName(String newUserDisplayName) async {
     await _gameRepository.updateUserDisplayName(newUserDisplayName);
     await _refreshLeaderboard();
-    await _refreshCurrentUserAccount();
   }
 
   void onLeaderboardPageOpen() async {
     await _refreshLeaderboard();
+  }
+
+  @override
+  Future<void> close() {
+    _accountUpdateStreamSubscription.cancel();
+    return super.close();
   }
 }

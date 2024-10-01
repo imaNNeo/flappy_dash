@@ -26,4 +26,11 @@ class MultiplayerRepository {
 
   Future<void> leaveMatch(String matchId) =>
       _nakamaDataSource.leaveMatch(matchId);
+
+  void sendUserDisplayNameUpdatedEvent(String matchId) {
+    _nakamaDataSource.sendDispatchingEvent(
+      matchId,
+      DispatchingUserDisplayNameUpdatedEvent(),
+    );
+  }
 }
