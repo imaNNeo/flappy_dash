@@ -52,9 +52,11 @@ class PendingMatchBox extends StatelessWidget {
                             ),
                             itemCount: state.inLobbyPlayers.length,
                             itemBuilder: (context, index) {
+                              final player = state.inLobbyPlayers[index];
                               return DashPlayerBox(
-                                playerName:
-                                    state.inLobbyPlayers[index].displayName,
+                                playerUserId: player.userId,
+                                playerName: player.displayName,
+                                isMe: player.userId == state.currentUserId,
                               );
                             },
                           ),

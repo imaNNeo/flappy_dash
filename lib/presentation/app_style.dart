@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:flappy_dash/domain/entities/dash_type.dart';
+
 class AppColors {
   static const backgroundColor = Color(0xFF0F8B8D);
   static const backgroundColor60 = Color(0x800F8B8D);
@@ -33,6 +35,19 @@ class AppColors {
     Color(0xFFAE0089),
     Color(0xFF0073FF),
   ];
+
+  static Color getDashColor(DashType type) => switch (type) {
+        DashType.flutterDash => const Color(0xFF2AC6FD),
+        DashType.limeDash => const Color(0xFFD0FF6F),
+        DashType.peachyDash => const Color(0xFFFDBDB3),
+        DashType.roseDash => const Color(0xFFFDABE3),
+        DashType.sandDash => const Color(0xFFFDCA7B),
+        DashType.scarletDash => const Color(0xFFFF635A),
+        DashType.skyDash => const Color(0xFFA3EAFF),
+        DashType.mintyDash => const Color(0xFF5EF9A5),
+        DashType.sunnyDash => const Color(0xFFFFE247),
+        DashType.violetDash => const Color(0xFFBEA2FD),
+      };
 }
 
 class PresentationConstants {
