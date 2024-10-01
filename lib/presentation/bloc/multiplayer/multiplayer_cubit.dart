@@ -30,6 +30,19 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     _timer = Timer.periodic(const Duration(milliseconds: 100), (_) {
       _refreshRemainingTime();
     });
+    _listenToUserDisplayNameUpdates();
+  }
+
+  void _listenToUserDisplayNameUpdates() {
+    _gameRepository.getUserAccountUpdateStream().listen((account) {
+      final currentAccount = state.currentAccount;
+      if (currentAccount != null &&
+          currentAccount.user.displayName != account.user.displayName &&
+          state.matchId.isNotBlank) {
+        _multiplayerRepository.sendUserDisplayNameUpdatedEvent(state.matchId);
+      }
+      emit(state.copyWith(currentAccount: account));
+    });
   }
 
   final MultiplayerRepository _multiplayerRepository;
@@ -79,7 +92,6 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
   }
 
   void _onMatchEvent(MatchEvent event) {
-    print('New event: $event');
     final newState = switch (event) {
       MatchWelcomeEvent() => event.state,
       MatchWaitingTimeIncreasedEvent() => event.state,
