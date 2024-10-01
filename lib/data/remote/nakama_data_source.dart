@@ -125,6 +125,9 @@ class NakamaDataSource {
     return match;
   }
 
+  Future<void> leaveMatch(String matchId) =>
+      _websocketClient.leaveMatch(matchId);
+
   void sendDispatchingEvent(String matchId, DispatchingMatchEvent event) {
     _websocketClient.sendMatchData(
       matchId: matchId,
