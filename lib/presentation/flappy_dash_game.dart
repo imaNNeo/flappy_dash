@@ -1,8 +1,8 @@
-
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame_bloc/flame_bloc.dart';
+import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -11,8 +11,10 @@ import 'component/flappy_dash_root_component.dart';
 
 class FlappyDashGame extends FlameGame<FlappyDashWorld>
     with KeyboardEvents, HasCollisionDetection {
-  FlappyDashGame(this.gameCubit)
-      : super(
+  FlappyDashGame(
+    this.gameCubit,
+    this.leaderboardCubit,
+  ) : super(
           world: FlappyDashWorld(),
           camera: CameraComponent.withFixedResolution(
             width: 600,
@@ -21,6 +23,7 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
         );
 
   final GameCubit gameCubit;
+  final LeaderboardCubit leaderboardCubit;
 
   @override
   KeyEventResult onKeyEvent(
@@ -36,6 +39,15 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
+  }
+
+  void gameOver() async {
+    await gameCubit.gameOver();
+    leaderboardCubit.refreshLeaderboard();
+  }
+
+  void increaseScore() {
+    gameCubit.increaseScore();
   }
 }
 
