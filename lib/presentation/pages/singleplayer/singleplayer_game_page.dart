@@ -1,4 +1,5 @@
 import 'package:flame/game.dart';
+import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
 import 'package:flappy_dash/presentation/dialogs/app_dialogs.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
@@ -24,13 +25,15 @@ class _SinglePlayerGamePageState extends State<SinglePlayerGamePage> {
   late FlappyDashGame _flappyDashGame;
 
   late GameCubit gameCubit;
+  late LeaderboardCubit leaderboardCubit;
 
   PlayingState? _latestState;
 
   @override
   void initState() {
     gameCubit = BlocProvider.of<GameCubit>(context);
-    _flappyDashGame = FlappyDashGame(gameCubit);
+    leaderboardCubit = BlocProvider.of<LeaderboardCubit>(context);
+    _flappyDashGame = FlappyDashGame(gameCubit, leaderboardCubit);
     super.initState();
   }
 
@@ -41,7 +44,10 @@ class _SinglePlayerGamePageState extends State<SinglePlayerGamePage> {
         if (state.currentPlayingState.isIdle &&
             _latestState == PlayingState.gameOver) {
           setState(() {
-            _flappyDashGame = FlappyDashGame(gameCubit);
+            _flappyDashGame = FlappyDashGame(
+              gameCubit,
+              leaderboardCubit,
+            );
           });
         }
 

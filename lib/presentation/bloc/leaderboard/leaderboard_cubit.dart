@@ -19,7 +19,7 @@ class LeaderboardCubit extends Cubit<LeaderboardState> {
   late final StreamSubscription<Account> _userAccountUpdateSubscription;
 
   void _init() {
-    _refreshLeaderboard();
+    refreshLeaderboard();
     _listenToUserDisplayNameUpdates();
   }
 
@@ -29,13 +29,13 @@ class LeaderboardCubit extends Cubit<LeaderboardState> {
       final currentAccount = state.currentAccount;
       if (currentAccount != null &&
           currentAccount.user.displayName != account.user.displayName) {
-        _refreshLeaderboard();
+        refreshLeaderboard();
       }
       emit(state.copyWith(currentAccount: account));
     });
   }
 
-  Future<void> _refreshLeaderboard() async {
+  Future<void> refreshLeaderboard() async {
     final leaderboard = await _gameRepository.getLeaderboard();
     emit(state.copyWith(
       leaderboardEntity: leaderboard,
@@ -43,7 +43,7 @@ class LeaderboardCubit extends Cubit<LeaderboardState> {
   }
 
   void onLeaderboardPageOpen() async {
-    await _refreshLeaderboard();
+    await refreshLeaderboard();
   }
 
   @override
