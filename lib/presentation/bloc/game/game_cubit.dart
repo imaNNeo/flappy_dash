@@ -1,3 +1,4 @@
+import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flappy_dash/audio_helper.dart';
@@ -13,6 +14,12 @@ class GameCubit extends Cubit<GameState> {
 
   final AudioHelper _audioHelper;
   final GameRepository _gameRepository;
+
+  void initialize(GameMode gameMode) {
+    emit(const GameState().copyWith(
+      gameMode: gameMode,
+    ));
+  }
 
   void startPlaying() {
     _audioHelper.playBackgroundAudio();
