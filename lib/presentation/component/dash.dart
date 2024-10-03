@@ -14,7 +14,7 @@ class Dash extends PositionComponent
         CollisionCallbacks,
         HasGameRef<FlappyDashGame>,
         FlameBlocReader<GameCubit, GameState> {
-  Dash()
+  Dash({this.speed = 200.0})
       : super(
           position: Vector2(0, 0),
           size: Vector2.all(80.0),
@@ -24,9 +24,10 @@ class Dash extends PositionComponent
 
   late Sprite _dashSprite;
 
-  final Vector2 _gravity = Vector2(0, 1400.0);
-  Vector2 _velocity = Vector2(0, 0);
-  final Vector2 _jumpForce = Vector2(0, -500);
+  final double _gravity = 1400.0;
+  double _yVelocity = 0;
+  final double _jumpForce = -500;
+  final double speed;
 
   @override
   Future<void> onLoad() async {
@@ -47,15 +48,16 @@ class Dash extends PositionComponent
     if (bloc.state.currentPlayingState.isNotPlaying) {
       return;
     }
-    _velocity += _gravity * dt;
-    position += _velocity * dt;
+    _yVelocity += _gravity * dt;
+    position.y += _yVelocity * dt;
+    position.x += speed * dt;
   }
 
   void jump() {
     if (bloc.state.currentPlayingState.isNotPlaying) {
       return;
     }
-    _velocity = _jumpForce;
+    _yVelocity = _jumpForce;
   }
 
   @override
