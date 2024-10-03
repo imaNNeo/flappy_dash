@@ -14,21 +14,23 @@ class FlappyDashRootComponent extends Component
     with HasGameRef<FlappyDashGame>, FlameBlocReader<GameCubit, GameState> {
   late Dash _dash;
   late PipePair _lastPipe;
+  late DashParallaxBackground _background;
   static const _pipesDistance = 400.0;
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    add(DashParallaxBackground());
+    add(_background = DashParallaxBackground());
     add(_dash = Dash());
     _generatePipes(
       fromX: 350,
     );
+    game.camera.follow(_dash, horizontalOnly: true);
   }
 
   void _generatePipes({
     int count = 5,
-    double fromX = 0.0,
+    required double fromX,
   }) {
     for (int i = 0; i < count; i++) {
       const area = 600;
@@ -66,9 +68,10 @@ class FlappyDashRootComponent extends Component
   @override
   void update(double dt) {
     super.update(dt);
+    _background.x = _dash.x;
     if (_dash.x >= _lastPipe.x) {
       _generatePipes(
-        fromX: _pipesDistance,
+        fromX: _lastPipe.x + _pipesDistance,
       );
       _removeLastPipes();
     }
