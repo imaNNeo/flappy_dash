@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame_bloc/flame_bloc.dart';
+import 'package:flappy_dash/domain/entities/game_config_entity.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
 
@@ -15,15 +16,16 @@ class FlappyDashRootComponent extends Component
   late Dash _dash;
   late PipePair _lastPipe;
   late DashParallaxBackground _background;
-  static const _pipesDistance = 400.0;
+  late GameConfigEntity _config;
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
     add(_background = DashParallaxBackground());
     add(_dash = Dash());
+    _config = bloc.state.gameMode!.gameConfig;
     _generatePipes(
-      fromX: 350,
+      fromX: _config.pipesDistance,
     );
     game.camera.follow(_dash, horizontalOnly: true);
   }
@@ -33,10 +35,12 @@ class FlappyDashRootComponent extends Component
     required double fromX,
   }) {
     for (int i = 0; i < count; i++) {
-      const area = 600;
+      final area = _config.pipesPositionArea;
       final y = (Random().nextDouble() * area) - (area / 2);
       add(_lastPipe = PipePair(
-        position: Vector2(fromX + (i * _pipesDistance), y),
+        position: Vector2(fromX + (i * _config.pipesDistance), y),
+        gap: _config.pipeHoleGap,
+        pipeWidth: _config.pipeWidth,
       ));
     }
   }
@@ -71,7 +75,7 @@ class FlappyDashRootComponent extends Component
     _background.x = _dash.x;
     if (_dash.x >= _lastPipe.x) {
       _generatePipes(
-        fromX: _lastPipe.x + _pipesDistance,
+        fromX: _lastPipe.x + _config.pipesDistance,
       );
       _removeLastPipes();
     }

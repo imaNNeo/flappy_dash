@@ -6,10 +6,12 @@ class Pipe extends PositionComponent {
   late Sprite _pipeSprite;
 
   final bool isFlipped;
+  final double pipeWidth;
 
   Pipe({
     required this.isFlipped,
     required super.position,
+    required this.pipeWidth,
   }): super(priority: 2);
 
   @override
@@ -18,8 +20,7 @@ class Pipe extends PositionComponent {
     _pipeSprite = await Sprite.load('pipe.png');
     anchor = Anchor.topCenter;
     final ratio = _pipeSprite.srcSize.y / _pipeSprite.srcSize.x;
-    const width = 82.0;
-    size = Vector2(width, width * ratio);
+    size = Vector2(pipeWidth, pipeWidth * ratio);
     if (isFlipped) {
       flipVertically();
     }

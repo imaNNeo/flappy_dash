@@ -9,10 +9,12 @@ class PipePair extends PositionComponent
     with FlameBlocReader<GameCubit, GameState> {
   PipePair({
     required super.position,
-    this.gap = 200.0,
+    required this.gap,
+    required this.pipeWidth,
   });
 
   final double gap;
+  final double pipeWidth;
 
   @override
   Future<void> onLoad() async {
@@ -21,10 +23,12 @@ class PipePair extends PositionComponent
       Pipe(
         isFlipped: false,
         position: Vector2(0, gap / 2),
+        pipeWidth: pipeWidth,
       ),
       Pipe(
         isFlipped: true,
         position: Vector2(0, -(gap / 2)),
+        pipeWidth: pipeWidth,
       ),
       HiddenCoin(
         position: Vector2(30, 0),

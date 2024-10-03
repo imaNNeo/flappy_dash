@@ -1,4 +1,5 @@
 import 'package:flame/game.dart';
+import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
 import 'package:flappy_dash/presentation/dialogs/app_dialogs.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
@@ -32,6 +33,7 @@ class _SinglePlayerGamePageState extends State<SinglePlayerGamePage> {
   @override
   void initState() {
     gameCubit = BlocProvider.of<GameCubit>(context);
+    gameCubit.initialize(const SinglePlayerGameMode());
     leaderboardCubit = BlocProvider.of<LeaderboardCubit>(context);
     _flappyDashGame = FlappyDashGame(gameCubit, leaderboardCubit);
     super.initState();
