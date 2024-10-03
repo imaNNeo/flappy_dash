@@ -16,7 +16,9 @@ class FlappyDashRootComponent extends Component
   late Dash _dash;
   late PipePair _lastPipe;
   late DashParallaxBackground _background;
-  late GameConfigEntity _config;
+  late final GameConfigEntity _config;
+
+  int _pipeCounter = 0;
 
   @override
   Future<void> onLoad() async {
@@ -30,18 +32,32 @@ class FlappyDashRootComponent extends Component
     game.camera.follow(_dash, horizontalOnly: true);
   }
 
+  double _getNewPipeYForMultiplayer(MultiplayerGameConfigEntity config) {
+    final pipesPosition =
+        (_config as MultiplayerGameConfigEntity).pipesPosition;
+    final posIndex = _pipeCounter % pipesPosition.length;
+    return pipesPosition[posIndex] * _config.pipesPositionArea;
+  }
+
   void _generatePipes({
     int count = 5,
     required double fromX,
   }) {
     for (int i = 0; i < count; i++) {
       final area = _config.pipesPositionArea;
-      final y = (Random().nextDouble() * area) - (area / 2);
+
+      final y = switch (_config) {
+        SinglePlayerGameConfigEntity() =>
+          (Random().nextDouble() * area) - (area / 2),
+        MultiplayerGameConfigEntity() => _getNewPipeYForMultiplayer(_config),
+      };
+
       add(_lastPipe = PipePair(
         position: Vector2(fromX + (i * _config.pipesDistance), y),
         gap: _config.pipeHoleGap,
         pipeWidth: _config.pipeWidth,
       ));
+      _pipeCounter++;
     }
   }
 

@@ -44,6 +44,13 @@ class MultiplayerGameConfigEntity extends GameConfigEntity {
     this.pipesDistance = 400.0,
     this.pipeWidth = 82.0,
     this.pipeHoleGap = 200,
+    this.pipesPosition = const [
+      1.0,
+      0.5,
+      0.0,
+      -0.5,
+      -1.0
+    ],
   });
 
   @override
@@ -58,8 +65,11 @@ class MultiplayerGameConfigEntity extends GameConfigEntity {
   @override
   final double pipeHoleGap;
 
+  final List<double> pipesPosition;
+
   @override
   List<Object?> get props => [
+        pipesPosition,
         pipesPositionArea,
         pipesDistance,
         pipeWidth,
