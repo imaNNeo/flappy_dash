@@ -67,6 +67,8 @@ class MultiplayerGameConfigEntity extends GameConfigEntity {
 
   final List<double> pipesPosition;
 
+  double get worldWidth => pipesDistance * (pipesPosition.length);
+
   @override
   List<Object?> get props => [
         pipesPosition,
