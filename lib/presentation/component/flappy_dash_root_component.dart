@@ -40,7 +40,7 @@ class FlappyDashRootComponent extends Component
   }
 
   void _generatePipes({
-    int count = 5,
+    int count = 1,
     required double fromX,
   }) {
     for (int i = 0; i < count; i++) {
@@ -85,10 +85,39 @@ class FlappyDashRootComponent extends Component
     }
   }
 
+  PipePair _removeAllPipesExceptLastOne() {
+    final pipes = children.whereType<PipePair>();
+    for (int i = pipes.length - 2; i >= 0; i--) {
+      pipes.elementAt(i).removeFromParent();
+    }
+    return pipes.last;
+  }
+
+  void _tryToLoopTheGame() {
+    if (_config is! MultiplayerGameConfigEntity) {
+      return;
+    }
+
+    // We loop if the dash is out of the screen
+    if (_dash.x < _config.worldWidth) {
+      return;
+    }
+
+    final lastPipe = _removeAllPipesExceptLastOne();
+    lastPipe.x = 0.0;
+    _dash.x = 0.0;
+    _background.x = 0.0;
+    _pipeCounter = 0;
+    _generatePipes(
+      fromX: _config.pipesDistance,
+    );
+  }
+
   @override
   void update(double dt) {
     super.update(dt);
     _background.x = _dash.x;
+    _tryToLoopTheGame();
     if (_dash.x >= _lastPipe.x) {
       _generatePipes(
         fromX: _lastPipe.x + _config.pipesDistance,
