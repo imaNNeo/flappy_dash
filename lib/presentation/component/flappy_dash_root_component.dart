@@ -4,6 +4,8 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flappy_dash/domain/entities/game_config_entity.dart';
+import 'package:flappy_dash/domain/entities/game_mode.dart';
+import 'package:flappy_dash/presentation/component/multiplayer_controller.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
 
@@ -20,11 +22,19 @@ class FlappyDashRootComponent extends Component
 
   int _pipeCounter = 0;
 
+  String get myId => game.leaderboardCubit.state.currentAccount!.user.id;
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
     add(_background = DashParallaxBackground());
-    add(_dash = Dash());
+    if (bloc.state.gameMode == const MultiplayerGameMode()) {
+      add(MultiplayerController());
+    }
+    add(_dash = Dash(
+      playerId: myId,
+      isMe: true,
+    ));
     _config = bloc.state.gameMode!.gameConfig;
     _generatePipes(
       fromX: _config.pipesDistance,
@@ -61,6 +71,11 @@ class FlappyDashRootComponent extends Component
     }
   }
 
+  @override
+  void updateTree(double dt) {
+    super.updateTree(dt * 0.1);
+  }
+
   void _removeLastPipes() {
     final pipes = children.whereType<PipePair>();
     final shouldBeRemoved = max(pipes.length - 5, 0);
@@ -82,6 +97,10 @@ class FlappyDashRootComponent extends Component
   void _checkToStart() {
     if (bloc.state.currentPlayingState.isIdle) {
       bloc.startPlaying();
+      if (_config is MultiplayerGameConfigEntity) {
+        final bool isFirstRound = bloc.state.currentScore == 0;
+        game.multiplayerCubit.dispatchStartEvent(isFirstRound);
+      }
     }
   }
 

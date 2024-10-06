@@ -16,10 +16,9 @@ enum MatchEventOpCode {
   playerScored(203),
   playerDied(204),
   playerIsIdle(205),
-  playerStartedAgain(206),
-  playerKickedFromTheLobby(207),
-  playerCorrectPosition(208),
-  playerDisplayNameUpdated(209);
+  playerKickedFromTheLobby(206),
+  playerCorrectPosition(207),
+  playerDisplayNameUpdated(208);
 
   final int opCode;
 
@@ -39,7 +38,6 @@ enum MatchEventOpCode {
         MatchEventOpCode.playerScored => PlayerScoredEvent(data),
         MatchEventOpCode.playerDied => PlayerDiedEvent(data),
         MatchEventOpCode.playerIsIdle => PlayerIsIdleEvent(data),
-        MatchEventOpCode.playerStartedAgain => PlayerStartedAgainEvent(data),
         MatchEventOpCode.playerKickedFromTheLobby =>
           PlayerKickedFromTheLobbyEvent(data),
         MatchEventOpCode.playerCorrectPosition =>
@@ -50,18 +48,13 @@ enum MatchEventOpCode {
 
   static MatchEventOpCode fromDispatchingEvent(DispatchingMatchEvent event) =>
       switch (event) {
-        DispatchingPlayerJoinedLobbyEvent() =>
-          MatchEventOpCode.playerJoinedTheLobby,
+        DispatchingPlayerJoinedLobbyEvent() => MatchEventOpCode.playerJoinedTheLobby,
         DispatchingPlayerStartedEvent() => MatchEventOpCode.playerStarted,
         DispatchingPlayerJumpedEvent() => MatchEventOpCode.playerJumped,
         DispatchingPlayerScoredEvent() => MatchEventOpCode.playerScored,
         DispatchingPlayerDiedEvent() => MatchEventOpCode.playerDied,
         DispatchingPlayerIsIdleEvent() => MatchEventOpCode.playerIsIdle,
-        DispatchingPlayerStartedAgainEvent() =>
-          MatchEventOpCode.playerStartedAgain,
-        DispatchingPlayerKickedFromLobbyEvent() =>
-          MatchEventOpCode.playerKickedFromTheLobby,
-        DispatchingUserDisplayNameUpdatedEvent() =>
-          MatchEventOpCode.playerDisplayNameUpdated,
+        DispatchingPlayerKickedFromLobbyEvent() => MatchEventOpCode.playerKickedFromTheLobby,
+        DispatchingUserDisplayNameUpdatedEvent() => MatchEventOpCode.playerDisplayNameUpdated,
       };
 }

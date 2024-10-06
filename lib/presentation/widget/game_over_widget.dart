@@ -1,6 +1,8 @@
 import 'dart:ui';
 
+import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
+import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -39,7 +41,12 @@ class GameOverWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 60),
                   ElevatedButton(
-                    onPressed: () => context.read<GameCubit>().restartGame(),
+                    onPressed: () {
+                      context.read<GameCubit>().restartGame();
+                      if (state.gameMode is MultiplayerGameMode) {
+                        context.read<MultiplayerCubit>().dispatchPlayerIsIdleEvent();
+                      }
+                    },
                     child: const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Text(

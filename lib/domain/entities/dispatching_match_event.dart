@@ -17,14 +17,10 @@ class DispatchingPlayerJoinedLobbyEvent extends DispatchingMatchEvent {
 }
 
 class DispatchingPlayerStartedEvent extends DispatchingMatchEvent {
-  final double positionX;
-
-  DispatchingPlayerStartedEvent(this.positionX);
+  DispatchingPlayerStartedEvent();
 
   @override
-  List<int> toBytes() => _jsonToData({
-        'positionX': positionX,
-      });
+  List<int> toBytes() => [];
 }
 
 class DispatchingPlayerJumpedEvent extends DispatchingMatchEvent {
@@ -61,25 +57,10 @@ class DispatchingPlayerDiedEvent extends DispatchingMatchEvent {
 }
 
 class DispatchingPlayerIsIdleEvent extends DispatchingMatchEvent {
-  final double positionX;
-
-  DispatchingPlayerIsIdleEvent(this.positionX);
+  DispatchingPlayerIsIdleEvent();
 
   @override
-  List<int> toBytes() => _jsonToData({
-        'positionX': positionX,
-      });
-}
-
-class DispatchingPlayerStartedAgainEvent extends DispatchingMatchEvent {
-  final double positionX;
-
-  DispatchingPlayerStartedAgainEvent(this.positionX);
-
-  @override
-  List<int> toBytes() => _jsonToData({
-        'positionX': positionX,
-      });
+  List<int> toBytes() => [];
 }
 
 class DispatchingPlayerKickedFromLobbyEvent extends DispatchingMatchEvent {

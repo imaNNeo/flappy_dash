@@ -9,9 +9,9 @@ class AudioHelper {
 
   Future<void> initialize() async {
     _soLoud = SoLoud.instance;
-    if (_soLoud.isInitialized) {
-      return;
-    }
+    // if (_soLoud.isInitialized) {
+    //   return;
+    // }
     await _soLoud.init();
     _backgroundSource = await _soLoud.loadAsset('assets/audio/background.mp3');
     _scoreSource = await _soLoud.loadAsset('assets/audio/score.mp3');

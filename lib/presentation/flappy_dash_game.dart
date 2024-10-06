@@ -2,17 +2,20 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame_bloc/flame_bloc.dart';
+import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'bloc/game/game_cubit.dart';
+import 'bloc/multiplayer/multiplayer_cubit.dart';
 import 'component/flappy_dash_root_component.dart';
 
 class FlappyDashGame extends FlameGame<FlappyDashWorld>
     with KeyboardEvents, HasCollisionDetection {
   FlappyDashGame(
     this.gameCubit,
+    this.multiplayerCubit,
     this.leaderboardCubit,
   ) : super(
           world: FlappyDashWorld(),
@@ -23,6 +26,7 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
         );
 
   final GameCubit gameCubit;
+  final MultiplayerCubit multiplayerCubit;
   final LeaderboardCubit leaderboardCubit;
 
   @override
@@ -43,7 +47,9 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
 
   void gameOver() async {
     await gameCubit.gameOver();
-    leaderboardCubit.refreshLeaderboard();
+    if (gameCubit.state.gameMode is SinglePlayerGameMode) {
+      leaderboardCubit.refreshLeaderboard();
+    }
   }
 
   void increaseScore() {
@@ -58,14 +64,22 @@ class FlappyDashWorld extends World
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    add(
-      FlameBlocProvider<GameCubit, GameState>(
-        create: () => game.gameCubit,
-        children: [
-          _rootComponent = FlappyDashRootComponent(),
-        ],
-      ),
-    );
+    add(FlameMultiBlocProvider(
+      providers: [
+        FlameBlocProvider<GameCubit, GameState>(
+          create: () => game.gameCubit,
+        ),
+        FlameBlocProvider<MultiplayerCubit, MultiplayerState>(
+          create: () => game.multiplayerCubit,
+        ),
+        FlameBlocProvider<LeaderboardCubit, LeaderboardState>(
+          create: () => game.leaderboardCubit,
+        ),
+      ],
+      children: [
+        _rootComponent = FlappyDashRootComponent(),
+      ],
+    ));
   }
 
   void onSpaceDown() => _rootComponent.onSpaceDown();

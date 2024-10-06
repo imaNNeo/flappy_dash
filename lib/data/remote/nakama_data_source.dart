@@ -122,6 +122,7 @@ class NakamaDataSource {
       _websocketClient.onMatchData
           .where((event) => event.matchId == matchId)
           .map((event) {
+            print('Received event in datasource: ${event.opCode}');
         final index = MatchEventOpCode.values
             .indexWhere((element) => element.opCode == event.opCode);
         if (index == -1) {
@@ -144,9 +145,15 @@ class NakamaDataSource {
       _websocketClient.leaveMatch(matchId);
 
   void sendDispatchingEvent(String matchId, DispatchingMatchEvent event) {
+    final opCode = MatchEventOpCode.fromDispatchingEvent(event).opCode;
+    print('dispatching event: $event (opCode: $opCode) on match: $matchId, bytes: ${event.toBytes()}');
+
+    // the issue is that this method sends the event to the server,
+    // we see the log (that a message is recieved), but it doesn't send to the game loop
+    // I need to sleep now!
     _websocketClient.sendMatchData(
       matchId: matchId,
-      opCode: MatchEventOpCode.fromDispatchingEvent(event).opCode,
+      opCode: opCode,
       data: event.toBytes(),
     );
   }

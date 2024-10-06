@@ -38,25 +38,29 @@ class MatchState with EquatableMixin {
         players: players ?? this.players,
       );
 
-  factory MatchState.fromJson(Map<String, dynamic> json) => MatchState(
-    matchInitializedAt:
-    DateTime.fromMillisecondsSinceEpoch(json['matchInitializedAt']),
-    matchRunsAt: DateTime.fromMillisecondsSinceEpoch(json['matchRunsAt']),
-    matchFinishesAt:
-    DateTime.fromMillisecondsSinceEpoch(json['matchFinishesAt']),
-    currentPhase: MatchPhase.values[json['currentPhase']],
-    presences: (json['presences'] as List)
-        .map((e) => UserPresence(
-      userId: e['userId'],
-      sessionId: e['sessionId'],
-      username: e['username'],
-      persistence: false,
-    ))
-        .toList(),
-    players: (json['players'] as Map<String, dynamic>).map(
-          (k, v) => MapEntry(k, PlayerState.fromJson(v)),
-    ),
-  );
+  factory MatchState.fromJson(Map<String, dynamic> json) {
+    final state = MatchState(
+      matchInitializedAt:
+      DateTime.fromMillisecondsSinceEpoch(json['matchInitializedAt']),
+      matchRunsAt: DateTime.fromMillisecondsSinceEpoch(json['matchRunsAt']),
+      matchFinishesAt:
+      DateTime.fromMillisecondsSinceEpoch(json['matchFinishesAt']),
+      currentPhase: MatchPhase.values[json['currentPhase']],
+      presences: (json['presences'] as List)
+          .map((e) => UserPresence(
+        userId: e['userId'],
+        sessionId: e['sessionId'],
+        username: e['username'],
+        persistence: false,
+      ))
+          .toList(),
+      players: (json['players'] as Map<String, dynamic>).map(
+            (k, v) => MapEntry(k, PlayerState.fromJson(v)),
+      ),
+    );
+    print('parsing match state: ${json['matchFinishesAt']}, date: ${state.matchFinishesAt}');
+    return state;
+  }
 
   @override
   List<Object?> get props => [

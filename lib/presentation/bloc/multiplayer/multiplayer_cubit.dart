@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:equatable/equatable.dart';
+import 'package:flappy_dash/domain/entities/dispatching_match_event.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
 import 'package:flappy_dash/domain/entities/match_phase.dart';
 import 'package:flappy_dash/domain/entities/match_state.dart';
@@ -21,6 +22,10 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
   ) : super(const MultiplayerState()) {
     _initialize();
   }
+
+  final _matchEvents = StreamController<MatchEvent>.broadcast();
+
+  Stream<MatchEvent> get matchEvents => _matchEvents.stream;
 
   void _initialize() async {
     final userId = await _gameRepository.getCurrentUserId();
@@ -52,11 +57,18 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
   late StreamSubscription _matchEventsSubscription;
 
   void _refreshRemainingTime() {
-    final remaining =
+    final waitingRemaining =
         state.matchState?.matchRunsAt.difference(DateTime.now()).inSeconds;
+    final playingRemaining =
+        state.matchState?.matchFinishesAt.difference(DateTime.now()).inSeconds;
+
     emit(state.copyWith(
-      matchWaitingRemainingSeconds:
-          remaining != null ? max(remaining, 0) : remaining,
+      matchWaitingRemainingSeconds: waitingRemaining != null
+          ? max(waitingRemaining, 0)
+          : waitingRemaining,
+      matchPlayingRemainingSeconds: playingRemaining != null
+          ? max(playingRemaining, 0)
+          : playingRemaining,
     ));
   }
 
@@ -91,23 +103,7 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     }
   }
 
-  void _onMatchEvent(MatchEvent event) {
-    final newState = switch (event) {
-      MatchWelcomeEvent() => event.state,
-      MatchWaitingTimeIncreasedEvent() => event.state,
-      MatchPresencesUpdatedEvent() => event.state,
-      MatchStartedEvent() => event.state,
-      MatchFinishedEvent() => event.state,
-      PlayerJoinedTheLobby() => event.state,
-      PlayerStartedEvent() => event.state,
-      PlayerJumpedEvent() => event.state,
-      PlayerScoredEvent() => event.state,
-      PlayerDiedEvent() => event.state,
-      PlayerIsIdleEvent() => event.state,
-      PlayerStartedAgainEvent() => event.state,
-      PlayerKickedFromTheLobbyEvent() => event.state,
-      PlayerCorrectPositionEvent() => event.state,
-    };
+  void _updateLobby(MatchState newState) {
     final inLobby =
         newState.players.values.where((player) => player.isInLobby).toList();
     emit(state.copyWith(
@@ -116,6 +112,45 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
       joinedInLobby:
           inLobby.any((player) => player.userId == state.currentUserId),
     ));
+  }
+
+  void _onMatchStarted(MatchState newState) {
+    assert(newState.currentPhase == MatchPhase.running);
+    emit(state.copyWith(
+      matchState: newState,
+      inLobbyPlayers: [],
+      joinedInLobby: false,
+    ));
+  }
+
+  void _onMatchEvent(MatchEvent event) {
+    final phase = state.matchState?.currentPhase;
+    print('Received event: $event in phase: $phase');
+    switch (phase) {
+      case null || MatchPhase.waitingForPlayers:
+        switch (event) {
+          case MatchWelcomeEvent():
+          case MatchWaitingTimeIncreasedEvent():
+          case MatchPresencesUpdatedEvent():
+          case PlayerJoinedTheLobby():
+          case PlayerKickedFromTheLobbyEvent():
+            _updateLobby(event.state);
+            break;
+          case MatchStartedEvent():
+            _onMatchStarted(event.state);
+            break;
+
+          case _:
+            throw StateError('Invalid $event in this phase: $phase');
+        }
+        break;
+      case MatchPhase.running:
+        emit(state.copyWith(matchState: event.state));
+        break;
+      case MatchPhase.finished:
+        break;
+    }
+    _matchEvents.add(event);
   }
 
   void joinLobby() {
@@ -135,6 +170,57 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     }
 
     await _multiplayerRepository.leaveMatch(state.matchId);
+  }
+
+  void dispatchJumpEvent(double positionX) {
+    if (state.matchId.isBlank) {
+      return;
+    }
+    _multiplayerRepository.sendDispatchingEvent(
+      state.matchId,
+      DispatchingPlayerJumpedEvent(positionX),
+    );
+  }
+
+  void dispatchIncreaseScoreEvent(double x) {
+    if (state.matchId.isBlank) {
+      return;
+    }
+    _multiplayerRepository.sendDispatchingEvent(
+      state.matchId,
+      DispatchingPlayerScoredEvent(x),
+    );
+  }
+
+  void dispatchPlayerDiedEvent(double x) {
+    if (state.matchId.isBlank) {
+      return;
+    }
+    _multiplayerRepository.sendDispatchingEvent(
+      state.matchId,
+      DispatchingPlayerDiedEvent(x),
+    );
+  }
+
+  void dispatchPlayerIsIdleEvent() {
+    if (state.matchId.isBlank) {
+      return;
+    }
+    _multiplayerRepository.sendDispatchingEvent(
+      state.matchId,
+      DispatchingPlayerIsIdleEvent(),
+    );
+  }
+
+  void dispatchStartEvent(bool isFirstRound) {
+    if (state.matchId.isBlank) {
+      return;
+    }
+
+    _multiplayerRepository.sendDispatchingEvent(
+      state.matchId,
+      DispatchingPlayerStartedEvent(),
+    );
   }
 
   @override
