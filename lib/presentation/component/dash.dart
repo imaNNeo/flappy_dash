@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame_bloc/flame_bloc.dart';
+import 'package:flappy_dash/domain/entities/playing_state.dart';
+import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/component/pipe.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
@@ -14,13 +16,20 @@ class Dash extends PositionComponent
         CollisionCallbacks,
         HasGameRef<FlappyDashGame>,
         FlameBlocReader<GameCubit, GameState> {
-  Dash({this.speed = 200.0})
-      : super(
+  Dash({
+    this.speed = 200.0,
+    required this.playerId,
+    required this.isMe,
+  }) : super(
           position: Vector2(0, 0),
           size: Vector2.all(80.0),
           anchor: Anchor.center,
           priority: 10,
         );
+
+  final String playerId;
+  final bool isMe;
+  late final MultiplayerCubit _multiplayerCubit;
 
   late Sprite _dashSprite;
 
@@ -40,12 +49,17 @@ class Dash extends PositionComponent
       position: center * 1.1,
       anchor: Anchor.center,
     ));
+    _multiplayerCubit = game.multiplayerCubit;
   }
+
+  PlayingState get currentPlayingState => isMe
+      ? bloc.state.currentPlayingState
+      : _multiplayerCubit.state.matchState!.players[playerId]!.playingState;
 
   @override
   void update(double dt) {
     super.update(dt);
-    if (bloc.state.currentPlayingState.isNotPlaying) {
+    if (currentPlayingState.isNotPlaying) {
       return;
     }
     _yVelocity += _gravity * dt;
@@ -54,7 +68,7 @@ class Dash extends PositionComponent
   }
 
   void jump() {
-    if (bloc.state.currentPlayingState.isNotPlaying) {
+    if (currentPlayingState.isNotPlaying) {
       return;
     }
     _yVelocity = _jumpForce;
@@ -72,7 +86,10 @@ class Dash extends PositionComponent
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
-    if (bloc.state.currentPlayingState.isNotPlaying) {
+    if (currentPlayingState.isNotPlaying) {
+      return;
+    }
+    if (!isMe) {
       return;
     }
     if (other is HiddenCoin) {

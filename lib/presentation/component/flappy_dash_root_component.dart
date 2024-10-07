@@ -4,6 +4,9 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flappy_dash/domain/entities/game_config_entity.dart';
+import 'package:flappy_dash/domain/entities/game_mode.dart';
+import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
+import 'package:flappy_dash/presentation/component/multiplayer_controller.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
 
@@ -17,14 +20,21 @@ class FlappyDashRootComponent extends Component
   late PipePair _lastPipe;
   late DashParallaxBackground _background;
   late final GameConfigEntity _config;
+  late final MultiplayerCubit _multiplayerCubit;
 
   int _pipeCounter = 0;
+
+  String get myId => game.leaderboardCubit.state.currentAccount!.user.id;
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    _multiplayerCubit = game.multiplayerCubit;
     add(_background = DashParallaxBackground());
-    add(_dash = Dash());
+    add(_dash = Dash(
+      playerId: myId,
+      isMe: true,
+    ));
     _config = bloc.state.gameMode!.gameConfig;
     _generatePipes(
       fromX: _config.pipesDistance,
