@@ -3,6 +3,7 @@ import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
+import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -13,6 +14,7 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
     with KeyboardEvents, HasCollisionDetection {
   FlappyDashGame(
     this.gameCubit,
+    this.multiplayerCubit,
     this.leaderboardCubit,
   ) : super(
           world: FlappyDashWorld(),
@@ -23,6 +25,7 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
         );
 
   final GameCubit gameCubit;
+  final MultiplayerCubit multiplayerCubit;
   final LeaderboardCubit leaderboardCubit;
 
   @override
