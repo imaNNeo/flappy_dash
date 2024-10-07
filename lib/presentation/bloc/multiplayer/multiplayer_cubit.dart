@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:equatable/equatable.dart';
+import 'package:flappy_dash/domain/entities/dispatching_match_event.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
 import 'package:flappy_dash/domain/entities/match_phase.dart';
 import 'package:flappy_dash/domain/entities/match_state.dart';
@@ -9,6 +10,7 @@ import 'package:flappy_dash/domain/entities/player_state.dart';
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
 import 'package:flappy_dash/domain/repositories/game_repository.dart';
 import 'package:flappy_dash/domain/repositories/multiplayer_repository.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nakama/nakama.dart';
 
@@ -169,6 +171,57 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     }
 
     await _multiplayerRepository.leaveMatch(state.matchId);
+  }
+
+  void dispatchJumpEvent(double x, double y) {
+    if (state.matchId.isBlank) {
+      return;
+    }
+    _multiplayerRepository.sendDispatchingEvent(
+      state.matchId,
+      DispatchingPlayerJumpedEvent(x, y),
+    );
+  }
+
+  void dispatchIncreaseScoreEvent(double x, double y) {
+    if (state.matchId.isBlank) {
+      return;
+    }
+    _multiplayerRepository.sendDispatchingEvent(
+      state.matchId,
+      DispatchingPlayerScoredEvent(x, y),
+    );
+  }
+
+  void dispatchPlayerDiedEvent(double x, double y) {
+    if (state.matchId.isBlank) {
+      return;
+    }
+    _multiplayerRepository.sendDispatchingEvent(
+      state.matchId,
+      DispatchingPlayerDiedEvent(x, y),
+    );
+  }
+
+  void dispatchPlayerIsIdleEvent() {
+    if (state.matchId.isBlank) {
+      return;
+    }
+    _multiplayerRepository.sendDispatchingEvent(
+      state.matchId,
+      DispatchingPlayerIsIdleEvent(),
+    );
+  }
+
+  void dispatchStartEvent() {
+    if (state.matchId.isBlank) {
+      return;
+    }
+
+    _multiplayerRepository.sendDispatchingEvent(
+      state.matchId,
+      DispatchingPlayerStartedEvent(),
+    );
   }
 
   @override

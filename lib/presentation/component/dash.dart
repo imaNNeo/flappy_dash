@@ -93,10 +93,10 @@ class Dash extends PositionComponent
       return;
     }
     if (other is HiddenCoin) {
-      game.increaseScore();
+      game.increaseScore(x, y);
       other.removeFromParent();
     } else if (other is Pipe) {
-      game.gameOver();
+      game.gameOver(x, y);
     }
   }
 }

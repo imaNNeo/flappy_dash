@@ -33,4 +33,11 @@ class MultiplayerRepository {
       DispatchingUserDisplayNameUpdatedEvent(),
     );
   }
+
+  void sendDispatchingEvent(String matchId, DispatchingMatchEvent event) {
+    _nakamaDataSource.sendDispatchingEvent(
+      matchId,
+      event,
+    );
+  }
 }
