@@ -17,79 +17,80 @@ class DispatchingPlayerJoinedLobbyEvent extends DispatchingMatchEvent {
 }
 
 class DispatchingPlayerStartedEvent extends DispatchingMatchEvent {
-  final double positionX;
-
-  DispatchingPlayerStartedEvent(this.positionX);
+  DispatchingPlayerStartedEvent();
 
   @override
-  List<int> toBytes() => _jsonToData({
-        'positionX': positionX,
-      });
+  List<int> toBytes() => [];
 }
 
 class DispatchingPlayerJumpedEvent extends DispatchingMatchEvent {
   final double positionX;
+  final double positionY;
 
-  DispatchingPlayerJumpedEvent(this.positionX);
+  DispatchingPlayerJumpedEvent(
+    this.positionX,
+    this.positionY,
+  );
 
   @override
   List<int> toBytes() => _jsonToData({
         'positionX': positionX,
+        'positionY': positionY,
       });
 }
 
 class DispatchingPlayerScoredEvent extends DispatchingMatchEvent {
   final double positionX;
+  final double positionY;
 
-  DispatchingPlayerScoredEvent(this.positionX);
+  DispatchingPlayerScoredEvent(
+    this.positionX,
+    this.positionY,
+  );
 
   @override
   List<int> toBytes() => _jsonToData({
         'positionX': positionX,
+        'positionY': positionY,
       });
 }
 
 class DispatchingPlayerDiedEvent extends DispatchingMatchEvent {
   final double positionX;
+  final double positionY;
 
-  DispatchingPlayerDiedEvent(this.positionX);
+  DispatchingPlayerDiedEvent(
+    this.positionX,
+    this.positionY,
+  );
 
   @override
   List<int> toBytes() => _jsonToData({
         'positionX': positionX,
+        'positionY': positionY,
       });
 }
 
 class DispatchingPlayerIsIdleEvent extends DispatchingMatchEvent {
-  final double positionX;
-
-  DispatchingPlayerIsIdleEvent(this.positionX);
+  DispatchingPlayerIsIdleEvent();
 
   @override
-  List<int> toBytes() => _jsonToData({
-        'positionX': positionX,
-      });
-}
-
-class DispatchingPlayerStartedAgainEvent extends DispatchingMatchEvent {
-  final double positionX;
-
-  DispatchingPlayerStartedAgainEvent(this.positionX);
-
-  @override
-  List<int> toBytes() => _jsonToData({
-        'positionX': positionX,
-      });
+  List<int> toBytes() => [];
 }
 
 class DispatchingPlayerKickedFromLobbyEvent extends DispatchingMatchEvent {
   final double positionX;
+  final double positionY;
 
-  DispatchingPlayerKickedFromLobbyEvent(this.positionX);
+  DispatchingPlayerKickedFromLobbyEvent(
+    this.positionX,
+    this.positionY,
+  );
 
   @override
   List<int> toBytes() => _jsonToData({
         'positionX': positionX,
+        'positionY': positionY,
       });
 }
 
