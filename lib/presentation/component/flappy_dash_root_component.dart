@@ -79,19 +79,22 @@ class FlappyDashRootComponent extends Component
     });
   }
 
-  void onSpaceDown() {
-    _checkToStart();
-    _dash.jump();
-  }
+  void onSpaceDown() => _jump();
 
-  void onTapDown(TapDownEvent event) {
+  void onTapDown(TapDownEvent event) => _jump();
+
+  void _jump() {
     _checkToStart();
     _dash.jump();
+    _multiplayerCubit.dispatchJumpEvent(_dash.x, _dash.y);
   }
 
   void _checkToStart() {
     if (bloc.state.currentPlayingState.isIdle) {
       bloc.startPlaying();
+      if (_config is MultiplayerGameConfigEntity) {
+        game.multiplayerCubit.dispatchStartEvent();
+      }
     }
   }
 

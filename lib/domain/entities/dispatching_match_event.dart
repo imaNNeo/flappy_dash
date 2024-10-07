@@ -78,22 +78,6 @@ class DispatchingPlayerIsIdleEvent extends DispatchingMatchEvent {
   List<int> toBytes() => [];
 }
 
-class DispatchingPlayerKickedFromLobbyEvent extends DispatchingMatchEvent {
-  final double positionX;
-  final double positionY;
-
-  DispatchingPlayerKickedFromLobbyEvent(
-    this.positionX,
-    this.positionY,
-  );
-
-  @override
-  List<int> toBytes() => _jsonToData({
-        'positionX': positionX,
-        'positionY': positionY,
-      });
-}
-
 class DispatchingUserDisplayNameUpdatedEvent extends DispatchingMatchEvent {
   DispatchingUserDisplayNameUpdatedEvent();
 
