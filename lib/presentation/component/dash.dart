@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame_bloc/flame_bloc.dart';
+import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/component/pipe.dart';
@@ -81,6 +82,12 @@ class Dash extends PositionComponent
       canvas,
       size: size,
     );
+  }
+
+  void updatePosition(double dashX, double dashY) {
+    assert(game.gameCubit.state.gameMode is MultiplayerGameMode && !isMe);
+    x = dashX;
+    y = dashY;
   }
 
   @override
