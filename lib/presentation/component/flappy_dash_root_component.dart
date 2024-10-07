@@ -31,6 +31,9 @@ class FlappyDashRootComponent extends Component
     await super.onLoad();
     _multiplayerCubit = game.multiplayerCubit;
     add(_background = DashParallaxBackground());
+    if (bloc.state.gameMode == const MultiplayerGameMode()) {
+      add(MultiplayerController());
+    }
     add(_dash = Dash(
       playerId: myId,
       isMe: true,
