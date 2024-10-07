@@ -9,6 +9,7 @@ class MultiplayerState with EquatableMixin {
     this.currentMatch,
     this.matchState,
     this.matchWaitingRemainingSeconds,
+    this.matchPlayingRemainingSeconds,
     this.inLobbyPlayers = const [],
     this.joinedInLobby = false,
     this.currentAccount,
@@ -21,6 +22,7 @@ class MultiplayerState with EquatableMixin {
   final Match? currentMatch;
   final MatchState? matchState;
   final int? matchWaitingRemainingSeconds;
+  final int? matchPlayingRemainingSeconds;
   final List<PlayerState> inLobbyPlayers;
   final bool joinedInLobby;
   final Account? currentAccount;
@@ -33,6 +35,7 @@ class MultiplayerState with EquatableMixin {
     Match? currentMatch,
     MatchState? matchState,
     int? matchWaitingRemainingSeconds,
+    int? matchPlayingRemainingSeconds,
     List<PlayerState>? inLobbyPlayers,
     bool? joinedInLobby,
     Account? currentAccount,
@@ -46,6 +49,8 @@ class MultiplayerState with EquatableMixin {
         matchState: matchState ?? this.matchState,
         matchWaitingRemainingSeconds:
             matchWaitingRemainingSeconds ?? this.matchWaitingRemainingSeconds,
+        matchPlayingRemainingSeconds:
+            matchPlayingRemainingSeconds ?? this.matchPlayingRemainingSeconds,
         inLobbyPlayers: inLobbyPlayers ?? this.inLobbyPlayers,
         joinedInLobby: joinedInLobby ?? this.joinedInLobby,
         currentAccount: currentAccount ?? this.currentAccount,
@@ -60,6 +65,7 @@ class MultiplayerState with EquatableMixin {
         currentMatch,
         matchState,
         matchWaitingRemainingSeconds,
+        matchPlayingRemainingSeconds,
         inLobbyPlayers,
         joinedInLobby,
         currentAccount,
