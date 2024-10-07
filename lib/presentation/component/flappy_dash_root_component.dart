@@ -74,6 +74,11 @@ class FlappyDashRootComponent extends Component
     }
   }
 
+  @override
+  void updateTree(double dt) {
+    super.updateTree(dt * 0.1);
+  }
+
   void _removeLastPipes() {
     final pipes = children.whereType<PipePair>();
     final shouldBeRemoved = max(pipes.length - 5, 0);
