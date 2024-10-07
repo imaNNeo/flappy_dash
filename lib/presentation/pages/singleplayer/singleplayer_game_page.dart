@@ -1,6 +1,8 @@
 import 'package:flame/game.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
+import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
+import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/dialogs/app_dialogs.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
@@ -26,6 +28,7 @@ class _SinglePlayerGamePageState extends State<SinglePlayerGamePage> {
   late FlappyDashGame _flappyDashGame;
 
   late GameCubit gameCubit;
+  late MultiplayerCubit multiplayerCubit;
   late LeaderboardCubit leaderboardCubit;
 
   PlayingState? _latestState;
@@ -34,8 +37,13 @@ class _SinglePlayerGamePageState extends State<SinglePlayerGamePage> {
   void initState() {
     gameCubit = BlocProvider.of<GameCubit>(context);
     gameCubit.initialize(const SinglePlayerGameMode());
+    multiplayerCubit = BlocProvider.of<MultiplayerCubit>(context);
     leaderboardCubit = BlocProvider.of<LeaderboardCubit>(context);
-    _flappyDashGame = FlappyDashGame(gameCubit, leaderboardCubit);
+    _flappyDashGame = FlappyDashGame(
+      gameCubit,
+      multiplayerCubit,
+      leaderboardCubit,
+    );
     super.initState();
   }
 
@@ -48,6 +56,7 @@ class _SinglePlayerGamePageState extends State<SinglePlayerGamePage> {
           setState(() {
             _flappyDashGame = FlappyDashGame(
               gameCubit,
+              multiplayerCubit,
               leaderboardCubit,
             );
           });
