@@ -172,33 +172,33 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     await _multiplayerRepository.leaveMatch(state.matchId);
   }
 
-  void dispatchJumpEvent(double positionX) {
+  void dispatchJumpEvent(double x, double y) {
     if (state.matchId.isBlank) {
       return;
     }
     _multiplayerRepository.sendDispatchingEvent(
       state.matchId,
-      DispatchingPlayerJumpedEvent(positionX),
+      DispatchingPlayerJumpedEvent(x, y),
     );
   }
 
-  void dispatchIncreaseScoreEvent(double x) {
+  void dispatchIncreaseScoreEvent(double x, double y) {
     if (state.matchId.isBlank) {
       return;
     }
     _multiplayerRepository.sendDispatchingEvent(
       state.matchId,
-      DispatchingPlayerScoredEvent(x),
+      DispatchingPlayerScoredEvent(x, y),
     );
   }
 
-  void dispatchPlayerDiedEvent(double x) {
+  void dispatchPlayerDiedEvent(double x, double y) {
     if (state.matchId.isBlank) {
       return;
     }
     _multiplayerRepository.sendDispatchingEvent(
       state.matchId,
-      DispatchingPlayerDiedEvent(x),
+      DispatchingPlayerDiedEvent(x, y),
     );
   }
 

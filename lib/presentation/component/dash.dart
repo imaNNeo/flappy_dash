@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame_bloc/flame_bloc.dart';
+import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/component/pipe.dart';
@@ -71,7 +72,6 @@ class Dash extends PositionComponent
       return;
     }
     _yVelocity = _jumpForce;
-    _multiplayerCubit.dispatchJumpEvent(x);
   }
 
   @override
@@ -83,19 +83,26 @@ class Dash extends PositionComponent
     );
   }
 
+  void updatePosition(double dashX, double dashY) {
+    assert(game.gameCubit.state.gameMode is MultiplayerGameMode && !isMe);
+    x = dashX;
+    y = dashY;
+  }
+
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
     if (currentPlayingState.isNotPlaying) {
       return;
     }
+    if (!isMe) {
+      return;
+    }
     if (other is HiddenCoin) {
-      game.increaseScore();
-      _multiplayerCubit.dispatchIncreaseScoreEvent(x);
+      game.increaseScore(x, y);
       other.removeFromParent();
     } else if (other is Pipe) {
-      game.gameOver();
-      _multiplayerCubit.dispatchPlayerDiedEvent(x);
+      game.gameOver(x, y);
     }
   }
 }

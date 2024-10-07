@@ -25,34 +25,49 @@ class DispatchingPlayerStartedEvent extends DispatchingMatchEvent {
 
 class DispatchingPlayerJumpedEvent extends DispatchingMatchEvent {
   final double positionX;
+  final double positionY;
 
-  DispatchingPlayerJumpedEvent(this.positionX);
+  DispatchingPlayerJumpedEvent(
+    this.positionX,
+    this.positionY,
+  );
 
   @override
   List<int> toBytes() => _jsonToData({
         'positionX': positionX,
+        'positionY': positionY,
       });
 }
 
 class DispatchingPlayerScoredEvent extends DispatchingMatchEvent {
   final double positionX;
+  final double positionY;
 
-  DispatchingPlayerScoredEvent(this.positionX);
+  DispatchingPlayerScoredEvent(
+    this.positionX,
+    this.positionY,
+  );
 
   @override
   List<int> toBytes() => _jsonToData({
         'positionX': positionX,
+        'positionY': positionY,
       });
 }
 
 class DispatchingPlayerDiedEvent extends DispatchingMatchEvent {
   final double positionX;
+  final double positionY;
 
-  DispatchingPlayerDiedEvent(this.positionX);
+  DispatchingPlayerDiedEvent(
+    this.positionX,
+    this.positionY,
+  );
 
   @override
   List<int> toBytes() => _jsonToData({
         'positionX': positionX,
+        'positionY': positionY,
       });
 }
 
@@ -61,17 +76,6 @@ class DispatchingPlayerIsIdleEvent extends DispatchingMatchEvent {
 
   @override
   List<int> toBytes() => [];
-}
-
-class DispatchingPlayerKickedFromLobbyEvent extends DispatchingMatchEvent {
-  final double positionX;
-
-  DispatchingPlayerKickedFromLobbyEvent(this.positionX);
-
-  @override
-  List<int> toBytes() => _jsonToData({
-        'positionX': positionX,
-      });
 }
 
 class DispatchingUserDisplayNameUpdatedEvent extends DispatchingMatchEvent {

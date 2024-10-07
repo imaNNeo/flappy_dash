@@ -45,15 +45,23 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
     return KeyEventResult.ignored;
   }
 
-  void gameOver() async {
+  void gameOver(double x, double y) async {
     await gameCubit.gameOver();
-    if (gameCubit.state.gameMode is SinglePlayerGameMode) {
-      leaderboardCubit.refreshLeaderboard();
+    switch(gameCubit.state.gameMode!) {
+      case SinglePlayerGameMode():
+        leaderboardCubit.refreshLeaderboard();
+        break;
+      case MultiplayerGameMode():
+        multiplayerCubit.dispatchPlayerDiedEvent(x, y);
+        break;
     }
   }
 
-  void increaseScore() {
+  void increaseScore(double x, double y) {
     gameCubit.increaseScore();
+    if (gameCubit.state.gameMode is MultiplayerGameMode) {
+      multiplayerCubit.dispatchIncreaseScoreEvent(x, y);
+    }
   }
 }
 

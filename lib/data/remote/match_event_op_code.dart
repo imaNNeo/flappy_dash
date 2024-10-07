@@ -54,7 +54,6 @@ enum MatchEventOpCode {
         DispatchingPlayerScoredEvent() => MatchEventOpCode.playerScored,
         DispatchingPlayerDiedEvent() => MatchEventOpCode.playerDied,
         DispatchingPlayerIsIdleEvent() => MatchEventOpCode.playerIsIdle,
-        DispatchingPlayerKickedFromLobbyEvent() => MatchEventOpCode.playerKickedFromTheLobby,
         DispatchingUserDisplayNameUpdatedEvent() => MatchEventOpCode.playerDisplayNameUpdated,
       };
 }

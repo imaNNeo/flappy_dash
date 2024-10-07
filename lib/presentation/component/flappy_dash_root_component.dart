@@ -84,14 +84,14 @@ class FlappyDashRootComponent extends Component
     });
   }
 
-  void onSpaceDown() {
-    _checkToStart();
-    _dash.jump();
-  }
+  void onSpaceDown() => _jumped();
 
-  void onTapDown(TapDownEvent event) {
+  void onTapDown(TapDownEvent event) => _jumped();
+
+  void _jumped() {
     _checkToStart();
     _dash.jump();
+    game.multiplayerCubit.dispatchJumpEvent(_dash.x, _dash.y);
   }
 
   void _checkToStart() {

@@ -39,7 +39,8 @@ class MultiplayerController extends Component
 
   void _onPlayersUpdated(Map<String, PlayerState>? players) {
     if (players == null) {
-      _otherDashes.forEach((_, dashBundle) => dashBundle.dash.removeFromParent());
+      _otherDashes
+          .forEach((_, dashBundle) => dashBundle.dash.removeFromParent());
       _otherDashes.clear();
       return;
     }
@@ -73,25 +74,33 @@ class MultiplayerController extends Component
   }
 
   void _onNewEvent(MatchEvent event) {
+    if (event.sender?.userId == _cubit.state.currentAccount!.user.id) {
+      // It's my own event
+      return;
+    }
     switch (event) {
       case PlayerStartedEvent():
         break;
       case PlayerJumpedEvent():
-        _otherDashes[event.sender!.userId]!.dash.jump();
-        _otherDashes[event.sender!.userId]!.dash.position.x = event.dashX;
+        final dash = _otherDashes[event.sender!.userId]!.dash;
+        dash.jump();
+        dash.updatePosition(event.dashX, event.dashY);
         break;
       case PlayerDiedEvent():
         // Die animation? (state is automatically updated)
-        _otherDashes[event.sender!.userId]!.dash.position.x = event.dashX;
+        final dash = _otherDashes[event.sender!.userId]!.dash;
+        dash.updatePosition(event.dashX, event.dashY);
         break;
       case PlayerIsIdleEvent():
         // Idle animation or style (state is automatically updated)
         // We just update the dash x position
-        _otherDashes[event.sender!.userId]!.dash.position.x = event.dashX;
+        final dash = _otherDashes[event.sender!.userId]!.dash;
+        dash.updatePosition(event.dashX, event.dashY);
         break;
       case PlayerCorrectPositionEvent():
         // We just mutate the position of the dash
-        _otherDashes[event.sender!.userId]!.dash.position.x = event.dashX;
+        final dash = _otherDashes[event.sender!.userId]!.dash;
+        dash.updatePosition(event.dashX, event.dashY);
         break;
       // We don't care about these events at the moment
       case PlayerKickedFromTheLobbyEvent():
