@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flame/parallax.dart';
 import 'package:flame_bloc/flame_bloc.dart';
+import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
 
