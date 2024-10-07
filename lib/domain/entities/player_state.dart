@@ -6,6 +6,7 @@ class PlayerState with EquatableMixin {
   final String displayName;
   final bool isInLobby;
   final double lastKnownX;
+  final double lastKnownY;
   final int score;
   final PlayingState playingState;
 
@@ -14,6 +15,7 @@ class PlayerState with EquatableMixin {
     required this.displayName,
     required this.isInLobby,
     required this.lastKnownX,
+    required this.lastKnownY,
     required this.score,
     required this.playingState,
   });
@@ -23,6 +25,7 @@ class PlayerState with EquatableMixin {
         displayName: json['displayName'],
         isInLobby: json['isInLobby'],
         lastKnownX: double.parse(json['lastKnownX'].toString()),
+        lastKnownY: double.parse(json['lastKnownY'].toString()),
         score: json['score'],
         playingState: PlayingState.values[json['playingState']],
       );
@@ -33,6 +36,7 @@ class PlayerState with EquatableMixin {
         displayName,
         isInLobby,
         lastKnownX,
+        lastKnownY,
         score,
         playingState,
       ];
