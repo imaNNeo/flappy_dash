@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flappy_dash/domain/entities/match_event.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/presentation_utils.dart';
@@ -12,6 +15,7 @@ import 'package:flappy_dash/presentation/widget/transparent_content_box.dart';
 import 'package:flappy_dash/presentation/widget/watch_on_youtube_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 part 'parts/pending_match_box.dart';
 
@@ -29,13 +33,28 @@ class MultiPlayerLobbyPage extends StatefulWidget {
 }
 
 class _MultiPlayerLobbyPageContentState extends State<MultiPlayerLobbyPage> {
-
   late MultiplayerCubit _multiplayerCubit;
+
+  late StreamSubscription<MatchEvent> _matchEventsSubscription;
+
   @override
   void initState() {
     _multiplayerCubit = context.read<MultiplayerCubit>();
     _multiplayerCubit.joinMatch(widget.matchId);
+    _matchEventsSubscription = _multiplayerCubit.matchEvents.listen(
+      _onMatchEvent,
+    );
     super.initState();
+  }
+
+  void _onMatchEvent(MatchEvent event) {
+    if (event is MatchStartedEvent) {
+      if (!context.mounted) {
+        return;
+      }
+      final matchId = _multiplayerCubit.state.matchId;
+      context.go('/multi_player/$matchId');
+    }
   }
 
   @override
@@ -120,6 +139,7 @@ class _MultiPlayerLobbyPageContentState extends State<MultiPlayerLobbyPage> {
   @override
   void dispose() {
     _multiplayerCubit.onLobbyClosed();
+    _matchEventsSubscription.cancel();
     super.dispose();
   }
 }
