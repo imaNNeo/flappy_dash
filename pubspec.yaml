@@ -55,6 +55,7 @@ dependencies:
   url_launcher: ^6.3.0
   device_preview: ^1.2.0
   toastification: ^2.3.0
+  flame_svg: ^1.11.1
 
 dev_dependencies:
   flutter_test:

@@ -3,6 +3,9 @@ import 'dart:ui';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame_bloc/flame_bloc.dart';
+import 'package:flame_svg/flame_svg.dart';
+import 'package:flame_svg/svg.dart';
+import 'package:flappy_dash/domain/entities/dash_type.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
@@ -21,7 +24,8 @@ class Dash extends PositionComponent
     this.speed = 200.0,
     required this.playerId,
     required this.isMe,
-  }) : super(
+  })  : type = DashType.fromUserId(playerId),
+        super(
           position: Vector2(0, 0),
           size: Vector2.all(80.0),
           anchor: Anchor.center,
@@ -32,7 +36,8 @@ class Dash extends PositionComponent
   final bool isMe;
   late final MultiplayerCubit _multiplayerCubit;
 
-  late Sprite _dashSprite;
+  final DashType type;
+  late final Svg _dashSvg;
 
   final double _gravity = 1400.0;
   double _yVelocity = 0;
@@ -42,7 +47,7 @@ class Dash extends PositionComponent
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    _dashSprite = await Sprite.load('dash.png');
+    _dashSvg = await Svg.load(type.flameAssetName);
     final radius = size.x / 2;
     final center = size / 2;
     add(CircleHitbox(
@@ -78,9 +83,9 @@ class Dash extends PositionComponent
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    _dashSprite.render(
+    _dashSvg.render(
       canvas,
-      size: size,
+      size,
     );
   }
 
