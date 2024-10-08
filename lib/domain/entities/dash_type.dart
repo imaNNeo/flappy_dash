@@ -45,5 +45,7 @@ enum DashType {
         DashType.violetDash => 'violet_dash.svg',
       };
 
-  String get assetName => 'assets/images/dashes/$_fileName';
+  String get flameAssetName => 'images/dashes/$_fileName';
+
+  String get assetName => 'assets/$flameAssetName';
 }

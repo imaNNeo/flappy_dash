@@ -181,10 +181,10 @@ packages:
     dependency: "direct main"
     description:
       name: flame
-      sha256: "79133dc46a3ff870950f41d0dc1598414e7bd7ae2c29bd9f0a9de208d9a70cb7"
+      sha256: "89d65fdb10b8c4ac46c86b8d5541e560604bf55317c01f3f558d09c4a65953c1"
       url: "https://pub.dev"
     source: hosted
-    version: "1.18.0"
+    version: "1.20.0"
   flame_bloc:
     dependency: "direct main"
     description:
@@ -193,6 +193,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.12.0"
+  flame_svg:
+    dependency: "direct main"
+    description:
+      name: flame_svg
+      sha256: "32bdeb6ebc486bc8faa60877c39884ed24b2cf71dc5517f962b2301beced112e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.11.1"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -450,10 +458,10 @@ packages:
     dependency: transitive
     description:
       name: ordered_set
-      sha256: "1bfaaaee0419e43ecc9eaebd410eb4bd5039657b72011de75ff3e2915c9aac60"
+      sha256: "3129515e563a14817adebbdeee2acbb845fc69b6fc99a94349b641d1c829d5cd"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.3"
+    version: "6.1.0"
   path:
     dependency: transitive
     description:
