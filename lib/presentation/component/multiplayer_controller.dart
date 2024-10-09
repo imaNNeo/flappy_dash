@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:flame/components.dart';
+import 'package:flappy_dash/domain/entities/dash_type.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
 import 'package:flappy_dash/domain/entities/player_state.dart';
+import 'package:flappy_dash/domain/extensions/string_extension.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/component/dash.dart';
 import 'package:flappy_dash/presentation/component/flappy_dash_root_component.dart';
@@ -39,7 +41,8 @@ class MultiplayerController extends Component
 
   void _onPlayersUpdated(Map<String, PlayerState>? players) {
     if (players == null) {
-      _otherDashes.forEach((_, dashBundle) => dashBundle.dash.removeFromParent());
+      _otherDashes
+          .forEach((_, dashBundle) => dashBundle.dash.removeFromParent());
       _otherDashes.clear();
       return;
     }
@@ -58,8 +61,12 @@ class MultiplayerController extends Component
     for (final otherPlayer in otherPlayers) {
       if (!_otherDashes.containsKey(otherPlayer.key)) {
         final playerState = otherPlayer.value;
+        final dashType = DashType.fromUserId(playerState.userId);
         final dash = Dash(
           playerId: playerState.userId,
+          displayName: playerState.displayName.isNotBlank
+              ? playerState.displayName
+              : dashType.name,
           isMe: false,
         );
         add(dash);

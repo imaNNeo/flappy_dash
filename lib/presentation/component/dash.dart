@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame_bloc/flame_bloc.dart';
@@ -8,12 +6,15 @@ import 'package:flame_svg/svg.dart';
 import 'package:flappy_dash/domain/entities/dash_type.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
+import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/component/pipe.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
+import 'package:flutter/material.dart';
 
 import 'hidden_coin.dart';
+import 'outlined_text_component.dart';
 
 class Dash extends PositionComponent
     with
@@ -23,6 +24,7 @@ class Dash extends PositionComponent
   Dash({
     this.speed = 200.0,
     required this.playerId,
+    required this.displayName,
     required this.isMe,
   })  : type = DashType.fromUserId(playerId),
         super(
@@ -33,6 +35,7 @@ class Dash extends PositionComponent
         );
 
   final String playerId;
+  final String displayName;
   final bool isMe;
   late final MultiplayerCubit _multiplayerCubit;
 
@@ -56,6 +59,17 @@ class Dash extends PositionComponent
       anchor: Anchor.center,
     ));
     _multiplayerCubit = game.multiplayerCubit;
+    add(OutlinedTextComponent(
+      text: displayName,
+      position: Vector2(size.x / 2, 0),
+      textStyle: TextStyle(
+        fontSize: 24,
+        fontFamily: 'Chewy',
+        fontWeight: FontWeight.bold,
+        letterSpacing: 2,
+        color: AppColors.getDashColor(type),
+      ),
+    ));
   }
 
   PlayingState get currentPlayingState => isMe
