@@ -36,6 +36,7 @@ class FlappyDashRootComponent extends Component
     }
     add(_dash = Dash(
       playerId: myId,
+      displayName: '',
       isMe: true,
     ));
     _config = bloc.state.gameMode!.gameConfig;
