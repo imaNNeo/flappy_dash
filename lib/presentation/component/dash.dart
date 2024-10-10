@@ -85,6 +85,10 @@ class Dash extends PositionComponent
     _yVelocity += _gravity * dt;
     position.y += _yVelocity * dt;
     position.x += speed * dt;
+
+    if (position.y.abs() > (game.size.y / 2) + 20) {
+      game.gameOver(x, y);
+    }
   }
 
   void jump() {
