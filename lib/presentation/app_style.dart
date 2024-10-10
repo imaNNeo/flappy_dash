@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flappy_dash/domain/entities/dash_type.dart';
+import 'package:flutter/material.dart';
 
 class AppColors {
   static const backgroundColor = Color(0xFF0F8B8D);
@@ -28,6 +29,8 @@ class AppColors {
   static const greenButtonBgColor = backgroundColor60;
   static const greenButtonStrokeColor = Color(0xFF052727);
   static const playerBoxStrokeColor = Color(0x8016425B);
+
+  static const multiplayerScoreboardBgColor = Color(0x99000000);
 
   static const multiColorGradient = [
     Color(0xFFFF25B2),
