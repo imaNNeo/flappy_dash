@@ -16,22 +16,24 @@ class AppRoutes {
       GoRoute(
         path: '/',
         builder: (context, state) => const HomePage(),
-      ),
-      GoRoute(
-        path: '/single_player',
-        builder: (context, state) => const SinglePlayerGamePage(),
-      ),
-      GoRoute(
-        path: '/lobby/:matchId',
-        builder: (context, state) {
-          return MultiPlayerLobbyPage(
-            matchId: state.pathParameters['matchId']!,
-          );
-        },
-      ),
-      GoRoute(
-        path: '/multi_player/:matchId',
-        builder: (context, state) => const MultiPlayerGamePage(),
+        routes: [
+          GoRoute(
+            path: 'single_player',
+            builder: (context, state) => const SinglePlayerGamePage(),
+          ),
+          GoRoute(
+            path: 'lobby/:matchId',
+            builder: (context, state) {
+              return MultiPlayerLobbyPage(
+                matchId: state.pathParameters['matchId']!,
+              );
+            },
+          ),
+          GoRoute(
+            path: 'multi_player/:matchId',
+            builder: (context, state) => const MultiPlayerGamePage(),
+          ),
+        ]
       ),
     ],
   );

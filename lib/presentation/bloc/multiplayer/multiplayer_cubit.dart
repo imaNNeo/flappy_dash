@@ -76,7 +76,11 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
   void joinMatch(String matchId) async {
     if (matchId != state.matchId) {
       // Reset the state
-      emit(MultiplayerState(matchId: matchId));
+      emit(MultiplayerState(
+        matchId: matchId,
+        currentUserId: state.currentUserId,
+        currentAccount: state.currentAccount,
+      ));
     }
 
     if (state.joinMatchLoading) {
@@ -222,6 +226,13 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
       state.matchId,
       DispatchingPlayerStartedEvent(),
     );
+  }
+
+  void stopPlaying() {
+    if (state.matchId.isBlank) {
+      return;
+    }
+    _multiplayerRepository.leaveMatch(state.matchId);
   }
 
   @override
