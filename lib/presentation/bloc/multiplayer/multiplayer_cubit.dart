@@ -109,13 +109,19 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
   }
 
   void _updateLobby(MatchState newState) {
-    final inLobby =
-        newState.players.values.where((player) => player.isInLobby).toList();
+    final me = newState.players[state.currentUserId]!;
+    final othersInLobby = newState.players.values
+        .where((player) =>
+            player.isInLobby && player.userId != state.currentUserId)
+        .toList();
+
     emit(state.copyWith(
       matchState: newState,
-      inLobbyPlayers: inLobby,
-      joinedInLobby:
-          inLobby.any((player) => player.userId == state.currentUserId),
+      inLobbyPlayers: [
+        if (me.isInLobby) me,
+        ...othersInLobby,
+      ],
+      joinedInLobby: me.isInLobby,
     ));
   }
 
