@@ -19,7 +19,7 @@ class AudioHelper {
     _soLoud.setProtectVoice(_playingBackground!, true);
   }
 
-  void stopBackgroundAudio() {
+  void stopBackgroundAudio({bool immediately = false}) {
     if (_playingBackground == null) {
       return;
     }
@@ -27,7 +27,7 @@ class AudioHelper {
     _soLoud.fadeVolume(
       _playingBackground!,
       0.0,
-      const Duration(milliseconds: 500),
+      Duration(milliseconds: immediately ? 0 : 500),
     );
   }
 

@@ -129,4 +129,10 @@ class _SinglePlayerGamePageState extends State<SinglePlayerGamePage> {
       },
     );
   }
+
+  @override
+  void dispose() {
+    gameCubit.stopPlaying();
+    super.dispose();
+  }
 }

@@ -51,4 +51,11 @@ class GameCubit extends Cubit<GameState> {
       currentScore: 0,
     ));
   }
+
+  void stopPlaying() {
+    _audioHelper.stopBackgroundAudio(immediately: true);
+    emit(state.copyWith(
+      currentPlayingState: PlayingState.idle,
+    ));
+  }
 }

@@ -119,6 +119,13 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
       },
     );
   }
+
+  @override
+  void dispose() {
+    multiplayerCubit.stopPlaying();
+    gameCubit.stopPlaying();
+    super.dispose();
+  }
 }
 
 class _RemainingPlayingTimer extends StatelessWidget {
