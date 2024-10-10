@@ -1,4 +1,5 @@
 import 'package:flame/game.dart';
+import 'package:flappy_dash/domain/entities/dash_type.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
@@ -9,6 +10,7 @@ import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flappy_dash/presentation/presentation_utils.dart';
 import 'package:flappy_dash/presentation/widget/game_back_button.dart';
 import 'package:flappy_dash/presentation/widget/game_over_widget.dart';
+import 'package:flappy_dash/presentation/widget/multiplayer_scoreboard.dart';
 import 'package:flappy_dash/presentation/widget/profile_overlay.dart';
 import 'package:flappy_dash/presentation/widget/tap_to_play.dart';
 import 'package:flappy_dash/presentation/widget/top_score.dart';
@@ -98,16 +100,22 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
                       top: PresentationConstants.defaultPadding,
                       right: PresentationConstants.defaultPadding,
                     ),
-                    child: Row(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const GameBackButton(),
-                        Expanded(
-                          child: Container(
-                            height: 0,
-                          ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const GameBackButton(),
+                            Expanded(
+                              child: Container(
+                                height: 0,
+                              ),
+                            ),
+                            const ProfileOverlay(),
+                          ],
                         ),
-                        const ProfileOverlay(),
+                        const _ScoreboardSection(),
                       ],
                     ),
                   ),
@@ -137,6 +145,49 @@ class _RemainingPlayingTimer extends StatelessWidget {
           PresentationUtils.formatSeconds(
             state.matchPlayingRemainingSeconds,
           ),
+        );
+      },
+    );
+  }
+}
+
+class _ScoreboardSection extends StatelessWidget {
+  const _ScoreboardSection();
+
+  List<MultiplayerScore> getSortedScores(MultiplayerState state) {
+    final sortedPlayers =
+        state.matchState!.players.entries.map((e) => e.value).toList();
+    sortedPlayers.sort(
+      (a, b) => b.score.compareTo(a.score),
+    );
+
+    return sortedPlayers.asMap().entries.map((e) {
+      final rank = e.key + 1;
+      final player = e.value;
+      final dashType = DashType.fromUserId(
+        player.userId,
+      );
+      return MultiplayerScore(
+        playerId: player.userId,
+        score: player.score,
+        displayName: player.displayName,
+        dashType: dashType,
+        rank: rank,
+        isMe: player.userId == state.currentUserId,
+      );
+    }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<MultiplayerCubit, MultiplayerState>(
+      builder: (context, state) {
+        if (state.matchState == null) {
+          return const SizedBox();
+        }
+
+        return MultiplayerScoreBoard(
+          scores: getSortedScores(state),
         );
       },
     );
