@@ -33,6 +33,11 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
 
   PlayingState? _latestState;
 
+  DashType get dashType {
+    final userId = multiplayerCubit.state.currentUserId;
+    return DashType.fromUserId(userId);
+  }
+
   @override
   void initState() {
     gameCubit = BlocProvider.of<GameCubit>(context);
@@ -87,7 +92,11 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
                 SafeArea(
                   child: Column(
                     children: [
-                      const TopScore(),
+                      TopScore(
+                        customColor: AppColors.getDashColor(
+                          dashType,
+                        ),
+                      ),
                       _RemainingPlayingTimer(),
                     ],
                   ),
@@ -144,6 +153,11 @@ class _RemainingPlayingTimer extends StatelessWidget {
         return Text(
           PresentationUtils.formatSeconds(
             state.matchPlayingRemainingSeconds,
+          ),
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 18,
+            height: 1,
           ),
         );
       },
