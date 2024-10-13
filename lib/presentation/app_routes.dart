@@ -5,6 +5,8 @@ import 'package:flappy_dash/presentation/pages/singleplayer/singleplayer_game_pa
 import 'package:flappy_dash/presentation/pages/splash/splash_page.dart';
 import 'package:go_router/go_router.dart';
 
+import 'pages/multiplayer/result/match_result_page.dart';
+
 class AppRoutes {
   static GoRouter router = GoRouter(
     initialLocation: '/splash',
@@ -32,6 +34,16 @@ class AppRoutes {
           GoRoute(
             path: 'multi_player/:matchId',
             builder: (context, state) => const MultiPlayerGamePage(),
+            routes: [
+              GoRoute(
+                path: 'result',
+                builder: (context, state) {
+                  return MatchResultPage(
+                    matchId: state.pathParameters['matchId']!,
+                  );
+                },
+              ),
+            ]
           ),
         ]
       ),

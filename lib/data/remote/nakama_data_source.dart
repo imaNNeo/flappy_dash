@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flappy_dash/domain/entities/dispatching_match_event.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
+import 'package:flappy_dash/domain/entities/match_result_entity.dart';
+import 'package:flappy_dash/domain/extensions/string_extension.dart';
 import 'package:flutter/foundation.dart';
 import 'package:nakama/nakama.dart';
 
@@ -18,6 +21,9 @@ class NakamaDataSource {
     grpcPort: _grpcPort,
     httpPort: _httpPort,
   );
+
+  String _makePayload(Map<String, dynamic> json) =>
+      '"${jsonEncode(json).replaceAll('"', '\\"')}"';
 
   NakamaWebsocketClient _initWebsocketClient(String token) =>
       NakamaWebsocketClient.init(
@@ -149,5 +155,19 @@ class NakamaDataSource {
       opCode: MatchEventOpCode.fromDispatchingEvent(event).opCode,
       data: event.toBytes(),
     );
+  }
+
+  Future<MatchResultEntity> getMatchResult(String matchId) async {
+    final response = await client.rpc(
+      session: _currentSession,
+      id: 'get_match_result',
+      payload: _makePayload({
+        'matchId': matchId,
+      }),
+    );
+    if (response == null || response.isBlank) {
+      throw Exception('Failed to get match result');
+    }
+    return MatchResultEntity.fromJson(jsonDecode(response));
   }
 }

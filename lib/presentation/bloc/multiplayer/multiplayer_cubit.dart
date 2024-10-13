@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:equatable/equatable.dart';
+import 'package:flappy_dash/audio_helper.dart';
 import 'package:flappy_dash/domain/entities/dispatching_match_event.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
 import 'package:flappy_dash/domain/entities/match_phase.dart';
@@ -20,10 +21,12 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
   MultiplayerCubit(
     this._multiplayerRepository,
     this._gameRepository,
+    this._audioHelper,
   ) : super(const MultiplayerState()) {
     _initialize();
   }
 
+  final AudioHelper _audioHelper;
   final _matchEvents = StreamController<MatchEvent>.broadcast();
 
   Stream<MatchEvent> get matchEvents => _matchEvents.stream;
@@ -157,6 +160,13 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
         break;
       case MatchPhase.running:
         emit(state.copyWith(matchState: event.state));
+        switch (event) {
+          case MatchFinishedEvent():
+            _onGameFinished();
+            break;
+          case _:
+            break;
+        }
         break;
       case MatchPhase.finished:
         break;
@@ -239,6 +249,10 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
       return;
     }
     _multiplayerRepository.leaveMatch(state.matchId);
+  }
+
+  void _onGameFinished() {
+    _audioHelper.stopBackgroundAudio();
   }
 
   @override

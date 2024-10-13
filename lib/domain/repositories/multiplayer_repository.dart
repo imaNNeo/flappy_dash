@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flappy_dash/data/remote/nakama_data_source.dart';
 import 'package:flappy_dash/domain/entities/dispatching_match_event.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
+import 'package:flappy_dash/domain/entities/match_result_entity.dart';
 import 'package:nakama/nakama.dart';
 
 class MultiplayerRepository {
@@ -40,4 +41,7 @@ class MultiplayerRepository {
       event,
     );
   }
+
+  Future<MatchResultEntity> getMatchResult(String matchId) =>
+      _nakamaDataSource.getMatchResult(matchId);
 }

@@ -45,6 +45,7 @@ class MyApp extends StatelessWidget {
           create: (context) => MultiplayerCubit(
             getIt.get<MultiplayerRepository>(),
             getIt.get<GameRepository>(),
+            getIt.get<AudioHelper>(),
           ),
         ),
         BlocProvider(
