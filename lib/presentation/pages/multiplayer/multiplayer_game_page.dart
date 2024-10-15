@@ -12,7 +12,6 @@ import 'package:flappy_dash/presentation/presentation_utils.dart';
 import 'package:flappy_dash/presentation/widget/game_back_button.dart';
 import 'package:flappy_dash/presentation/widget/game_over_widget.dart';
 import 'package:flappy_dash/presentation/widget/multiplayer_scoreboard.dart';
-import 'package:flappy_dash/presentation/widget/profile_overlay.dart';
 import 'package:flappy_dash/presentation/widget/tap_to_play.dart';
 import 'package:flappy_dash/presentation/widget/top_score.dart';
 import 'package:flutter/material.dart';
@@ -119,7 +118,6 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
                     child: Padding(
                       padding: const EdgeInsets.only(
                         top: PresentationConstants.defaultPadding,
-                        right: PresentationConstants.defaultPadding,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,10 +131,9 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
                                   height: 0,
                                 ),
                               ),
-                              const ProfileOverlay(),
+                              const _ScoreboardSection(),
                             ],
                           ),
-                          const _ScoreboardSection(),
                         ],
                       ),
                     ),
