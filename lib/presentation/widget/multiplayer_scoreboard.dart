@@ -81,9 +81,9 @@ class _MultiplayerScoreBoardState extends State<MultiplayerScoreBoard> {
   Widget build(BuildContext context) {
     final screenSize = ScreenSize.fromContext(context);
     final width = switch (screenSize) {
-      ScreenSize.extraSmall || ScreenSize.small => 148.0,
-      ScreenSize.medium => 220.0,
-      ScreenSize.large || ScreenSize.extraLarge => 280.0,
+      ScreenSize.extraSmall || ScreenSize.small => 132.0,
+      ScreenSize.medium => 206.0,
+      ScreenSize.large || ScreenSize.extraLarge => 260.0,
     };
     final margin = switch (screenSize) {
       ScreenSize.extraSmall || ScreenSize.small => 6.0,
@@ -255,34 +255,34 @@ class _MultiplayerScoreRowWidget extends StatelessWidget {
       ScreenSize.large || ScreenSize.extraLarge => 48.0,
     };
     final rankTextSpace = switch (screenSize) {
-      ScreenSize.extraSmall || ScreenSize.small => 20.0,
-      ScreenSize.medium => 32.0,
-      ScreenSize.large || ScreenSize.extraLarge => 42.0,
+      ScreenSize.extraSmall || ScreenSize.small => 14.0,
+      ScreenSize.medium => 28.0,
+      ScreenSize.large || ScreenSize.extraLarge => 36.0,
     };
     final scoreTextSpace = switch (screenSize) {
-      ScreenSize.extraSmall || ScreenSize.small => 20.0,
-      ScreenSize.medium => 32.0,
-      ScreenSize.large || ScreenSize.extraLarge => 42.0,
+      ScreenSize.extraSmall || ScreenSize.small => 14.0,
+      ScreenSize.medium => 28.0,
+      ScreenSize.large || ScreenSize.extraLarge => 36.0,
     };
     final dashSize = switch (screenSize) {
-      ScreenSize.extraSmall || ScreenSize.small => 18.0,
-      ScreenSize.medium => 24.0,
-      ScreenSize.large || ScreenSize.extraLarge => 32.0,
+      ScreenSize.extraSmall || ScreenSize.small => 16.0,
+      ScreenSize.medium => 22.0,
+      ScreenSize.large || ScreenSize.extraLarge => 30.0,
     };
     final rightPadding = switch (screenSize) {
-      ScreenSize.extraSmall || ScreenSize.small => 12.0,
-      ScreenSize.medium => 16.0,
-      ScreenSize.large || ScreenSize.extraLarge => 24.0,
+      ScreenSize.extraSmall || ScreenSize.small => 8.0,
+      ScreenSize.medium => 14.0,
+      ScreenSize.large || ScreenSize.extraLarge => 20.0,
     };
     final rankTextSize = switch (screenSize) {
-      ScreenSize.extraSmall || ScreenSize.small => 14.0,
-      ScreenSize.medium => 16.0,
-      ScreenSize.large || ScreenSize.extraLarge => 18.0,
-    };
-    final normalTextSize = switch (screenSize) {
       ScreenSize.extraSmall || ScreenSize.small => 12.0,
       ScreenSize.medium => 14.0,
       ScreenSize.large || ScreenSize.extraLarge => 16.0,
+    };
+    final normalTextSize = switch (screenSize) {
+      ScreenSize.extraSmall || ScreenSize.small => 10.0,
+      ScreenSize.medium => 12.0,
+      ScreenSize.large || ScreenSize.extraLarge => 14.0,
     };
     final showingName = score.displayName.isNotNullOrBlank
         ? score.displayName

@@ -50,7 +50,7 @@ class DashPlayerBox extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: AppColors.getDashColor(dashType),
-                    fontSize: boxWidth * 0.12,
+                    fontSize: boxWidth * 0.10,
                   ),
                 ),
                 strokeWidth: 2,
