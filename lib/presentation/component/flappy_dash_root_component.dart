@@ -77,7 +77,7 @@ class FlappyDashRootComponent extends Component
 
   @override
   void updateTree(double dt) {
-    super.updateTree(dt * 0.1);
+    super.updateTree(dt * 0.5);
   }
 
   void _removeLastPipes() {

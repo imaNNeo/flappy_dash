@@ -1,5 +1,5 @@
 import 'package:flappy_dash/presentation/pages/home/home_page.dart';
-import 'package:flappy_dash/presentation/pages/multiplayer/multiplayer_game_page.dart';
+import 'package:flappy_dash/presentation/pages/multiplayer/game/multiplayer_game_page.dart';
 import 'package:flappy_dash/presentation/pages/multiplayer/lobby/multiplayer_lobby_page.dart';
 import 'package:flappy_dash/presentation/pages/singleplayer/singleplayer_game_page.dart';
 import 'package:flappy_dash/presentation/pages/splash/splash_page.dart';

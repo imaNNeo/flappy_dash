@@ -1,15 +1,27 @@
 import 'dart:ui';
 
 import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
+import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class GameOverWidget extends StatelessWidget {
-  const GameOverWidget({super.key});
+class MultiplayerDiedOverlayWidget extends StatelessWidget {
+  const MultiplayerDiedOverlayWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<GameCubit, GameState>(
+    return BlocConsumer<GameCubit, GameState>(
+      listener: (context, state) {
+        if (state.spawnsAgainAt != null) {
+          final secondsLeft =
+              state.spawnsAgainAt!.difference(DateTime.now()).inSeconds;
+
+          if (secondsLeft <= 0 && state.currentPlayingState.isGameOver) {
+            context.read<MultiplayerCubit>().dispatchPlayerIsIdleEvent();
+            context.read<GameCubit>().continueGame();
+          }
+        }
+      },
       builder: (context, state) {
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
@@ -19,38 +31,24 @@ class GameOverWidget extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
-                    'GAME OVER!',
-                    style: TextStyle(
+                  Text(
+                    state.multiplayerDiedMessage?.header ?? '',
+                    style: const TextStyle(
                       color: Color(0xFFFFCA00),
                       fontWeight: FontWeight.bold,
                       fontSize: 48,
                       letterSpacing: 2,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 24),
                   Text(
-                    'Score: ${state.currentScore}',
+                    state.multiplayerDiedMessage
+                            ?.getBody(state.spawnRemainingSeconds) ??
+                        '',
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 22,
+                      fontSize: 24,
                       letterSpacing: 2,
-                    ),
-                  ),
-                  const SizedBox(height: 60),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<GameCubit>().restartGame();
-                    },
-                    child: const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        'PLAY AGAIN!',
-                        style: TextStyle(
-                          fontSize: 22,
-                          letterSpacing: 2,
-                        ),
-                      ),
                     ),
                   ),
                 ],

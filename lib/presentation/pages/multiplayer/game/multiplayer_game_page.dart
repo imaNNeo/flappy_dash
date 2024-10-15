@@ -10,13 +10,14 @@ import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flappy_dash/presentation/presentation_utils.dart';
 import 'package:flappy_dash/presentation/widget/game_back_button.dart';
-import 'package:flappy_dash/presentation/widget/game_over_widget.dart';
 import 'package:flappy_dash/presentation/widget/multiplayer_scoreboard.dart';
 import 'package:flappy_dash/presentation/widget/tap_to_play.dart';
 import 'package:flappy_dash/presentation/widget/top_score.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+
+import 'parts/multiplayer_died_overlay.dart';
 
 class MultiPlayerGamePage extends StatefulWidget {
   const MultiPlayerGamePage({super.key});
@@ -93,25 +94,24 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
                   },
                 ),
                 if (state.currentPlayingState.isGameOver)
-                  const GameOverWidget(),
+                  const MultiplayerDiedOverlayWidget(),
                 if (state.currentPlayingState.isIdle)
                   const Align(
                     alignment: Alignment(0, 0.2),
                     child: TapToPlay(),
                   ),
-                if (state.currentPlayingState.isNotGameOver)
-                  SafeArea(
-                    child: Column(
-                      children: [
-                        TopScore(
-                          customColor: AppColors.getDashColor(
-                            dashType,
-                          ),
+                SafeArea(
+                  child: Column(
+                    children: [
+                      TopScore(
+                        customColor: AppColors.getDashColor(
+                          dashType,
                         ),
-                        _RemainingPlayingTimer(),
-                      ],
-                    ),
+                      ),
+                      _RemainingPlayingTimer(),
+                    ],
                   ),
+                ),
                 Align(
                   alignment: Alignment.topCenter,
                   child: SafeArea(
