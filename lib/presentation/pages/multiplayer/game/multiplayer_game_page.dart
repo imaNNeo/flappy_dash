@@ -4,7 +4,7 @@ import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/match_phase.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
-import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
+import 'package:flappy_dash/presentation/bloc/singleplayer/singleplayer_game_cubit.dart';
 import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
@@ -29,7 +29,7 @@ class MultiPlayerGamePage extends StatefulWidget {
 class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
   late FlappyDashGame _flappyDashGame;
 
-  late GameCubit gameCubit;
+  late SingleplayerGameCubit singleplayerCubit;
   late MultiplayerCubit multiplayerCubit;
   late LeaderboardCubit leaderboardCubit;
 
@@ -42,12 +42,12 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
 
   @override
   void initState() {
-    gameCubit = BlocProvider.of<GameCubit>(context);
-    gameCubit.initialize(const MultiplayerGameMode());
+    singleplayerCubit = BlocProvider.of<SingleplayerGameCubit>(context);
     multiplayerCubit = BlocProvider.of<MultiplayerCubit>(context);
     leaderboardCubit = BlocProvider.of<LeaderboardCubit>(context);
     _flappyDashGame = FlappyDashGame(
-      gameCubit,
+      const MultiplayerGameMode(),
+      singleplayerCubit,
       multiplayerCubit,
       leaderboardCubit,
     );
@@ -65,13 +65,14 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
           _onGameFinished();
         }
       },
-      child: BlocConsumer<GameCubit, GameState>(
+      child: BlocConsumer<MultiplayerCubit, MultiplayerState>(
         listener: (context, state) {
           if (state.currentPlayingState.isIdle &&
               _latestState == PlayingState.gameOver) {
             setState(() {
               _flappyDashGame = FlappyDashGame(
-                gameCubit,
+                const MultiplayerGameMode(),
+                singleplayerCubit,
                 multiplayerCubit,
                 leaderboardCubit,
               );
@@ -104,6 +105,7 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
                   child: Column(
                     children: [
                       TopScore(
+                        currentScore: state.currentScore,
                         customColor: AppColors.getDashColor(
                           dashType,
                         ),
@@ -150,7 +152,6 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
   @override
   void dispose() {
     multiplayerCubit.stopPlaying();
-    gameCubit.stopPlaying();
     super.dispose();
   }
 

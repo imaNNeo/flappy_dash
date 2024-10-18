@@ -1,12 +1,9 @@
 import 'package:flame/components.dart';
-import 'package:flame_bloc/flame_bloc.dart';
-import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
 import 'package:flappy_dash/presentation/component/pipe.dart';
 
 import 'hidden_coin.dart';
 
-class PipePair extends PositionComponent
-    with FlameBlocReader<GameCubit, GameState> {
+class PipePair extends PositionComponent {
   PipePair({
     required super.position,
     required this.gap,

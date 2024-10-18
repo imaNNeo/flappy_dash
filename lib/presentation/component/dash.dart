@@ -1,26 +1,20 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flame_svg/flame_svg.dart';
 import 'package:flame_svg/svg.dart';
 import 'package:flappy_dash/domain/entities/dash_type.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
-import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/component/pipe.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
-import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
 import 'package:flutter/material.dart';
 
 import 'hidden_coin.dart';
 import 'outlined_text_component.dart';
 
 class Dash extends PositionComponent
-    with
-        CollisionCallbacks,
-        HasGameRef<FlappyDashGame>,
-        FlameBlocReader<GameCubit, GameState> {
+    with CollisionCallbacks, HasGameRef<FlappyDashGame> {
   Dash({
     this.speed = 200.0,
     required this.playerId,
@@ -37,8 +31,6 @@ class Dash extends PositionComponent
   final String playerId;
   final String displayName;
   final bool isMe;
-  late final MultiplayerCubit _multiplayerCubit;
-
   final DashType type;
   late final Svg _dashSvg;
 
@@ -58,7 +50,6 @@ class Dash extends PositionComponent
       position: center * 1.1,
       anchor: Anchor.center,
     ));
-    _multiplayerCubit = game.multiplayerCubit;
     add(OutlinedTextComponent(
       text: displayName,
       position: Vector2(size.x / 2, 0),
@@ -72,9 +63,9 @@ class Dash extends PositionComponent
     ));
   }
 
-  PlayingState get currentPlayingState => isMe
-      ? bloc.state.currentPlayingState
-      : _multiplayerCubit.state.matchState!.players[playerId]!.playingState;
+  PlayingState get currentPlayingState => game.getCurrentPlayingState(
+        otherPlayerId: isMe ? null : playerId,
+      );
 
   @override
   void update(double dt) {
@@ -108,7 +99,7 @@ class Dash extends PositionComponent
   }
 
   void updatePosition(double dashX, double dashY) {
-    assert(game.gameCubit.state.gameMode is MultiplayerGameMode && !isMe);
+    assert(game.gameMode is MultiplayerGameMode && !isMe);
     x = dashX;
     y = dashY;
   }

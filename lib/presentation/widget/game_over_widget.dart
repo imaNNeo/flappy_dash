@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
+import 'package:flappy_dash/presentation/bloc/singleplayer/singleplayer_game_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -9,7 +9,7 @@ class GameOverWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<GameCubit, GameState>(
+    return BlocBuilder<SingleplayerGameCubit, SingleplayerGameState>(
       builder: (context, state) {
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
@@ -40,7 +40,7 @@ class GameOverWidget extends StatelessWidget {
                   const SizedBox(height: 60),
                   ElevatedButton(
                     onPressed: () {
-                      context.read<GameCubit>().restartGame();
+                      context.read<SingleplayerGameCubit>().restartGame();
                     },
                     child: const Padding(
                       padding: EdgeInsets.all(8.0),

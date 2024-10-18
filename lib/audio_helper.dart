@@ -7,6 +7,8 @@ class AudioHelper {
 
   late AudioSource _scoreSource;
 
+  bool get isPlayingBackgroundAudio => _playingBackground != null;
+
   Future<void> initialize() async {
     _soLoud = SoLoud.instance;
     await _soLoud.init();
@@ -23,7 +25,6 @@ class AudioHelper {
     if (_playingBackground == null) {
       return;
     }
-
     _soLoud.fadeVolume(
       _playingBackground!,
       0.0,

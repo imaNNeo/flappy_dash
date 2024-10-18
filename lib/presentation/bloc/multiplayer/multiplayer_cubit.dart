@@ -4,10 +4,13 @@ import 'dart:math';
 import 'package:equatable/equatable.dart';
 import 'package:flappy_dash/audio_helper.dart';
 import 'package:flappy_dash/domain/entities/dispatching_match_event.dart';
+import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
 import 'package:flappy_dash/domain/entities/match_phase.dart';
 import 'package:flappy_dash/domain/entities/match_state.dart';
+import 'package:flappy_dash/domain/entities/multiplayer_died_message.dart';
 import 'package:flappy_dash/domain/entities/player_state.dart';
+import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
 import 'package:flappy_dash/domain/repositories/game_repository.dart';
 import 'package:flappy_dash/domain/repositories/multiplayer_repository.dart';
@@ -38,6 +41,7 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     ));
     _timer = Timer.periodic(const Duration(milliseconds: 100), (_) {
       _refreshRemainingTime();
+      _refreshRespawnTimer();
     });
     _listenToUserDisplayNameUpdates();
   }
@@ -203,17 +207,21 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     );
   }
 
-  void dispatchIncreaseScoreEvent(double x, double y) {
+  void increaseScore(double x, double y) {
     if (state.matchId.isBlank) {
       return;
     }
+    _audioHelper.playScoreCollectSound();
+    emit(state.copyWith(
+      currentScore: state.currentScore + 1,
+    ));
     _multiplayerRepository.sendDispatchingEvent(
       state.matchId,
       DispatchingPlayerScoredEvent(x, y),
     );
   }
 
-  void dispatchPlayerDiedEvent(double x, double y) {
+  void playerDied(double x, double y) {
     if (state.matchId.isBlank) {
       return;
     }
@@ -221,9 +229,68 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
       state.matchId,
       DispatchingPlayerDiedEvent(x, y),
     );
+    final spawnsAfter = state.gameMode.gameConfig.spawnAgainAfterSeconds;
+    emit(state.copyWith(
+      currentPlayingState: PlayingState.gameOver,
+      spawnsAgainAt: DateTime.now().add(Duration(seconds: spawnsAfter)),
+      spawnRemainingSeconds: spawnsAfter,
+      multiplayerDiedMessage: _getRandomMultiplayerDiedMessage(),
+    ));
   }
 
-  void dispatchPlayerIsIdleEvent() {
+  MultiplayerDiedMessage _getRandomMultiplayerDiedMessage() {
+    List<MultiplayerDiedMessage> values;
+    if (state.currentScore == 0) {
+      values = MultiplayerDiedMessage.values
+          .where((element) => element.onlyForZeroScore)
+          .toList();
+    } else {
+      values = MultiplayerDiedMessage.values
+          .where((element) => !element.onlyForZeroScore)
+          .toList();
+    }
+    return values[Random().nextInt(values.length)];
+  }
+
+  void _refreshRespawnTimer() {
+    if (state.spawnsAgainAt == null) {
+      return;
+    }
+    final diff = state.spawnsAgainAt!.difference(DateTime.now()).inSeconds;
+    emit(state.copyWith(
+      spawnRemainingSeconds: max(diff, 0),
+    ));
+  }
+
+  void startPlaying() {
+    if (state.matchId.isBlank) {
+      return;
+    }
+    if (!_audioHelper.isPlayingBackgroundAudio) {
+      _audioHelper.playBackgroundAudio();
+    }
+    _multiplayerRepository.sendDispatchingEvent(
+      state.matchId,
+      DispatchingPlayerStartedEvent(),
+    );
+    emit(state.copyWith(
+      currentPlayingState: PlayingState.playing,
+    ));
+  }
+
+  void stopPlaying() {
+    if (state.matchId.isBlank) {
+      return;
+    }
+    _audioHelper.stopBackgroundAudio(immediately: true);
+    _multiplayerRepository.leaveMatch(state.matchId);
+  }
+
+  void _onGameFinished() {
+    _audioHelper.stopBackgroundAudio();
+  }
+
+  void continueGame() {
     if (state.matchId.isBlank) {
       return;
     }
@@ -231,28 +298,9 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
       state.matchId,
       DispatchingPlayerIsIdleEvent(),
     );
-  }
-
-  void dispatchStartEvent() {
-    if (state.matchId.isBlank) {
-      return;
-    }
-
-    _multiplayerRepository.sendDispatchingEvent(
-      state.matchId,
-      DispatchingPlayerStartedEvent(),
-    );
-  }
-
-  void stopPlaying() {
-    if (state.matchId.isBlank) {
-      return;
-    }
-    _multiplayerRepository.leaveMatch(state.matchId);
-  }
-
-  void _onGameFinished() {
-    _audioHelper.stopBackgroundAudio();
+    emit(state.copyWith(
+      currentPlayingState: PlayingState.idle,
+    ));
   }
 
   @override

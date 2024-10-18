@@ -13,7 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'presentation/app_routes.dart';
 import 'presentation/app_style.dart';
-import 'presentation/bloc/game/game_cubit.dart';
+import 'presentation/bloc/singleplayer/singleplayer_game_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => GameCubit(
+          create: (context) => SingleplayerGameCubit(
             getIt.get<AudioHelper>(),
             getIt.get<GameRepository>(),
           ),
@@ -61,6 +61,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp.router(
+        showPerformanceOverlay: true,
         routerConfig: AppRoutes.router,
         title: 'Flappy Dash',
         builder: DevicePreview.appBuilder,

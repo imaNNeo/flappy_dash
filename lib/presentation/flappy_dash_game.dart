@@ -3,19 +3,21 @@ import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
+import 'package:flappy_dash/domain/entities/playing_state.dart';
+import 'package:flappy_dash/domain/extensions/string_extension.dart';
 import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'bloc/game/game_cubit.dart';
-import 'bloc/multiplayer/multiplayer_cubit.dart';
+import 'bloc/singleplayer/singleplayer_game_cubit.dart';
 import 'component/flappy_dash_root_component.dart';
 
 class FlappyDashGame extends FlameGame<FlappyDashWorld>
     with KeyboardEvents, HasCollisionDetection {
   FlappyDashGame(
-    this.gameCubit,
+    this.gameMode,
+    this.singleplayerCubit,
     this.multiplayerCubit,
     this.leaderboardCubit,
   ) : super(
@@ -26,11 +28,21 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
           ),
         );
 
-  final GameCubit gameCubit;
+  final GameMode gameMode;
+  final SingleplayerGameCubit singleplayerCubit;
   final MultiplayerCubit multiplayerCubit;
   final LeaderboardCubit leaderboardCubit;
 
-  GameMode get gameMode => gameCubit.state.gameMode!;
+  PlayingState getCurrentPlayingState({
+    String? otherPlayerId,
+  }) =>
+      switch (gameMode) {
+        SinglePlayerGameMode() => singleplayerCubit.state.currentPlayingState,
+        MultiplayerGameMode() => otherPlayerId.isNotNullOrBlank
+            ? multiplayerCubit
+                .state.matchState!.players[otherPlayerId]!.playingState
+            : multiplayerCubit.state.currentPlayingState,
+      };
 
   @override
   KeyEventResult onKeyEvent(
@@ -49,21 +61,36 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
   }
 
   void gameOver(double x, double y) async {
-    await gameCubit.gameOver();
     switch (gameMode) {
       case SinglePlayerGameMode():
+        await singleplayerCubit.gameOver();
         leaderboardCubit.refreshLeaderboard();
         break;
       case MultiplayerGameMode():
-        multiplayerCubit.dispatchPlayerDiedEvent(x, y);
+        multiplayerCubit.playerDied(x, y);
         break;
     }
   }
 
   void increaseScore(double x, double y) {
-    gameCubit.increaseScore();
-    if (gameMode is MultiplayerGameMode) {
-      multiplayerCubit.dispatchIncreaseScoreEvent(x, y);
+    switch (gameMode) {
+      case SinglePlayerGameMode():
+        singleplayerCubit.increaseScore();
+        break;
+      case MultiplayerGameMode():
+        multiplayerCubit.increaseScore(x, y);
+        break;
+    }
+  }
+
+  void onGameStarted() {
+    switch (gameMode) {
+      case SinglePlayerGameMode():
+        singleplayerCubit.startPlaying();
+        break;
+      case MultiplayerGameMode():
+        multiplayerCubit.startPlaying();
+        break;
     }
   }
 }
@@ -77,8 +104,8 @@ class FlappyDashWorld extends World
     super.onLoad();
     add(FlameMultiBlocProvider(
       providers: [
-        FlameBlocProvider<GameCubit, GameState>(
-          create: () => game.gameCubit,
+        FlameBlocProvider<SingleplayerGameCubit, SingleplayerGameState>(
+          create: () => game.singleplayerCubit,
         ),
         FlameBlocProvider<MultiplayerCubit, MultiplayerState>(
           create: () => game.multiplayerCubit,

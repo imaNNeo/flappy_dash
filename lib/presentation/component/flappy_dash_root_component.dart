@@ -2,20 +2,18 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flappy_dash/domain/entities/game_config_entity.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/component/multiplayer_controller.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
-import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
 
 import 'dash.dart';
 import 'dash_parallax_background.dart';
 import 'pipe_pair.dart';
 
 class FlappyDashRootComponent extends Component
-    with HasGameRef<FlappyDashGame>, FlameBlocReader<GameCubit, GameState> {
+    with HasGameRef<FlappyDashGame> {
   late Dash _dash;
   late PipePair _lastPipe;
   late DashParallaxBackground _background;
@@ -31,7 +29,7 @@ class FlappyDashRootComponent extends Component
     await super.onLoad();
     _multiplayerCubit = game.multiplayerCubit;
     add(_background = DashParallaxBackground());
-    if (bloc.state.gameMode == const MultiplayerGameMode()) {
+    if (game.gameMode == const MultiplayerGameMode()) {
       add(MultiplayerController());
     }
     add(_dash = Dash(
@@ -39,7 +37,7 @@ class FlappyDashRootComponent extends Component
       displayName: '',
       isMe: true,
     ));
-    _config = bloc.state.gameMode!.gameConfig;
+    _config = game.gameMode.gameConfig;
     _generatePipes(
       fromX: _config.pipesDistance,
     );
@@ -99,11 +97,8 @@ class FlappyDashRootComponent extends Component
   }
 
   void _checkToStart() {
-    if (bloc.state.currentPlayingState.isIdle) {
-      bloc.startPlaying();
-      if (_config is MultiplayerGameConfigEntity) {
-        game.multiplayerCubit.dispatchStartEvent();
-      }
+    if (game.getCurrentPlayingState().isIdle) {
+      game.onGameStarted();
     }
   }
 
@@ -146,6 +141,5 @@ class FlappyDashRootComponent extends Component
       );
       _removeLastPipes();
     }
-    game.camera.viewfinder.zoom = 1.0;
   }
 }

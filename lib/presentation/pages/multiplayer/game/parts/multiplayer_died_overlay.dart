@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:flappy_dash/presentation/bloc/game/game_cubit.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,15 +9,13 @@ class MultiplayerDiedOverlayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<GameCubit, GameState>(
+    return BlocConsumer<MultiplayerCubit, MultiplayerState>(
       listener: (context, state) {
         if (state.spawnsAgainAt != null) {
           final secondsLeft =
               state.spawnsAgainAt!.difference(DateTime.now()).inSeconds;
-
           if (secondsLeft <= 0 && state.currentPlayingState.isGameOver) {
-            context.read<MultiplayerCubit>().dispatchPlayerIsIdleEvent();
-            context.read<GameCubit>().continueGame();
+            context.read<MultiplayerCubit>().continueGame();
           }
         }
       },
@@ -39,6 +36,7 @@ class MultiplayerDiedOverlayWidget extends StatelessWidget {
                       fontSize: 48,
                       letterSpacing: 2,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
                   Text(
