@@ -4,7 +4,6 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flappy_dash/domain/entities/game_config_entity.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
-import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/component/multiplayer_controller.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 
@@ -18,7 +17,6 @@ class FlappyDashRootComponent extends Component
   late PipePair _lastPipe;
   late DashParallaxBackground _background;
   late final GameConfigEntity _config;
-  late final MultiplayerCubit _multiplayerCubit;
 
   int _pipeCounter = 0;
 
@@ -27,7 +25,6 @@ class FlappyDashRootComponent extends Component
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    _multiplayerCubit = game.multiplayerCubit;
     add(_background = DashParallaxBackground());
     if (game.gameMode == const MultiplayerGameMode()) {
       add(MultiplayerController());
@@ -93,7 +90,7 @@ class FlappyDashRootComponent extends Component
   void _jump() {
     _checkToStart();
     _dash.jump();
-    _multiplayerCubit.dispatchJumpEvent(_dash.x, _dash.y);
+    game.playerJumped(_dash.x, _dash.y);
   }
 
   void _checkToStart() {
