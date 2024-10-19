@@ -7,6 +7,7 @@ import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
 import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
+import 'package:flappy_dash/presentation/component/dash_parallax_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -129,6 +130,7 @@ class FlappyDashWorld extends World
         _rootComponent = FlappyDashRootComponent(),
       ],
     ));
+    game.camera.backdrop = DashParallaxBackground();
   }
 
   void onSpaceDown() => _rootComponent.onSpaceDown();

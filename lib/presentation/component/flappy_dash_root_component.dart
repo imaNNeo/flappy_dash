@@ -8,14 +8,13 @@ import 'package:flappy_dash/presentation/component/multiplayer_controller.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 
 import 'dash.dart';
-import 'dash_parallax_background.dart';
 import 'pipe_pair.dart';
 
 class FlappyDashRootComponent extends Component
     with HasGameRef<FlappyDashGame> {
   late Dash _dash;
   late PipePair _lastPipe;
-  late DashParallaxBackground _background;
+  // late DashParallaxBackground _background;
   late final GameConfigEntity _config;
 
   int _pipeCounter = 0;
@@ -25,7 +24,7 @@ class FlappyDashRootComponent extends Component
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    add(_background = DashParallaxBackground());
+    // add(_background = DashParallaxBackground());
     if (game.gameMode == const MultiplayerGameMode()) {
       add(MultiplayerController());
     }
@@ -120,7 +119,7 @@ class FlappyDashRootComponent extends Component
     final lastPipe = _removeAllPipesExceptLastOne();
     lastPipe.x = 0.0;
     _dash.x = 0.0;
-    _background.x = 0.0;
+    // _background.x = 0.0;
     _pipeCounter = 0;
     _generatePipes(
       fromX: _config.pipesDistance,
@@ -130,7 +129,7 @@ class FlappyDashRootComponent extends Component
   @override
   void update(double dt) {
     super.update(dt);
-    _background.x = _dash.x;
+    // _background.x = _dash.x;
     _tryToLoopTheGame();
     if (_dash.x >= _lastPipe.x) {
       _generatePipes(

@@ -8,7 +8,6 @@ class DashParallaxBackground extends ParallaxComponent<FlappyDashGame>  {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    anchor = Anchor.center;
     parallax = await game.loadParallax(
       [
         ParallaxImageData('background/layer1-sky.png'),
