@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:isolate';
 
 import 'package:flappy_dash/domain/entities/dispatching_match_event.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
@@ -124,19 +125,25 @@ class NakamaDataSource {
     return matchId;
   }
 
-  Stream<MatchEvent> onMatchEvent(String matchId) =>
-      _websocketClient.onMatchData
-          .where((event) => event.matchId == matchId)
-          .map((event) {
-        final index = MatchEventOpCode.values
-            .indexWhere((element) => element.opCode == event.opCode);
-        if (index == -1) {
-          // opCode is not defined in the client
-          throw Exception('Unknown event type with opCode: ${event.opCode}');
-        }
-        final opCode = MatchEventOpCode.values[index];
-        return opCode.parseIncomingEvent(event);
-      });
+  Stream<MatchEvent> onMatchEvent(String matchId) async* {
+    await for (final data in _websocketClient.onMatchData) {
+      if (data.matchId != matchId) {
+        return;
+      }
+      final index = MatchEventOpCode.values
+          .indexWhere((element) => element.opCode == data.opCode);
+      if (index == -1) {
+        // opCode is not defined in the client
+        debugPrint('Unknown event type with opCode: ${data.opCode}');
+        continue;
+      }
+      final opCode = MatchEventOpCode.values[index];
+      yield await _parseData(opCode, data);
+    }
+  }
+
+  Future<MatchEvent> _parseData(MatchEventOpCode opCode, MatchData data) =>
+      compute(opCode.parseIncomingEvent, data);
 
   Future<Match> joinMatch(String matchId) async {
     final match = await _websocketClient.joinMatch(matchId);
@@ -149,11 +156,12 @@ class NakamaDataSource {
   Future<void> leaveMatch(String matchId) =>
       _websocketClient.leaveMatch(matchId);
 
-  void sendDispatchingEvent(String matchId, DispatchingMatchEvent event) {
+  void sendDispatchingEvent(String matchId, DispatchingMatchEvent event) async {
+    debugPrint('Sending event: $event');
     _websocketClient.sendMatchData(
       matchId: matchId,
       opCode: MatchEventOpCode.fromDispatchingEvent(event).opCode,
-      data: event.toBytes(),
+      data: await Isolate.run(() => event.toBytes()),
     );
   }
 
