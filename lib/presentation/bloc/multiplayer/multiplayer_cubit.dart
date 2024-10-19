@@ -138,6 +138,7 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
       matchState: newState,
       inLobbyPlayers: [],
       joinedInLobby: false,
+      diedCount: 0,
     ));
   }
 
@@ -234,13 +235,14 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
       currentPlayingState: PlayingState.gameOver,
       spawnsAgainAt: DateTime.now().add(Duration(seconds: spawnsAfter)),
       spawnRemainingSeconds: spawnsAfter,
+      diedCount: state.diedCount + 1,
       multiplayerDiedMessage: _getRandomMultiplayerDiedMessage(),
     ));
   }
 
   MultiplayerDiedMessage _getRandomMultiplayerDiedMessage() {
     List<MultiplayerDiedMessage> values;
-    if (state.currentScore == 0) {
+    if (state.currentScore == 0 && state.diedCount == 0) {
       values = MultiplayerDiedMessage.values
           .where((element) => element.onlyForZeroScore)
           .toList();
@@ -266,7 +268,9 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     if (state.matchId.isBlank) {
       return;
     }
-    if (!_audioHelper.isPlayingBackgroundAudio) {
+
+    // First round
+    if (state.diedCount == 0) {
       _audioHelper.playBackgroundAudio();
     }
     _multiplayerRepository.sendDispatchingEvent(

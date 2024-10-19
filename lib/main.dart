@@ -61,7 +61,6 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp.router(
-        showPerformanceOverlay: true,
         routerConfig: AppRoutes.router,
         title: 'Flappy Dash',
         builder: DevicePreview.appBuilder,

@@ -19,6 +19,7 @@ class MultiplayerState with EquatableMixin {
     this.spawnsAgainAt,
     this.spawnRemainingSeconds = 0,
     this.multiplayerDiedMessage,
+    this.diedCount = 0,
   });
 
   final MultiplayerGameMode gameMode;
@@ -38,6 +39,7 @@ class MultiplayerState with EquatableMixin {
   final DateTime? spawnsAgainAt;
   final int spawnRemainingSeconds;
   final MultiplayerDiedMessage? multiplayerDiedMessage;
+  final int diedCount;
 
   MultiplayerState copyWith({
     int? currentScore,
@@ -56,6 +58,7 @@ class MultiplayerState with EquatableMixin {
     DateTime? spawnsAgainAt,
     int? spawnRemainingSeconds,
     MultiplayerDiedMessage? multiplayerDiedMessage,
+    int? diedCount,
   }) =>
       MultiplayerState(
         currentScore: currentScore ?? this.currentScore,
@@ -78,6 +81,7 @@ class MultiplayerState with EquatableMixin {
             spawnRemainingSeconds ?? this.spawnRemainingSeconds,
         multiplayerDiedMessage:
             multiplayerDiedMessage ?? this.multiplayerDiedMessage,
+        diedCount: diedCount ?? this.diedCount,
       );
 
   @override
@@ -99,5 +103,6 @@ class MultiplayerState with EquatableMixin {
         spawnsAgainAt,
         spawnRemainingSeconds,
         multiplayerDiedMessage,
+        diedCount,
       ];
 }
