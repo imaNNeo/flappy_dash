@@ -45,11 +45,13 @@ class Dash extends PositionComponent
     _dashSvg = await Svg.load(type.flameAssetName);
     final radius = size.x / 2;
     final center = size / 2;
-    add(CircleHitbox(
-      radius: radius * 0.75,
-      position: center * 1.1,
-      anchor: Anchor.center,
-    ));
+    if (isMe) {
+      add(CircleHitbox(
+        radius: radius * 0.75,
+        position: center * 1.1,
+        anchor: Anchor.center,
+      ));
+    }
     add(OutlinedTextComponent(
       text: displayName,
       position: Vector2(size.x / 2, 0),
@@ -108,9 +110,6 @@ class Dash extends PositionComponent
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
     if (currentPlayingState.isNotPlaying) {
-      return;
-    }
-    if (!isMe) {
       return;
     }
     if (other is HiddenCoin) {
