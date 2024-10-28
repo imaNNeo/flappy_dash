@@ -24,7 +24,7 @@ class NakamaDataSource {
   );
 
   String _makePayload(Map<String, dynamic> json) =>
-      '"${jsonEncode(json).replaceAll('"', '\\"')}"';
+      jsonEncode(json);
 
   NakamaWebsocketClient _initWebsocketClient(String token) =>
       NakamaWebsocketClient.init(

@@ -20,14 +20,18 @@ class MatchResultCubit extends Cubit<MatchResultState> {
   }
 
   void _fetchMatchResult() async {
-    emit(state.copyWith(isLoading: true));
+    emit(state.copyWith(
+      isLoading: true,
+      error: '',
+    ));
     try {
       final matchResult = await gameRepository.getMatchResult(state.matchId);
       emit(state.copyWith(
         isLoading: false,
         matchResult: matchResult,
       ));
-    } catch (e) {
+    } catch (e, stack) {
+      print(stack.toString());
       emit(state.copyWith(
         isLoading: false,
         error: e.toString(),
