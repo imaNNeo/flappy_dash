@@ -5,7 +5,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 class GameBackButton extends StatelessWidget {
   const GameBackButton({
     super.key,
+    this.svgIcon = 'ic_back.svg',
+    this.overrideOnPressed,
   });
+
+  final String svgIcon;
+  final VoidCallback? overrideOnPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +26,11 @@ class GameBackButton extends StatelessWidget {
       child: IconButton(
         padding: EdgeInsets.all(backIconSize * 0.5),
         icon: SvgPicture.asset(
-          'assets/icons/ic_back.svg',
+          'assets/icons/$svgIcon',
           width: backIconSize,
+          height: backIconSize,
         ),
-        onPressed: () => Navigator.of(context).pop(),
+        onPressed: overrideOnPressed ?? () => Navigator.of(context).pop(),
       ),
     );
   }

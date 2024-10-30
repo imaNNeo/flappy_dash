@@ -3,7 +3,8 @@ import 'package:flappy_dash/domain/extensions/string_extension.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/widget/outline_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
+import 'dash_image.dart';
 
 class DashPlayerBox extends StatelessWidget {
   const DashPlayerBox({
@@ -37,11 +38,7 @@ class DashPlayerBox extends StatelessWidget {
         child: Row(
           children: [
             SizedBox(width: boxWidth * 0.04),
-            SvgPicture.asset(
-              dashType.assetName,
-              width: iconSize,
-              height: iconSize,
-            ),
+            DashImage(size: iconSize, type: dashType),
             SizedBox(width: boxWidth * 0.04),
             Expanded(
               child: OutlineText(

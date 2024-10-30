@@ -8,6 +8,7 @@ class AppColors {
   static const backgroundColor60 = Color(0x800F8B8D);
 
   static const boxBgColor = Color(0x66000000);
+  static const blackOverlay = Color(0xCC000000);
   static const dialogBgColor = Color(0xFF16425B);
   static const mainColor = Color(0xFF00FBFF);
   static const blueColor = Color(0xFF26CBFE);

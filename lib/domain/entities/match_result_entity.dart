@@ -15,6 +15,14 @@ class MatchResultEntity with EquatableMixin {
     required this.scores,
   });
 
+  MatchScoreEntity? getMyScore(String? userId) {
+    try {
+      return scores.firstWhere((element) => element.user.id == userId);
+    } catch (e) {
+      return null;
+    }
+  }
+
   // fromJson
   factory MatchResultEntity.fromJson(Map<String, dynamic> json) =>
       MatchResultEntity(

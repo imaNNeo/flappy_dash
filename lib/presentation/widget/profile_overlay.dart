@@ -7,9 +7,9 @@ import 'package:flappy_dash/presentation/responsive/screen_size.dart';
 import 'package:flappy_dash/presentation/widget/outline_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'box_overlay.dart';
+import 'dash_image.dart';
 
 class ProfileOverlay extends StatelessWidget {
   const ProfileOverlay({super.key});
@@ -40,10 +40,7 @@ class ProfileOverlay extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SvgPicture.asset(
-                dashType.assetName,
-                height: relative(48),
-              ),
+              DashImage(size: relative(48), type: dashType),
               SizedBox(width: relative(6)),
               OutlineText(
                 Text(

@@ -6,12 +6,18 @@ class MatchResultState with EquatableMixin {
     this.matchResult,
     this.isLoading = false,
     this.error = '',
+    this.playAgainLoading = false,
+    this.playAgainError = '',
+    this.playAgainMatchId = '',
   });
 
   final String matchId;
   final MatchResultEntity? matchResult;
   final bool isLoading;
   final String error;
+  final bool playAgainLoading;
+  final String playAgainError;
+  final String playAgainMatchId;
 
   // copyWith
   MatchResultState copyWith({
@@ -19,12 +25,18 @@ class MatchResultState with EquatableMixin {
     MatchResultEntity? matchResult,
     bool? isLoading,
     String? error,
+    bool? playAgainLoading,
+    String? playAgainError,
+    String? playAgainMatchId,
   }) =>
       MatchResultState(
         matchId: matchId ?? this.matchId,
         matchResult: matchResult ?? this.matchResult,
         isLoading: isLoading ?? this.isLoading,
         error: error ?? this.error,
+        playAgainLoading: playAgainLoading ?? this.playAgainLoading,
+        playAgainError: playAgainError ?? this.playAgainError,
+        playAgainMatchId: playAgainMatchId ?? this.playAgainMatchId,
       );
 
   @override
@@ -33,5 +45,8 @@ class MatchResultState with EquatableMixin {
         matchResult,
         isLoading,
         error,
+        playAgainLoading,
+        playAgainError,
+        playAgainMatchId,
       ];
 }

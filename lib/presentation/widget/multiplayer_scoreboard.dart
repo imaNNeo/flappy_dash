@@ -357,6 +357,7 @@ class DashedBorderPainter extends CustomPainter {
   final bool drawRight;
   final bool drawBottom;
   final bool drawLeft;
+  final double borderRadius;
 
   DashedBorderPainter({
     required this.color,
@@ -367,6 +368,7 @@ class DashedBorderPainter extends CustomPainter {
     this.drawRight = true,
     this.drawBottom = true,
     this.drawLeft = true,
+    this.borderRadius = 0.0,
   });
 
   @override
@@ -378,22 +380,32 @@ class DashedBorderPainter extends CustomPainter {
 
     var path = Path();
 
-    // Draw individual sides if specified
-    if (drawTop) {
-      path.moveTo(0, 0);
-      path.lineTo(size.width, 0);
-    }
-    if (drawRight) {
-      path.moveTo(size.width, 0);
-      path.lineTo(size.width, size.height);
-    }
-    if (drawBottom) {
-      path.moveTo(size.width, size.height);
-      path.lineTo(0, size.height);
-    }
-    if (drawLeft) {
-      path.moveTo(0, size.height);
-      path.lineTo(0, 0);
+    if (!drawTop || !drawRight || !drawBottom || !drawLeft) {
+      // Draw individual sides if specified
+      if (drawTop) {
+        path.moveTo(0, 0);
+        path.lineTo(size.width, 0);
+      }
+      if (drawRight) {
+        path.moveTo(size.width, 0);
+        path.lineTo(size.width, size.height);
+      }
+      if (drawBottom) {
+        path.moveTo(size.width, size.height);
+        path.lineTo(0, size.height);
+      }
+      if (drawLeft) {
+        path.moveTo(0, size.height);
+        path.lineTo(0, 0);
+      }
+    } else {
+      path.addRRect(RRect.fromLTRBR(
+        0,
+        0,
+        size.width,
+        size.height,
+        Radius.circular(borderRadius),
+      ));
     }
 
     // Create the dashed path
@@ -458,7 +470,6 @@ class DashedContainer extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(borderRadius),
       ),
       child: CustomPaint(
         painter: DashedBorderPainter(
@@ -470,6 +481,7 @@ class DashedContainer extends StatelessWidget {
           drawRight: drawRight,
           drawBottom: drawBottom,
           drawLeft: drawLeft,
+          borderRadius: borderRadius,
         ),
         child: Padding(
           padding: EdgeInsets.all(strokeWidth),

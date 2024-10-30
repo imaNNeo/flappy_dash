@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flappy_dash/domain/entities/match_result_entity.dart';
 import 'package:flappy_dash/domain/repositories/multiplayer_repository.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'match_result_state.dart';
@@ -31,10 +32,32 @@ class MatchResultCubit extends Cubit<MatchResultState> {
         matchResult: matchResult,
       ));
     } catch (e, stack) {
-      print(stack.toString());
+      debugPrint(stack.toString());
       emit(state.copyWith(
         isLoading: false,
         error: e.toString(),
+      ));
+    }
+  }
+
+  void playAgainClicked() async {
+    emit(state.copyWith(
+      playAgainLoading: true,
+    ));
+    try {
+      final matchId = await gameRepository.getWaitingMatchId();
+      emit(state.copyWith(
+        playAgainLoading: false,
+        playAgainMatchId: matchId,
+      ));
+    } catch (e) {
+      debugPrint(e.toString());
+      emit(state.copyWith(
+        playAgainLoading: false,
+        playAgainError: e.toString(),
+      ));
+      emit(state.copyWith(
+        playAgainError: '',
       ));
     }
   }
