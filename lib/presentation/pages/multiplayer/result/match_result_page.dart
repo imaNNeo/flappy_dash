@@ -6,6 +6,7 @@ import 'package:flappy_dash/domain/extensions/user_extension.dart';
 import 'package:flappy_dash/domain/repositories/multiplayer_repository.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/bloc/account/account_cubit.dart';
+import 'package:flappy_dash/presentation/dialogs/raw_scores_list_dialog.dart';
 import 'package:flappy_dash/presentation/extensions/build_context_extension.dart';
 import 'package:flappy_dash/presentation/responsive/screen_size.dart';
 import 'package:flappy_dash/presentation/widget/app_outlined_button.dart';
@@ -98,9 +99,9 @@ class _MatchResultPageContentState extends State<_MatchResultPageContent> {
           int score,
         })? currentUserData;
 
+        final myId = context.read<AccountCubit>().state.currentAccount?.user.id;
+
         if (state.matchResult != null) {
-          final myId =
-              context.read<AccountCubit>().state.currentAccount?.user.id;
           final myScore = state.matchResult!.getMyScore(myId);
           if (myScore != null) {
             currentUserData = (
@@ -218,7 +219,29 @@ class _MatchResultPageContentState extends State<_MatchResultPageContent> {
                                     ),
                                   ],
                                 ),
-                                onPressed: () {},
+                                onPressed: () {
+                                  final rawScores = state.matchResult!.scores
+                                      .asMap()
+                                      .entries
+                                      .map((entry) {
+                                    final record = entry.value;
+                                    final index = entry.key;
+                                    final rank = index + 1;
+                                    return (
+                                      name: record.user.showingName,
+                                      isMe: record.user.id == myId,
+                                      dashType:
+                                          DashType.fromUserId(record.user.id),
+                                      score: record.score,
+                                      rank: rank,
+                                    );
+                                  }).toList();
+                                  RawScoresDialog.show(
+                                    context,
+                                    scores: rawScores,
+                                    allowEditDisplayName: false,
+                                  );
+                                },
                               ),
                             ],
                           ).animate().fadeIn(

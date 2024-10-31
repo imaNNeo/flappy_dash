@@ -4,8 +4,8 @@ import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/bloc/singleplayer/singleplayer_game_cubit.dart';
-import 'package:flappy_dash/presentation/dialogs/app_dialogs.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
+import 'package:flappy_dash/presentation/dialogs/leaderboard_dialog.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flappy_dash/presentation/widget/best_score_overlay.dart';
 import 'package:flappy_dash/presentation/widget/game_back_button.dart';
@@ -115,8 +115,7 @@ class _SinglePlayerGamePageState extends State<SinglePlayerGamePage> {
                               const ProfileOverlay(),
                               const SizedBox(height: 8),
                               BestScoreOverlay(
-                                onTap: () =>
-                                    AppDialogs.showLeaderboard(context),
+                                onTap: () => LeaderBoardDialog.show(context),
                               ),
                             ],
                           ),

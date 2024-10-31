@@ -4,6 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NicknameDialog extends StatefulWidget {
+
+  static Future<String?> show(BuildContext context) {
+    return showDialog<String?>(
+      context: context,
+      builder: (context) {
+        return const NicknameDialog();
+      },
+    );
+  }
+
   const NicknameDialog({super.key});
 
   @override

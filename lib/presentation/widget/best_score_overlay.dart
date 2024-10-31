@@ -1,6 +1,6 @@
 import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
-import 'package:flappy_dash/presentation/dialogs/leaderboard_dialog.dart';
+import 'package:flappy_dash/presentation/dialogs/raw_scores_list_dialog.dart';
 import 'package:flappy_dash/presentation/responsive/screen_size.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
