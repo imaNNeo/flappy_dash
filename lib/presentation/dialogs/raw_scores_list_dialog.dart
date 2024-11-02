@@ -17,6 +17,7 @@ class RawScoresDialog extends StatelessWidget {
     BuildContext context, {
     required List<RawScoreRecord> scores,
     bool allowEditDisplayName = true,
+        String title = 'Scores',
   }) =>
       showDialog<T?>(
         context: context,
@@ -24,6 +25,7 @@ class RawScoresDialog extends StatelessWidget {
           return RawScoresDialog(
             scores: scores,
             allowEditDisplayName: allowEditDisplayName,
+            title: title,
           );
         },
       );
@@ -31,11 +33,13 @@ class RawScoresDialog extends StatelessWidget {
   const RawScoresDialog({
     super.key,
     required this.scores,
+    this.title = 'Leaderboard',
     this.width = 400,
     this.height = 600,
     this.allowEditDisplayName = true,
   });
 
+  final String title;
   final List<RawScoreRecord> scores;
 
   final double width;
@@ -76,9 +80,9 @@ class RawScoresDialog extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const SizedBox(width: closeIconSize),
-                const Text(
-                  'Leaderboard',
-                  style: TextStyle(
+                Text(
+                  title,
+                  style: const TextStyle(
                     color: AppColors.whiteTextColor,
                     fontSize: 20,
                     fontFamily: 'Roboto',
