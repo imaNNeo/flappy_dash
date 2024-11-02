@@ -24,6 +24,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus_dialog/share_plus_dialog.dart';
 
 import 'cubit/match_result_cubit.dart';
 
@@ -273,6 +274,7 @@ class _MatchResultPageContentState extends State<_MatchResultPageContent> {
                           const SizedBox(height: 12),
                           AppOutlinedButton(
                             strokeColor: Colors.transparent,
+                            onPressed: _shareScore,
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -291,7 +293,6 @@ class _MatchResultPageContentState extends State<_MatchResultPageContent> {
                                 ),
                               ],
                             ),
-                            onPressed: () {},
                           ),
                           SizedBox(height: bottomPadding),
                         ],
@@ -318,6 +319,42 @@ class _MatchResultPageContentState extends State<_MatchResultPageContent> {
           ),
         );
       },
+    );
+  }
+
+  void _shareScore() {
+    late int myScore;
+    late int myRank;
+    final state = context.read<MatchResultCubit>().state;
+    final myId = context.read<AccountCubit>().state.currentAccount?.user.id;
+    for (var i = 0; i < state.matchResult!.scores.length; i++) {
+      if (state.matchResult!.scores[i].user.id == myId) {
+        myScore = state.matchResult!.scores[i].score;
+        myRank = i + 1;
+        break;
+      }
+    }
+
+    final rankText = switch (myRank) {
+      1 => '1st',
+      2 => '2nd',
+      3 => '3rd',
+      _ => '${myRank}th',
+    };
+    const subject = '🏆 Flappy Dash Round Finished! 🏆';
+    final message = '''
+🎉 I finished $rankText place, passing $myScore pipes!
+
+How far can you go? Try Flappy Dash now! 🚀
+
+🔗 play.flappydash.com
+''';
+
+    ShareDialog.share(
+      context,
+      dialogTitle: subject,
+      body: message,
+      platforms: SharePlatform.defaults,
     );
   }
 }
