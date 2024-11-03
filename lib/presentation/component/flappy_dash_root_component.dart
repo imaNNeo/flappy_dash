@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flappy_dash/domain/entities/game_config_entity.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
+import 'package:flappy_dash/domain/entities/playing_state.dart';
+import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/component/multiplayer_controller.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 
@@ -14,6 +17,7 @@ class FlappyDashRootComponent extends Component
     with HasGameRef<FlappyDashGame> {
   late Dash _dash;
   late PipePair _lastPipe;
+
   // late DashParallaxBackground _background;
   late final GameConfigEntity _config;
 
@@ -21,10 +25,21 @@ class FlappyDashRootComponent extends Component
 
   String get myId => game.leaderboardCubit.state.currentAccount!.user.id;
 
+  late MultiplayerCubit multiplayerCubit;
+  StreamSubscription? _multiplayerCubitSubscription;
+  MultiplayerState? _latestMultiplayerState;
+
+  // We use it for temporary debugging
+  static double gameSpeedMultiplier = 0.1;
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
     if (game.gameMode == const MultiplayerGameMode()) {
+      multiplayerCubit = game.multiplayerCubit;
+      _multiplayerCubitSubscription = multiplayerCubit.stream.listen(
+        _onMultiplayerStateChange,
+      );
       add(MultiplayerController(
         priority: 9,
       ));
@@ -40,6 +55,34 @@ class FlappyDashRootComponent extends Component
       fromX: _config.pipesDistance,
     );
     game.camera.follow(_dash, horizontalOnly: true);
+  }
+
+  void _onMultiplayerStateChange(MultiplayerState state) {
+    final restarted = state.currentPlayingState.isIdle &&
+        _latestMultiplayerState?.currentPlayingState == PlayingState.gameOver;
+    if (restarted) {
+      _restartGameForNewIdle();
+    }
+
+    _latestMultiplayerState = state;
+  }
+
+  void _restartGameForNewIdle() {
+    // Set a new position for the dash (zero for now)
+    _dash.x = 0.0;
+    _dash.y = 0.0;
+    _dash.resetSTate();
+
+    // Remove all pipes
+    children.whereType<PipePair>().forEach((pipe) {
+      pipe.removeFromParent();
+    });
+
+    // Generate new pipes
+    _pipeCounter = 0;
+    _generatePipes(
+      fromX: _dash.x + _config.pipesDistance,
+    );
   }
 
   double _getNewPipeYForMultiplayer(MultiplayerGameConfigEntity config) {
@@ -74,7 +117,7 @@ class FlappyDashRootComponent extends Component
 
   @override
   void updateTree(double dt) {
-    super.updateTree(dt * 0.1);
+    super.updateTree(dt * gameSpeedMultiplier);
   }
 
   void _removeLastPipes() {
@@ -92,7 +135,7 @@ class FlappyDashRootComponent extends Component
   void _jump() {
     _checkToStart();
     _dash.jump();
-    game.playerJumped(_dash.x, _dash.y);
+    game.playerJumped(_dash.x, _dash.y, _dash.velocityY);
   }
 
   void _checkToStart() {
@@ -140,5 +183,11 @@ class FlappyDashRootComponent extends Component
       );
       _removeLastPipes();
     }
+  }
+
+  @override
+  void onRemove() {
+    _multiplayerCubitSubscription?.cancel();
+    super.onRemove();
   }
 }

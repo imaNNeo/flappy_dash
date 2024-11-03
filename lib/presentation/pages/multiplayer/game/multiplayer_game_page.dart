@@ -2,7 +2,6 @@ import 'package:flame/game.dart';
 import 'package:flappy_dash/domain/entities/dash_type.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/match_phase.dart';
-import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/bloc/singleplayer/singleplayer_game_cubit.dart';
 import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
@@ -32,8 +31,6 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
   late SingleplayerGameCubit singleplayerCubit;
   late MultiplayerCubit multiplayerCubit;
   late LeaderboardCubit leaderboardCubit;
-
-  PlayingState? _latestState;
 
   DashType get dashType {
     final userId = multiplayerCubit.state.currentUserId;
@@ -65,22 +62,7 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
           _onGameFinished();
         }
       },
-      child: BlocConsumer<MultiplayerCubit, MultiplayerState>(
-        listener: (context, state) {
-          if (state.currentPlayingState.isIdle &&
-              _latestState == PlayingState.gameOver) {
-            setState(() {
-              _flappyDashGame = FlappyDashGame(
-                const MultiplayerGameMode(),
-                singleplayerCubit,
-                multiplayerCubit,
-                leaderboardCubit,
-              );
-            });
-          }
-
-          _latestState = state.currentPlayingState;
-        },
+      child: BlocBuilder<MultiplayerCubit, MultiplayerState>(
         builder: (context, state) {
           return Scaffold(
             resizeToAvoidBottomInset: false,

@@ -98,29 +98,49 @@ class MultiplayerController extends Component
       // We don't have a dash for this player yet
       return;
     }
+    print('Controller received event: $event');
     switch (event) {
       case PlayerStartedEvent():
         break;
       case PlayerJumpedEvent():
         final dash = _otherDashes[event.sender!.userId]!.dash;
-        dash.jump();
-        dash.updatePosition(event.dashX, event.dashY);
+        dash.updateState(
+          event.dashX,
+          event.dashY,
+          event.dashVelocityY,
+          event.timestamp,
+        );
         break;
       case PlayerDiedEvent():
         // Die animation? (state is automatically updated)
         final dash = _otherDashes[event.sender!.userId]!.dash;
-        dash.updatePosition(event.dashX, event.dashY);
+        dash.updateState(
+          event.dashX,
+          event.dashY,
+          event.dashVelocityY,
+          event.timestamp,
+        );
         break;
       case PlayerIsIdleEvent():
         // Idle animation or style (state is automatically updated)
         // We just update the dash x position
         final dash = _otherDashes[event.sender!.userId]!.dash;
-        dash.updatePosition(event.dashX, event.dashY);
+        dash.updateState(
+          event.dashX,
+          event.dashY,
+          event.dashVelocityY,
+          event.timestamp,
+        );
         break;
       case PlayerCorrectPositionEvent():
         // We just mutate the position of the dash
         final dash = _otherDashes[event.sender!.userId]!.dash;
-        dash.updatePosition(event.dashX, event.dashY);
+        dash.updateState(
+          event.dashX,
+          event.dashY,
+          event.dashVelocityY,
+          event.timestamp,
+        );
         break;
       // We don't care about these events at the moment
       case PlayerKickedFromTheLobbyEvent():

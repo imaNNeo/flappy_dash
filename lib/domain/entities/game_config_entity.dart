@@ -46,6 +46,7 @@ class MultiplayerGameConfigEntity extends GameConfigEntity {
     this.pipeHoleGap = 200,
     this.pipesPosition = const [1.0, 0.5, 0.0, -0.5, -1.0],
     this.spawnAgainAfterSeconds = 5,
+    this.correctPositionEvery = 2.0,
   });
 
   @override
@@ -64,6 +65,8 @@ class MultiplayerGameConfigEntity extends GameConfigEntity {
 
   final int spawnAgainAfterSeconds;
 
+  final double correctPositionEvery;
+
   double get worldWidth => pipesDistance * (pipesPosition.length);
 
   @override
@@ -74,5 +77,6 @@ class MultiplayerGameConfigEntity extends GameConfigEntity {
         pipeWidth,
         pipeHoleGap,
         spawnAgainAfterSeconds,
+        correctPositionEvery,
       ];
 }

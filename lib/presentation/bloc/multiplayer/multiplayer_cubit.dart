@@ -198,17 +198,22 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     await _multiplayerRepository.leaveMatch(state.matchId);
   }
 
-  void dispatchJumpEvent(double x, double y) {
+  void dispatchJumpEvent(double x, double y, double velocityY) {
     if (state.matchId.isBlank) {
       return;
     }
     _multiplayerRepository.sendDispatchingEvent(
       state.matchId,
-      DispatchingPlayerJumpedEvent(x, y),
+      DispatchingPlayerJumpedEvent(
+        x,
+        y,
+        velocityY,
+        DateTime.now().millisecondsSinceEpoch,
+      ),
     );
   }
 
-  void increaseScore(double x, double y) {
+  void increaseScore(double x, double y, double velocityY) {
     if (state.matchId.isBlank) {
       return;
     }
@@ -218,17 +223,27 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     ));
     _multiplayerRepository.sendDispatchingEvent(
       state.matchId,
-      DispatchingPlayerScoredEvent(x, y),
+      DispatchingPlayerScoredEvent(
+        x,
+        y,
+        velocityY,
+        DateTime.now().millisecondsSinceEpoch,
+      ),
     );
   }
 
-  void playerDied(double x, double y) {
+  void playerDied(double x, double y, double velocityY) {
     if (state.matchId.isBlank) {
       return;
     }
     _multiplayerRepository.sendDispatchingEvent(
       state.matchId,
-      DispatchingPlayerDiedEvent(x, y),
+      DispatchingPlayerDiedEvent(
+        x,
+        y,
+        velocityY,
+        DateTime.now().millisecondsSinceEpoch,
+      ),
     );
     final spawnsAfter = state.gameMode.gameConfig.spawnAgainAfterSeconds;
     emit(state.copyWith(
@@ -307,8 +322,21 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     ));
   }
 
+  void dispatchCorrectPosition(double x, double y, double yVelocity) {
+    _multiplayerRepository.sendDispatchingEvent(
+      state.matchId,
+      DispatchingPlayerCorrectPositionEvent(
+        x,
+        y,
+        yVelocity,
+        DateTime.now().millisecondsSinceEpoch,
+      ),
+    );
+  }
+
   @override
   Future<void> close() {
+    print('Closing multiplayer cubit');
     _timer?.cancel();
     _matchEventsSubscription.cancel();
     return super.close();

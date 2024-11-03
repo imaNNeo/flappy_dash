@@ -6,6 +6,7 @@ import 'package:flappy_dash/domain/entities/dash_type.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
+import 'package:flappy_dash/presentation/component/flappy_dash_root_component.dart';
 import 'package:flappy_dash/presentation/component/pipe.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flutter/material.dart';
@@ -35,9 +36,14 @@ class Dash extends PositionComponent
   late final Svg _dashSvg;
 
   final double _gravity = 1400.0;
-  double _yVelocity = 0;
+  double _velocityY = 0;
+
+  double get velocityY => _velocityY;
+
   final double _jumpForce = -500;
   final double speed;
+
+  late double _multiplayerCorrectPositionAfter;
 
   @override
   Future<void> onLoad() async {
@@ -64,6 +70,17 @@ class Dash extends PositionComponent
         color: AppColors.getDashColor(type),
       ),
     ));
+
+    _resetCorrectPositionAfter();
+  }
+
+  void _resetCorrectPositionAfter() {
+    if (game.gameMode is! MultiplayerGameMode) {
+      return;
+    }
+    _multiplayerCorrectPositionAfter =
+        (game.gameMode as MultiplayerGameMode).gameConfig.correctPositionEvery *
+            0.1;
   }
 
   PlayingState get currentPlayingState => game.getCurrentPlayingState(
@@ -76,11 +93,12 @@ class Dash extends PositionComponent
     if (currentPlayingState.isNotPlaying) {
       return;
     }
-    _yVelocity += _gravity * dt;
-    position.y += _yVelocity * dt;
+    _velocityY += _gravity * dt;
+    position.y += _velocityY * dt;
     position.x += speed * dt;
 
     _checkIfDashIsOutOfBounds();
+    _checkToDispatchMyPosition(dt);
   }
 
   void _checkIfDashIsOutOfBounds() {
@@ -88,15 +106,28 @@ class Dash extends PositionComponent
       return;
     }
     if (position.y.abs() > (game.size.y / 2) + 20) {
-      game.gameOver(x, y);
+      game.gameOver(x, y, _velocityY);
     }
+  }
+
+  void _checkToDispatchMyPosition(double dt) {
+    if (!isMe) {
+      return;
+    }
+
+    _multiplayerCorrectPositionAfter -= dt;
+    if (_multiplayerCorrectPositionAfter > 0) {
+      return;
+    }
+    game.multiplayerCubit.dispatchCorrectPosition(x, y, _velocityY);
+    _resetCorrectPositionAfter();
   }
 
   void jump() {
     if (currentPlayingState.isNotPlaying) {
       return;
     }
-    _yVelocity = _jumpForce;
+    _velocityY = _jumpForce;
   }
 
   @override
@@ -116,10 +147,33 @@ class Dash extends PositionComponent
     );
   }
 
-  void updatePosition(double dashX, double dashY) {
+  void resetSTate() {
+    _velocityY = 0;
+    position = Vector2(0, 0);
+  }
+
+  void updateState(
+    double positionX,
+    double positionY,
+    double velocityY,
+    DateTime timestamp,
+  ) {
     assert(game.gameMode is MultiplayerGameMode && !isMe);
-    x = dashX;
-    y = dashY;
+
+    // Todo:
+    // We have a displacement in Y position when player jumps,
+    // So we can prevent updating Y, when player jumps to avoid flickering.
+
+    final dt = (DateTime.now().difference(timestamp).inMilliseconds / 1000) * FlappyDashRootComponent.gameSpeedMultiplier;
+    print('calculating new state with dt: $dt');
+
+    final newX = positionX + (speed * dt);
+    final newVelocityY = velocityY + (_gravity * dt);
+    final newY = positionY + (newVelocityY * dt);
+
+    x = newX;
+    y = newY;
+    _velocityY = newVelocityY;
   }
 
   @override
@@ -129,10 +183,10 @@ class Dash extends PositionComponent
       return;
     }
     if (other is HiddenCoin) {
-      game.increaseScore(x, y);
+      game.increaseScore(x, y, _velocityY);
       other.removeFromParent();
     } else if (other is Pipe) {
-      game.gameOver(x, y);
+      game.gameOver(x, y, _velocityY);
     }
   }
 }

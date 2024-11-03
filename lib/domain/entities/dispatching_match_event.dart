@@ -26,48 +26,66 @@ class DispatchingPlayerStartedEvent extends DispatchingMatchEvent {
 class DispatchingPlayerJumpedEvent extends DispatchingMatchEvent {
   final double positionX;
   final double positionY;
+  final double velocityY;
+  final int timestamp;
 
   DispatchingPlayerJumpedEvent(
     this.positionX,
     this.positionY,
+    this.velocityY,
+    this.timestamp,
   );
 
   @override
   List<int> toBytes() => _jsonToData({
         'positionX': positionX,
         'positionY': positionY,
+        'velocityY': velocityY,
+        'timestamp': timestamp,
       });
 }
 
 class DispatchingPlayerScoredEvent extends DispatchingMatchEvent {
   final double positionX;
   final double positionY;
+  final double velocityY;
+  final int timestamp;
 
   DispatchingPlayerScoredEvent(
     this.positionX,
     this.positionY,
+    this.velocityY,
+    this.timestamp,
   );
 
   @override
   List<int> toBytes() => _jsonToData({
         'positionX': positionX,
         'positionY': positionY,
+        'velocityY': velocityY,
+        'timestamp': timestamp,
       });
 }
 
 class DispatchingPlayerDiedEvent extends DispatchingMatchEvent {
   final double positionX;
   final double positionY;
+  final double velocityY;
+  final int timestamp;
 
   DispatchingPlayerDiedEvent(
     this.positionX,
     this.positionY,
+    this.velocityY,
+    this.timestamp,
   );
 
   @override
   List<int> toBytes() => _jsonToData({
         'positionX': positionX,
         'positionY': positionY,
+        'velocityY': velocityY,
+        'timestamp': timestamp,
       });
 }
 
@@ -83,4 +101,26 @@ class DispatchingUserDisplayNameUpdatedEvent extends DispatchingMatchEvent {
 
   @override
   List<int> toBytes() => [];
+}
+
+class DispatchingPlayerCorrectPositionEvent extends DispatchingMatchEvent {
+  final double positionX;
+  final double positionY;
+  final double velocityY;
+  final int timestamp;
+
+  DispatchingPlayerCorrectPositionEvent(
+      this.positionX,
+      this.positionY,
+      this.velocityY,
+      this.timestamp,
+      );
+
+  @override
+  List<int> toBytes() => _jsonToData({
+        'positionX': positionX,
+        'positionY': positionY,
+        'velocityY': velocityY,
+        'timestamp': timestamp,
+      });
 }

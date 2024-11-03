@@ -47,35 +47,60 @@ class PlayerStartedEvent extends MatchEvent {
   PlayerStartedEvent(super.matchData);
 
   double get dashX => state.players[sender!.userId]!.lastKnownX;
+
   double get dashY => state.players[sender!.userId]!.lastKnownY;
+
+  double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
+
+  DateTime get timestamp => state.players[sender!.userId]!.lastKnownTimestamp;
 }
 
 class PlayerJumpedEvent extends MatchEvent {
   PlayerJumpedEvent(super.matchData);
 
   double get dashX => state.players[sender!.userId]!.lastKnownX;
+
   double get dashY => state.players[sender!.userId]!.lastKnownY;
+
+  double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
+
+  DateTime get timestamp => state.players[sender!.userId]!.lastKnownTimestamp;
 }
 
 class PlayerScoredEvent extends MatchEvent {
   PlayerScoredEvent(super.matchData);
 
   double get dashX => state.players[sender!.userId]!.lastKnownX;
+
   double get dashY => state.players[sender!.userId]!.lastKnownY;
+
+  double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
+
+  DateTime get timestamp => state.players[sender!.userId]!.lastKnownTimestamp;
 }
 
 class PlayerDiedEvent extends MatchEvent {
   PlayerDiedEvent(super.matchData);
 
   double get dashX => state.players[sender!.userId]!.lastKnownX;
+
   double get dashY => state.players[sender!.userId]!.lastKnownY;
+
+  double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
+
+  DateTime get timestamp => state.players[sender!.userId]!.lastKnownTimestamp;
 }
 
 class PlayerIsIdleEvent extends MatchEvent {
   PlayerIsIdleEvent(super.matchData);
 
   double get dashX => state.players[sender!.userId]!.lastKnownX;
+
   double get dashY => state.players[sender!.userId]!.lastKnownY;
+
+  double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
+
+  DateTime get timestamp => state.players[sender!.userId]!.lastKnownTimestamp;
 }
 
 class PlayerKickedFromTheLobbyEvent extends MatchEvent {
@@ -86,5 +111,10 @@ class PlayerCorrectPositionEvent extends MatchEvent {
   PlayerCorrectPositionEvent(super.matchData);
 
   double get dashX => state.players[sender!.userId]!.lastKnownX;
+
   double get dashY => state.players[sender!.userId]!.lastKnownY;
+
+  double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
+
+  DateTime get timestamp => state.players[sender!.userId]!.lastKnownTimestamp;
 }

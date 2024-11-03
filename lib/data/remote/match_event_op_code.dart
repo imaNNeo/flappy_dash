@@ -48,12 +48,16 @@ enum MatchEventOpCode {
 
   static MatchEventOpCode fromDispatchingEvent(DispatchingMatchEvent event) =>
       switch (event) {
-        DispatchingPlayerJoinedLobbyEvent() => MatchEventOpCode.playerJoinedTheLobby,
+        DispatchingPlayerJoinedLobbyEvent() =>
+          MatchEventOpCode.playerJoinedTheLobby,
         DispatchingPlayerStartedEvent() => MatchEventOpCode.playerStarted,
         DispatchingPlayerJumpedEvent() => MatchEventOpCode.playerJumped,
         DispatchingPlayerScoredEvent() => MatchEventOpCode.playerScored,
         DispatchingPlayerDiedEvent() => MatchEventOpCode.playerDied,
         DispatchingPlayerIsIdleEvent() => MatchEventOpCode.playerIsIdle,
-        DispatchingUserDisplayNameUpdatedEvent() => MatchEventOpCode.playerDisplayNameUpdated,
+        DispatchingUserDisplayNameUpdatedEvent() =>
+          MatchEventOpCode.playerDisplayNameUpdated,
+        DispatchingPlayerCorrectPositionEvent() =>
+          MatchEventOpCode.playerCorrectPosition,
       };
 }
