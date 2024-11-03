@@ -53,7 +53,7 @@ class HomePageContent extends StatelessWidget {
     return BlocConsumer<HomeCubit, HomeState>(
       listener: (context, state) {
         if (state.openMultiplayerLobby.isNotEmpty) {
-          context.push('/lobby/${state.openMultiplayerLobby}');
+          context.go('/lobby/${state.openMultiplayerLobby}');
         }
         if (state.multiPlayerMatchIdError.isNotEmpty) {
           context.showToastError(state.multiPlayerMatchIdError);
