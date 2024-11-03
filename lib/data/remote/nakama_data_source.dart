@@ -24,7 +24,9 @@ class NakamaDataSource {
   );
   static const kIsolatesDisabled = kIsWeb || kIsWasm;
 
-  String _makePayload(Map<String, dynamic> json) => jsonEncode(json);
+  String _makePayload(Map<String, dynamic> json) => kIsWeb || kIsWasm
+      ? '"${jsonEncode(json).replaceAll('"', '\\"')}"'
+      : jsonEncode(json);
 
   NakamaWebsocketClient _initWebsocketClient(String token) =>
       NakamaWebsocketClient.init(
