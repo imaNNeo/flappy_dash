@@ -100,6 +100,14 @@ class Dash extends PositionComponent
   }
 
   @override
+  void renderTree(Canvas canvas) {
+    if (!isMe && currentPlayingState.isNotPlaying) {
+      return;
+    }
+    super.renderTree(canvas);
+  }
+
+  @override
   void render(Canvas canvas) {
     super.render(canvas);
     _dashSvg.render(
