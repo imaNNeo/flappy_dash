@@ -8,7 +8,6 @@ class PlayerState with EquatableMixin {
   final double lastKnownX;
   final double lastKnownY;
   final double lastKnownVelocityY;
-  final DateTime lastKnownTimestamp;
   final int score;
   final PlayingState playingState;
 
@@ -19,7 +18,6 @@ class PlayerState with EquatableMixin {
     required this.lastKnownX,
     required this.lastKnownY,
     required this.lastKnownVelocityY,
-    required this.lastKnownTimestamp,
     required this.score,
     required this.playingState,
   });
@@ -31,9 +29,6 @@ class PlayerState with EquatableMixin {
         lastKnownX: double.parse(json['lastKnownX'].toString()),
         lastKnownY: double.parse(json['lastKnownY'].toString()),
         lastKnownVelocityY: double.parse(json['lastKnownVelocityY'].toString()),
-        lastKnownTimestamp: DateTime.fromMillisecondsSinceEpoch(
-          json['lastKnownTimestamp'],
-        ),
         score: json['score'],
         playingState: PlayingState.values[json['playingState']],
       );
@@ -46,7 +41,6 @@ class PlayerState with EquatableMixin {
         lastKnownX,
         lastKnownY,
         lastKnownVelocityY,
-        lastKnownTimestamp,
         score,
         playingState,
       ];

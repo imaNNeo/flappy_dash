@@ -104,12 +104,7 @@ class MultiplayerController extends Component
         break;
       case PlayerJumpedEvent():
         final dash = _otherDashes[event.sender!.userId]!.dash;
-        dash.updateState(
-          event.dashX,
-          event.dashY,
-          event.dashVelocityY,
-          event.timestamp,
-        );
+        dash.jump();
         break;
       case PlayerDiedEvent():
         // Die animation? (state is automatically updated)
@@ -118,7 +113,6 @@ class MultiplayerController extends Component
           event.dashX,
           event.dashY,
           event.dashVelocityY,
-          event.timestamp,
         );
         break;
       case PlayerIsIdleEvent():
@@ -129,7 +123,6 @@ class MultiplayerController extends Component
           event.dashX,
           event.dashY,
           event.dashVelocityY,
-          event.timestamp,
         );
         break;
       case PlayerCorrectPositionEvent():
@@ -139,7 +132,6 @@ class MultiplayerController extends Component
           event.dashX,
           event.dashY,
           event.dashVelocityY,
-          event.timestamp,
         );
         break;
       // We don't care about these events at the moment

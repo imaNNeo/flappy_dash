@@ -1,12 +1,12 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame_svg/flame_svg.dart';
 import 'package:flame_svg/svg.dart';
 import 'package:flappy_dash/domain/entities/dash_type.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
-import 'package:flappy_dash/presentation/component/flappy_dash_root_component.dart';
 import 'package:flappy_dash/presentation/component/pipe.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flutter/material.dart';
@@ -44,6 +44,8 @@ class Dash extends PositionComponent
   final double speed;
 
   late double _multiplayerCorrectPositionAfter;
+
+  MoveToEffect? _smoothUpdatingPositionEffect;
 
   @override
   Future<void> onLoad() async {
@@ -93,12 +95,23 @@ class Dash extends PositionComponent
     if (currentPlayingState.isNotPlaying) {
       return;
     }
+    if (isMe) {
+      _updatePositionNormally(dt);
+    } else {
+      if (_smoothUpdatingPositionEffect == null) {
+        _updatePositionNormally(dt);
+      }
+    }
+
+    _checkIfDashIsOutOfBounds();
+    _checkToDispatchMyPosition(dt);
+  }
+
+  void _updatePositionNormally(double dt) {
     _velocityY += _gravity * dt;
     position.y += _velocityY * dt;
     position.x += speed * dt;
 
-    _checkIfDashIsOutOfBounds();
-    _checkToDispatchMyPosition(dt);
   }
 
   void _checkIfDashIsOutOfBounds() {
@@ -156,24 +169,20 @@ class Dash extends PositionComponent
     double positionX,
     double positionY,
     double velocityY,
-    DateTime timestamp,
   ) {
     assert(game.gameMode is MultiplayerGameMode && !isMe);
-
-    // Todo:
-    // We have a displacement in Y position when player jumps,
-    // So we can prevent updating Y, when player jumps to avoid flickering.
-
-    final dt = (DateTime.now().difference(timestamp).inMilliseconds / 1000) * FlappyDashRootComponent.gameSpeedMultiplier;
-    print('calculating new state with dt: $dt');
-
-    final newX = positionX + (speed * dt);
-    final newVelocityY = velocityY + (_gravity * dt);
-    final newY = positionY + (newVelocityY * dt);
-
-    x = newX;
-    y = newY;
-    _velocityY = newVelocityY;
+    _smoothUpdatingPositionEffect?.removeFromParent();
+    add(_smoothUpdatingPositionEffect = MoveToEffect(
+      Vector2(positionX, positionY),
+      EffectController(
+        duration: 0.01,
+      ),
+      onComplete: () {
+        _smoothUpdatingPositionEffect?.removeFromParent();
+        _smoothUpdatingPositionEffect = null;
+      },
+    ));
+    _velocityY = velocityY;
   }
 
   @override
