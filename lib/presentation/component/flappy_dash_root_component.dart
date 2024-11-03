@@ -24,14 +24,16 @@ class FlappyDashRootComponent extends Component
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    // add(_background = DashParallaxBackground());
     if (game.gameMode == const MultiplayerGameMode()) {
-      add(MultiplayerController());
+      add(MultiplayerController(
+        priority: 9,
+      ));
     }
     add(_dash = Dash(
       playerId: myId,
       displayName: '',
       isMe: true,
+      priority: 10,
     ));
     _config = game.gameMode.gameConfig;
     _generatePipes(
@@ -64,6 +66,7 @@ class FlappyDashRootComponent extends Component
         position: Vector2(fromX + (i * _config.pipesDistance), y),
         gap: _config.pipeHoleGap,
         pipeWidth: _config.pipeWidth,
+        priority: 3,
       ));
       _pipeCounter++;
     }
@@ -71,7 +74,7 @@ class FlappyDashRootComponent extends Component
 
   @override
   void updateTree(double dt) {
-    super.updateTree(dt * 0.5);
+    super.updateTree(dt * 0.1);
   }
 
   void _removeLastPipes() {

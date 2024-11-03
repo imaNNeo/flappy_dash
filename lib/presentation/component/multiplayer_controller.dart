@@ -14,6 +14,10 @@ import 'package:flutter/foundation.dart';
 
 class MultiplayerController extends Component
     with ParentIsA<FlappyDashRootComponent>, HasGameRef<FlappyDashGame> {
+  MultiplayerController({
+    super.priority,
+  });
+
   late StreamSubscription<MultiplayerState> _stateStreamSubscription;
   late StreamSubscription<MatchEvent> _eventStreamSubscription;
 
@@ -80,8 +84,18 @@ class MultiplayerController extends Component
   }
 
   void _onNewEvent(MatchEvent event) {
-    if (event.sender?.userId == _cubit.state.currentAccount!.user.id) {
+    final senderId = event.sender?.userId;
+    if (senderId == null) {
+      // We don't care about events without a sender id (server events)
+      return;
+    }
+
+    if (senderId == _cubit.state.currentAccount!.user.id) {
       // It's my own event
+      return;
+    }
+    if (!_otherDashes.containsKey(senderId)) {
+      // We don't have a dash for this player yet
       return;
     }
     switch (event) {

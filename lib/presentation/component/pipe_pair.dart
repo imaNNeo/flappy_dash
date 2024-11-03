@@ -8,6 +8,7 @@ class PipePair extends PositionComponent {
     required super.position,
     required this.gap,
     required this.pipeWidth,
+    super.priority,
   });
 
   final double gap;

@@ -20,12 +20,12 @@ class Dash extends PositionComponent
     required this.playerId,
     required this.displayName,
     required this.isMe,
+    super.priority,
   })  : type = DashType.fromUserId(playerId),
         super(
           position: Vector2(0, 0),
           size: Vector2.all(80.0),
           anchor: Anchor.center,
-          priority: 10,
         );
 
   final String playerId;
