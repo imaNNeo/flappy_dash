@@ -1,7 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
-import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
@@ -105,6 +104,13 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
         break;
     }
   }
+
+  @override
+  void onRemove() {
+    removeAll(children);
+    processLifecycleEvents();
+    super.onRemove();
+  }
 }
 
 class FlappyDashWorld extends World
@@ -114,22 +120,7 @@ class FlappyDashWorld extends World
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    add(FlameMultiBlocProvider(
-      providers: [
-        FlameBlocProvider<SingleplayerGameCubit, SingleplayerGameState>(
-          create: () => game.singleplayerCubit,
-        ),
-        FlameBlocProvider<MultiplayerCubit, MultiplayerState>(
-          create: () => game.multiplayerCubit,
-        ),
-        FlameBlocProvider<LeaderboardCubit, LeaderboardState>(
-          create: () => game.leaderboardCubit,
-        ),
-      ],
-      children: [
-        _rootComponent = FlappyDashRootComponent(),
-      ],
-    ));
+    add(_rootComponent = FlappyDashRootComponent());
     game.camera.backdrop = DashParallaxBackground();
   }
 
