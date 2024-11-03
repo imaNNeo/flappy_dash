@@ -50,6 +50,7 @@ class Dash extends PositionComponent
         radius: radius * 0.75,
         position: center * 1.1,
         anchor: Anchor.center,
+        collisionType: isMe ? CollisionType.active : CollisionType.inactive,
       ));
     }
     add(OutlinedTextComponent(
@@ -79,6 +80,13 @@ class Dash extends PositionComponent
     position.y += _yVelocity * dt;
     position.x += speed * dt;
 
+    _checkIfDashIsOutOfBounds();
+  }
+
+  void _checkIfDashIsOutOfBounds() {
+    if (!isMe) {
+      return;
+    }
     if (position.y.abs() > (game.size.y / 2) + 20) {
       game.gameOver(x, y);
     }
