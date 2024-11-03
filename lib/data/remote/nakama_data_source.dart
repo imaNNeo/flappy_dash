@@ -22,9 +22,9 @@ class NakamaDataSource {
     grpcPort: _grpcPort,
     httpPort: _httpPort,
   );
+  static const kIsolatesDisabled = kIsWeb || kIsWasm;
 
-  String _makePayload(Map<String, dynamic> json) =>
-      jsonEncode(json);
+  String _makePayload(Map<String, dynamic> json) => jsonEncode(json);
 
   NakamaWebsocketClient _initWebsocketClient(String token) =>
       NakamaWebsocketClient.init(
@@ -143,7 +143,9 @@ class NakamaDataSource {
   }
 
   Future<MatchEvent> _parseData(MatchEventOpCode opCode, MatchData data) =>
-      compute(opCode.parseIncomingEvent, data);
+      kIsolatesDisabled
+          ? Future.value(opCode.parseIncomingEvent(data))
+          : compute(opCode.parseIncomingEvent, data);
 
   Future<Match> joinMatch(String matchId) async {
     final match = await _websocketClient.joinMatch(matchId);
@@ -161,7 +163,9 @@ class NakamaDataSource {
     _websocketClient.sendMatchData(
       matchId: matchId,
       opCode: MatchEventOpCode.fromDispatchingEvent(event).opCode,
-      data: await Isolate.run(() => event.toBytes()),
+      data: kIsolatesDisabled
+          ? event.toBytes()
+          : await Isolate.run(() => event.toBytes()),
     );
   }
 
