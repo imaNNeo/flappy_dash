@@ -101,9 +101,23 @@ class MultiplayerController extends Component
     print('Controller received event: $event');
     switch (event) {
       case PlayerStartedEvent():
+        final dash = _otherDashes[event.sender!.userId]!.dash;
+        dash.updateState(
+          event.dashX,
+          event.dashY,
+          event.dashVelocityY,
+          duration: 0.0,
+        );
+        dash.jump();
         break;
       case PlayerJumpedEvent():
         final dash = _otherDashes[event.sender!.userId]!.dash;
+        dash.updateState(
+          event.dashX,
+          event.dashY,
+          event.dashVelocityY,
+          duration: 0.0,
+        );
         dash.jump();
         break;
       case PlayerDiedEvent():
@@ -113,6 +127,7 @@ class MultiplayerController extends Component
           event.dashX,
           event.dashY,
           event.dashVelocityY,
+          duration: 0.0,
         );
         break;
       case PlayerIsIdleEvent():
@@ -123,6 +138,7 @@ class MultiplayerController extends Component
           event.dashX,
           event.dashY,
           event.dashVelocityY,
+          duration: 0.0,
         );
         break;
       case PlayerCorrectPositionEvent():

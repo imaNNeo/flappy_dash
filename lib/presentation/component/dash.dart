@@ -7,6 +7,7 @@ import 'package:flappy_dash/domain/entities/dash_type.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
+import 'package:flappy_dash/presentation/component/flappy_dash_root_component.dart';
 import 'package:flappy_dash/presentation/component/pipe.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flutter/material.dart';
@@ -82,7 +83,7 @@ class Dash extends PositionComponent
     }
     _multiplayerCorrectPositionAfter =
         (game.gameMode as MultiplayerGameMode).gameConfig.correctPositionEvery *
-            0.1;
+            FlappyDashRootComponent.gameSpeedMultiplier;
   }
 
   PlayingState get currentPlayingState => game.getCurrentPlayingState(
@@ -111,7 +112,6 @@ class Dash extends PositionComponent
     _velocityY += _gravity * dt;
     position.y += _velocityY * dt;
     position.x += speed * dt;
-
   }
 
   void _checkIfDashIsOutOfBounds() {
@@ -160,7 +160,7 @@ class Dash extends PositionComponent
     );
   }
 
-  void resetSTate() {
+  void resetState() {
     _velocityY = 0;
     position = Vector2(0, 0);
   }
@@ -168,21 +168,26 @@ class Dash extends PositionComponent
   void updateState(
     double positionX,
     double positionY,
-    double velocityY,
-  ) {
+    double velocityY, {
+    double duration = 0.2,
+  }) {
     assert(game.gameMode is MultiplayerGameMode && !isMe);
     _smoothUpdatingPositionEffect?.removeFromParent();
+
+    final newX = positionX + (speed * duration);
+    final newVelocity = velocityY + _gravity * duration;
+    final newY = positionY + (newVelocity * duration);
     add(_smoothUpdatingPositionEffect = MoveToEffect(
-      Vector2(positionX, positionY),
+      Vector2(newX, newY),
       EffectController(
-        duration: 0.01,
+        duration: duration,
       ),
       onComplete: () {
         _smoothUpdatingPositionEffect?.removeFromParent();
         _smoothUpdatingPositionEffect = null;
       },
     ));
-    _velocityY = velocityY;
+    _velocityY = newVelocity;
   }
 
   @override

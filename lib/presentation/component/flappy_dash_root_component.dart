@@ -71,7 +71,7 @@ class FlappyDashRootComponent extends Component
     // Set a new position for the dash (zero for now)
     _dash.x = 0.0;
     _dash.y = 0.0;
-    _dash.resetSTate();
+    _dash.resetState();
 
     // Remove all pipes
     children.whereType<PipePair>().forEach((pipe) {

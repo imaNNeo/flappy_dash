@@ -46,7 +46,7 @@ class MultiplayerGameConfigEntity extends GameConfigEntity {
     this.pipeHoleGap = 200,
     this.pipesPosition = const [1.0, 0.5, 0.0, -0.5, -1.0],
     this.spawnAgainAfterSeconds = 5,
-    this.correctPositionEvery = 2.0,
+    this.correctPositionEvery = 5.0,
   });
 
   @override
