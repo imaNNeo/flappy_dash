@@ -19,7 +19,12 @@ import 'package:go_router/go_router.dart';
 import 'parts/multiplayer_died_overlay.dart';
 
 class MultiPlayerGamePage extends StatefulWidget {
-  const MultiPlayerGamePage({super.key});
+  const MultiPlayerGamePage({
+    super.key,
+    required this.matchId,
+  });
+
+  final String matchId;
 
   @override
   State<MultiPlayerGamePage> createState() => _MultiPlayerGamePageState();
@@ -133,7 +138,7 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
 
   @override
   void dispose() {
-    multiplayerCubit.stopPlaying();
+    multiplayerCubit.stopPlaying(widget.matchId);
     super.dispose();
   }
 

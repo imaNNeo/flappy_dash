@@ -33,7 +33,11 @@ class AppRoutes {
           ),
           GoRoute(
             path: 'multi_player/:matchId',
-            builder: (context, state) => const MultiPlayerGamePage(),
+            builder: (context, state) {
+              return MultiPlayerGamePage(
+                matchId: state.pathParameters['matchId']!,
+              );
+            },
             routes: [
               GoRoute(
                 path: 'result',

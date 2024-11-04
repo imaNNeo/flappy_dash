@@ -195,6 +195,7 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
       return;
     }
 
+    _matchEventsSubscription.cancel();
     await _multiplayerRepository.leaveMatch(state.matchId);
   }
 
@@ -297,8 +298,12 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     ));
   }
 
-  void stopPlaying() {
+  void stopPlaying(String matchId) {
     if (state.matchId.isBlank) {
+      return;
+    }
+    if (state.matchId != matchId) {
+      // This match might be already finished
       return;
     }
     _audioHelper.stopBackgroundAudio(immediately: true);
