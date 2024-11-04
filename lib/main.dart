@@ -23,7 +23,7 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
   runApp(DevicePreview(
-    enabled: !kReleaseMode,
+    enabled: kDebugMode,
     builder: (context) => const MyApp(),
   ));
 }
