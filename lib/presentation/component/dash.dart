@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
@@ -46,7 +48,7 @@ class Dash extends PositionComponent
 
   late double _multiplayerCorrectPositionAfter;
 
-  MoveToEffect? _smoothUpdatingPositionEffect;
+  UpdateDashStateEffect? _smoothUpdatingPositionEffect;
 
   @override
   Future<void> onLoad() async {
@@ -165,29 +167,35 @@ class Dash extends PositionComponent
     position = Vector2(0, 0);
   }
 
-  void updateState(
-    double positionX,
-    double positionY,
-    double velocityY, {
-    double duration = 0.2,
-  }) {
+  void updateState(double positionX, double positionY, double velocityY,
+      {double duration = 0.15}) {
     assert(game.gameMode is MultiplayerGameMode && !isMe);
-    _smoothUpdatingPositionEffect?.removeFromParent();
-
-    final newX = positionX + (speed * duration);
-    final newVelocity = velocityY + _gravity * duration;
-    final newY = positionY + (newVelocity * duration);
-    add(_smoothUpdatingPositionEffect = MoveToEffect(
-      Vector2(newX, newY),
-      EffectController(
-        duration: duration,
-      ),
-      onComplete: () {
-        _smoothUpdatingPositionEffect?.removeFromParent();
-        _smoothUpdatingPositionEffect = null;
-      },
-    ));
-    _velocityY = newVelocity;
+    if (duration == 0) {
+      x = positionX;
+      y = positionY;
+      _velocityY = velocityY;
+    } else {
+      final scaledDuration =
+          duration * FlappyDashRootComponent.gameSpeedMultiplier;
+      final newX = positionX + (speed * scaledDuration);
+      final newVelocity = velocityY + _gravity * scaledDuration;
+      final newY = positionY + (newVelocity * scaledDuration);
+      _smoothUpdatingPositionEffect?.removeFromParent();
+      add(
+        _smoothUpdatingPositionEffect = UpdateDashStateEffect(
+          EffectController(
+            duration: scaledDuration,
+          ),
+          positionX: newX,
+          positionY: newY,
+          velocityY: newVelocity,
+          onComplete: () {
+            _smoothUpdatingPositionEffect?.removeFromParent();
+            _smoothUpdatingPositionEffect = null;
+          },
+        ),
+      );
+    }
   }
 
   @override
@@ -202,5 +210,39 @@ class Dash extends PositionComponent
     } else if (other is Pipe) {
       game.gameOver(x, y, _velocityY);
     }
+  }
+}
+
+class UpdateDashStateEffect extends ComponentEffect<Dash> {
+  UpdateDashStateEffect(
+    super.controller, {
+    required this.positionX,
+    required this.positionY,
+    required this.velocityY,
+    super.onComplete,
+  });
+
+  final double positionX;
+  final double positionY;
+  final double velocityY;
+
+  late final double initialX;
+  late final double initialY;
+  late final double initialVelocityY;
+
+  @override
+  void onMount() {
+    super.onMount();
+    initialX = target.x;
+    initialY = target.y;
+    initialVelocityY = target.velocityY;
+  }
+
+  @override
+  void apply(double progress) {
+    final newX = lerpDouble(initialX, positionX, progress)!;
+    final newY = lerpDouble(initialY, positionY, progress)!;
+    final newVelocityY = lerpDouble(initialVelocityY, velocityY, progress)!;
+    target.updateState(newX, newY, newVelocityY, duration: 0);
   }
 }

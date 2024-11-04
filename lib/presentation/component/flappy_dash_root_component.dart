@@ -30,7 +30,7 @@ class FlappyDashRootComponent extends Component
   MultiplayerState? _latestMultiplayerState;
 
   // We use it for temporary debugging
-  static double gameSpeedMultiplier = 0.1;
+  static double gameSpeedMultiplier = 1.0;
 
   @override
   Future<void> onLoad() async {
