@@ -358,6 +358,7 @@ class DashedBorderPainter extends CustomPainter {
   final bool drawBottom;
   final bool drawLeft;
   final double borderRadius;
+  final Paint _paint;
 
   DashedBorderPainter({
     required this.color,
@@ -369,48 +370,50 @@ class DashedBorderPainter extends CustomPainter {
     this.drawBottom = true,
     this.drawLeft = true,
     this.borderRadius = 0.0,
-  });
+  }) : _paint = Paint()
+          ..color = color
+          ..strokeWidth = strokeWidth
+          ..style = PaintingStyle.stroke;
+
+  Path? _path;
 
   @override
   void paint(Canvas canvas, Size size) {
-    var paint = Paint()
-      ..color = color
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke;
+    if (_path == null) {
+      var path = Path();
 
-    var path = Path();
+      if (!drawTop || !drawRight || !drawBottom || !drawLeft) {
+        // Draw individual sides if specified
+        if (drawTop) {
+          path.moveTo(0, 0);
+          path.lineTo(size.width, 0);
+        }
+        if (drawRight) {
+          path.moveTo(size.width, 0);
+          path.lineTo(size.width, size.height);
+        }
+        if (drawBottom) {
+          path.moveTo(size.width, size.height);
+          path.lineTo(0, size.height);
+        }
+        if (drawLeft) {
+          path.moveTo(0, size.height);
+          path.lineTo(0, 0);
+        }
+      } else {
+        path.addRRect(RRect.fromLTRBR(
+          0,
+          0,
+          size.width,
+          size.height,
+          Radius.circular(borderRadius),
+        ));
+      }
 
-    if (!drawTop || !drawRight || !drawBottom || !drawLeft) {
-      // Draw individual sides if specified
-      if (drawTop) {
-        path.moveTo(0, 0);
-        path.lineTo(size.width, 0);
-      }
-      if (drawRight) {
-        path.moveTo(size.width, 0);
-        path.lineTo(size.width, size.height);
-      }
-      if (drawBottom) {
-        path.moveTo(size.width, size.height);
-        path.lineTo(0, size.height);
-      }
-      if (drawLeft) {
-        path.moveTo(0, size.height);
-        path.lineTo(0, 0);
-      }
-    } else {
-      path.addRRect(RRect.fromLTRBR(
-        0,
-        0,
-        size.width,
-        size.height,
-        Radius.circular(borderRadius),
-      ));
+      // Create the dashed path
+      _path = _createDashedPath(path, dashWidth, dashGap);
     }
-
-    // Create the dashed path
-    var dashPath = _createDashedPath(path, dashWidth, dashGap);
-    canvas.drawPath(dashPath, paint);
+    canvas.drawPath(_path!, _paint);
   }
 
   Path _createDashedPath(Path path, double dashWidth, double dashGap) {
