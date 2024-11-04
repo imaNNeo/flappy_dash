@@ -129,6 +129,9 @@ class Dash extends PositionComponent
     if (!isMe) {
       return;
     }
+    if (game.gameMode is! MultiplayerGameMode) {
+      return;
+    }
 
     _multiplayerCorrectPositionAfter -= dt;
     if (_multiplayerCorrectPositionAfter > 0) {
