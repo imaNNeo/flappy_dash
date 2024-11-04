@@ -44,7 +44,6 @@ class MultiplayerGameConfigEntity extends GameConfigEntity {
     this.pipesDistance = 400.0,
     this.pipeWidth = 82.0,
     this.pipeHoleGap = 200,
-    this.pipesPosition = const [1.0, 0.5, 0.0, -0.5, -1.0],
     this.spawnAgainAfterSeconds = 5,
     this.correctPositionEvery = 5.0,
   });
@@ -61,17 +60,12 @@ class MultiplayerGameConfigEntity extends GameConfigEntity {
   @override
   final double pipeHoleGap;
 
-  final List<double> pipesPosition;
-
   final int spawnAgainAfterSeconds;
 
   final double correctPositionEvery;
 
-  double get worldWidth => pipesDistance * (pipesPosition.length);
-
   @override
   List<Object?> get props => [
-        pipesPosition,
         pipesPositionArea,
         pipesDistance,
         pipeWidth,

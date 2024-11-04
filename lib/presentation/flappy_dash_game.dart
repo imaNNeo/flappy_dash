@@ -111,6 +111,12 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
     processLifecycleEvents();
     super.onRemove();
   }
+
+  void onGameFinished() {
+    removeAll(children);
+    removeFromParent();
+    processLifecycleEvents();
+  }
 }
 
 class FlappyDashWorld extends World

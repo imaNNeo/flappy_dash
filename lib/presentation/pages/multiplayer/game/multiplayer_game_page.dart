@@ -31,7 +31,7 @@ class MultiPlayerGamePage extends StatefulWidget {
 }
 
 class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
-  late FlappyDashGame _flappyDashGame;
+  late FlappyDashGame? _flappyDashGame;
 
   late SingleplayerGameCubit singleplayerCubit;
   late MultiplayerCubit multiplayerCubit;
@@ -73,14 +73,15 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
             resizeToAvoidBottomInset: false,
             body: Stack(
               children: [
-                GameWidget(
-                  game: _flappyDashGame,
-                  backgroundBuilder: (_) {
-                    return Container(
-                      color: AppColors.backgroundColor,
-                    );
-                  },
-                ),
+                if (_flappyDashGame != null)
+                  GameWidget(
+                    game: _flappyDashGame!,
+                    backgroundBuilder: (_) {
+                      return Container(
+                        color: AppColors.backgroundColor,
+                      );
+                    },
+                  ),
                 if (state.currentPlayingState.isGameOver)
                   const MultiplayerDiedOverlayWidget(),
                 if (state.currentPlayingState.isIdle)
@@ -143,6 +144,8 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
   }
 
   void _onGameFinished() {
+    _flappyDashGame!.onGameFinished();
+    _flappyDashGame = null;
     final matchId = multiplayerCubit.state.matchId;
     context.go('/multi_player/$matchId/result');
   }

@@ -11,6 +11,7 @@ class MatchState with EquatableMixin {
   final MatchPhase currentPhase;
   final List<UserPresence> presences;
   final Map<String, PlayerState> players;
+  final List<double> pipesPositions;
 
   MatchState({
     required this.matchInitializedAt,
@@ -19,6 +20,7 @@ class MatchState with EquatableMixin {
     required this.currentPhase,
     required this.presences,
     required this.players,
+    required this.pipesPositions,
   });
 
   MatchState copyWith({
@@ -28,6 +30,7 @@ class MatchState with EquatableMixin {
     MatchPhase? currentPhase,
     List<UserPresence>? presences,
     Map<String, PlayerState>? players,
+    List<double>? pipesPositions,
   }) =>
       MatchState(
         matchInitializedAt: matchInitializedAt ?? this.matchInitializedAt,
@@ -36,6 +39,7 @@ class MatchState with EquatableMixin {
         currentPhase: currentPhase ?? this.currentPhase,
         presences: presences ?? this.presences,
         players: players ?? this.players,
+        pipesPositions: pipesPositions ?? this.pipesPositions,
       );
 
   factory MatchState.fromJson(Map<String, dynamic> json) => MatchState(
@@ -56,6 +60,7 @@ class MatchState with EquatableMixin {
     players: (json['players'] as Map<String, dynamic>).map(
           (k, v) => MapEntry(k, PlayerState.fromJson(v)),
     ),
+    pipesPositions: (json['pipesPositions'] as List).cast<double>(),
   );
 
   @override
@@ -66,5 +71,6 @@ class MatchState with EquatableMixin {
     currentPhase,
     presences,
     players,
+    pipesPositions,
   ];
 }

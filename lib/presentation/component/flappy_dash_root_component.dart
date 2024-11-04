@@ -21,6 +21,8 @@ class FlappyDashRootComponent extends Component
   // late DashParallaxBackground _background;
   late final GameConfigEntity _config;
 
+  late final MultiplayerCubit _cubit;
+
   int _pipeCounter = 0;
 
   String get myId => game.leaderboardCubit.state.currentAccount!.user.id;
@@ -35,6 +37,7 @@ class FlappyDashRootComponent extends Component
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    _cubit = game.multiplayerCubit;
     if (game.gameMode == const MultiplayerGameMode()) {
       multiplayerCubit = game.multiplayerCubit;
       _multiplayerCubitSubscription = multiplayerCubit.stream.listen(
@@ -86,8 +89,7 @@ class FlappyDashRootComponent extends Component
   }
 
   double _getNewPipeYForMultiplayer(MultiplayerGameConfigEntity config) {
-    final pipesPosition =
-        (_config as MultiplayerGameConfigEntity).pipesPosition;
+    final pipesPosition = _cubit.state.matchState!.pipesPositions;
     final posIndex = _pipeCounter % pipesPosition.length;
     return pipesPosition[posIndex] * _config.pipesPositionArea;
   }
@@ -158,7 +160,9 @@ class FlappyDashRootComponent extends Component
     }
 
     // We loop if the dash is out of the screen
-    if (_dash.x < _config.worldWidth) {
+    final worldWidth =
+        _config.pipesDistance * _cubit.state.matchState!.pipesPositions.length;
+    if (_dash.x < worldWidth) {
       return;
     }
 
