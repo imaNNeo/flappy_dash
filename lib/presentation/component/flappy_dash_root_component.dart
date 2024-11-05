@@ -54,9 +54,7 @@ class FlappyDashRootComponent extends Component
       priority: 10,
     ));
     _config = game.gameMode.gameConfig;
-    _generatePipes(
-      fromX: _config.pipesDistance,
-    );
+    _restartGameForNewIdle();
     game.camera.follow(_dash, horizontalOnly: true);
   }
 
@@ -72,9 +70,30 @@ class FlappyDashRootComponent extends Component
 
   void _restartGameForNewIdle() {
     // Set a new position for the dash (zero for now)
-    _dash.x = 0.0;
-    _dash.y = 0.0;
-    _dash.resetState();
+    switch (game.gameMode) {
+      case SinglePlayerGameMode():
+        _dash.x = 0.0;
+        _dash.y = 0.0;
+        _dash.resetVelocity();
+        break;
+      case MultiplayerGameMode():
+        final cubit = game.multiplayerCubit;
+        final state = cubit.state;
+        final pipesLength = state.matchState!.pipesPositions.length;
+        final pipesDistance = state.gameMode.gameConfig.pipesDistance;
+        const y = 0.0;
+        final randomX =
+            (Random().nextInt(pipesLength) * pipesDistance).toDouble();
+        _dash.y = y;
+        _dash.x = randomX;
+        _dash.resetVelocity();
+
+        cubit.dispatchIdleEvent(
+          _dash.x,
+          _dash.y,
+        );
+        break;
+    }
 
     // Remove all pipes
     children.whereType<PipePair>().forEach((pipe) {
@@ -82,7 +101,7 @@ class FlappyDashRootComponent extends Component
     });
 
     // Generate new pipes
-    _pipeCounter = 0;
+    _pipeCounter = _dash.x ~/ _config.pipesDistance;
     _generatePipes(
       fromX: _dash.x + _config.pipesDistance,
     );

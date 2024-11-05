@@ -318,10 +318,6 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     if (state.matchId.isBlank) {
       return;
     }
-    _multiplayerRepository.sendDispatchingEvent(
-      state.matchId,
-      DispatchingPlayerIsIdleEvent(),
-    );
     emit(state.copyWith(
       currentPlayingState: PlayingState.idle,
     ));
@@ -339,9 +335,19 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     );
   }
 
+  void dispatchIdleEvent(double x, double y) {
+    _multiplayerRepository.sendDispatchingEvent(
+      state.matchId,
+      DispatchingPlayerIsIdleEvent(
+        x,
+        y,
+        DateTime.now().millisecondsSinceEpoch,
+      ),
+    );
+  }
+
   @override
   Future<void> close() {
-    print('Closing multiplayer cubit');
     _timer?.cancel();
     _matchEventsSubscription.cancel();
     return super.close();

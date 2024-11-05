@@ -157,15 +157,15 @@ class Dash extends PositionComponent
   @override
   void render(Canvas canvas) {
     super.render(canvas);
+    debugMode = true;
     _dashSprite.render(
       canvas,
       size: size,
     );
   }
 
-  void resetState() {
+  void resetVelocity() {
     _velocityY = 0;
-    position = Vector2(0, 0);
   }
 
   void updateState(double positionX, double positionY, double velocityY,
