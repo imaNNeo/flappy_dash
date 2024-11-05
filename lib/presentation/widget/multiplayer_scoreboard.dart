@@ -7,7 +7,6 @@ import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/responsive/screen_size.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class MultiplayerScoreBoard extends StatefulWidget {
   const MultiplayerScoreBoard({
@@ -314,8 +313,8 @@ class _MultiplayerScoreRowWidget extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            SvgPicture.asset(
-              score.dashType.assetName,
+            Image.asset(
+              score.dashType.pngAssetName,
               width: dashSize,
               height: dashSize,
             ),

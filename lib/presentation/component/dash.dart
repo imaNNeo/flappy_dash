@@ -3,8 +3,6 @@ import 'dart:ui';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
-import 'package:flame_svg/flame_svg.dart';
-import 'package:flame_svg/svg.dart';
 import 'package:flappy_dash/domain/entities/dash_type.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
@@ -36,7 +34,7 @@ class Dash extends PositionComponent
   final String displayName;
   final bool isMe;
   final DashType type;
-  late final Svg _dashSvg;
+  late final Sprite _dashSprite;
 
   final double _gravity = 1400.0;
   double _velocityY = 0;
@@ -53,7 +51,7 @@ class Dash extends PositionComponent
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    _dashSvg = await Svg.load(type.flameAssetName);
+    _dashSprite = await game.loadSprite(type.flamePngAssetName);
     final radius = size.x / 2;
     final center = size / 2;
     if (isMe) {
@@ -159,9 +157,9 @@ class Dash extends PositionComponent
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    _dashSvg.render(
+    _dashSprite.render(
       canvas,
-      size,
+      size: size,
     );
   }
 

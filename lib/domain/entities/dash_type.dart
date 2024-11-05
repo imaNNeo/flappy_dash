@@ -33,19 +33,19 @@ enum DashType {
       };
 
   String get _fileName => switch (this) {
-        DashType.flutterDash => 'flutter_dash.svg',
-        DashType.limeDash => 'lime_dash.svg',
-        DashType.peachyDash => 'peachy_dash.svg',
-        DashType.roseDash => 'rose_dash.svg',
-        DashType.sandDash => 'sand_dash.svg',
-        DashType.scarletDash => 'scarlet_dash.svg',
-        DashType.skyDash => 'sky_dash.svg',
-        DashType.mintyDash => 'minty_dash.svg',
-        DashType.sunnyDash => 'sunny_dash.svg',
-        DashType.violetDash => 'violet_dash.svg',
+        DashType.flutterDash => 'flutter_dash',
+        DashType.limeDash => 'lime_dash',
+        DashType.peachyDash => 'peachy_dash',
+        DashType.roseDash => 'rose_dash',
+        DashType.sandDash => 'sand_dash',
+        DashType.scarletDash => 'scarlet_dash',
+        DashType.skyDash => 'sky_dash',
+        DashType.mintyDash => 'minty_dash',
+        DashType.sunnyDash => 'sunny_dash',
+        DashType.violetDash => 'violet_dash',
       };
 
-  String get flameAssetName => 'images/dashes/$_fileName';
+  String get flamePngAssetName => 'dashes/$_fileName.png';
 
-  String get assetName => 'assets/$flameAssetName';
+  String get pngAssetName => 'assets/images/dashes/$_fileName.png';
 }
