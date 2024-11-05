@@ -157,7 +157,6 @@ class Dash extends PositionComponent
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    debugMode = true;
     _dashSprite.render(
       canvas,
       size: size,
