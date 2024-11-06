@@ -152,6 +152,23 @@ class Dash extends PositionComponent
       return;
     }
     super.renderTree(canvas);
+    if (game.gameMode is MultiplayerGameMode && !isMe) {
+      final worldWidth = game.worldWidth;
+      final visibleWidth = game.camera.visibleWorldRect.size.width;
+      if (x < visibleWidth) {
+        // mirror for the right side
+        canvas.save();
+        canvas.translate(game.worldWidth, 0);
+        super.renderTree(canvas);
+        canvas.restore();
+      } else if (x > worldWidth - visibleWidth) {
+        // mirror for the left side
+        canvas.save();
+        canvas.translate(-game.worldWidth, 0);
+        super.renderTree(canvas);
+        canvas.restore();
+      }
+    }
   }
 
   @override
@@ -170,7 +187,8 @@ class Dash extends PositionComponent
   void updateState(double positionX, double positionY, double velocityY,
       {double duration = 0.15}) {
     assert(game.gameMode is MultiplayerGameMode && !isMe);
-    if (duration == 0) {
+    final xDiff = (positionX - x).abs();
+    if (xDiff > 200 || duration == 0) {
       x = positionX;
       y = positionY;
       _velocityY = velocityY;

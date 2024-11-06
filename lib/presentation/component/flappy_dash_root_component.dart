@@ -180,9 +180,7 @@ class FlappyDashRootComponent extends Component
     }
 
     // We loop if the dash is out of the screen
-    final worldWidth =
-        _config.pipesDistance * _cubit.state.matchState!.pipesPositions.length;
-    if (_dash.x < worldWidth) {
+    if (_dash.x < game.worldWidth) {
       return;
     }
 

@@ -44,6 +44,10 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
             : multiplayerCubit.state.currentPlayingState,
       };
 
+  double get worldWidth =>
+      gameMode.gameConfig.pipesDistance *
+      multiplayerCubit.state.matchState!.pipesPositions.length;
+
   @override
   KeyEventResult onKeyEvent(
     KeyEvent event,
