@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 sealed class GameConfigEntity with EquatableMixin {
   const GameConfigEntity();
 
+  final double dashMoveSpeed = 160.0;
   abstract final double pipesPositionArea;
   abstract final double pipesDistance;
   abstract final double pipeWidth;
@@ -12,9 +13,9 @@ sealed class GameConfigEntity with EquatableMixin {
 class SinglePlayerGameConfigEntity extends GameConfigEntity {
   const SinglePlayerGameConfigEntity({
     this.pipesPositionArea = 300.0,
-    this.pipesDistance = 400.0,
+    this.pipesDistance = 420.0,
     this.pipeWidth = 82.0,
-    this.pipeHoleGap = 200,
+    this.pipeHoleGap = 240,
   });
 
   @override
@@ -41,7 +42,7 @@ class SinglePlayerGameConfigEntity extends GameConfigEntity {
 class MultiplayerGameConfigEntity extends GameConfigEntity {
   const MultiplayerGameConfigEntity({
     this.pipesPositionArea = 300.0,
-    this.pipesDistance = 400.0,
+    this.pipesDistance = 420.0,
     this.pipeWidth = 82.0,
     this.pipeHoleGap = 200,
     this.spawnAgainAfterSeconds = 5,

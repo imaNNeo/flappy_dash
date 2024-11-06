@@ -47,13 +47,14 @@ class FlappyDashRootComponent extends Component
         priority: 9,
       ));
     }
+    _config = game.gameMode.gameConfig;
     add(_dash = Dash(
       playerId: myId,
       displayName: '',
       isMe: true,
       priority: 10,
+      speed: _config.dashMoveSpeed,
     ));
-    _config = game.gameMode.gameConfig;
     _restartGameForNewIdle();
     game.camera.follow(_dash, horizontalOnly: true);
   }

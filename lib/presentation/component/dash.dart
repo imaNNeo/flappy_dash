@@ -18,7 +18,7 @@ import 'outlined_text_component.dart';
 class Dash extends PositionComponent
     with CollisionCallbacks, HasGameRef<FlappyDashGame> {
   Dash({
-    this.speed = 200.0,
+    required this.speed,
     required this.playerId,
     required this.displayName,
     required this.isMe,

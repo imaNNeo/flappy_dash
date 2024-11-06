@@ -72,6 +72,7 @@ class MultiplayerController extends Component
               ? playerState.displayName
               : dashType.name,
           isMe: false,
+          speed: game.gameMode.gameConfig.dashMoveSpeed,
         );
         add(dash);
         dash.position.x = playerState.lastKnownX;
