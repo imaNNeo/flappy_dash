@@ -1,6 +1,6 @@
 {
     "name": "flappy_dash",
-    "short_name": "flappy_dash",
+    "short_name": "Flappy Dash",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
