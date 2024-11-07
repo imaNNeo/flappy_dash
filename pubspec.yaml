@@ -67,6 +67,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^3.0.0
+  icons_launcher: ^3.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -92,3 +93,15 @@ flutter:
     - family: Chewy
       fonts:
         - asset: assets/fonts/Chewy-Regular.ttf
+
+
+icons_launcher:
+  image_path: "assets/images/logo.png"
+  platforms:
+    android:
+      enable: true
+      adaptive_background_color: '#1FF0FF'
+    ios:
+      enable: true
+    web:
+      enable: true
