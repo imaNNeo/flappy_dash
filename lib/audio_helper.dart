@@ -17,7 +17,7 @@ class AudioHelper {
   }
 
   void playBackgroundAudio() async {
-    _playingBackground = await _soLoud.play(_backgroundSource);
+    _playingBackground = await _soLoud.play(_backgroundSource, looping: true);
     _soLoud.setProtectVoice(_playingBackground!, true);
   }
 
