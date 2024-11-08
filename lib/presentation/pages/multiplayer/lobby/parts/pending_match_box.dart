@@ -83,9 +83,7 @@ class PendingMatchBox extends StatelessWidget {
                       bgColor: AppColors.blueButtonBgColor,
                       onPressed: state.joinedInLobby
                           ? null
-                          : () {
-                              context.read<MultiplayerCubit>().joinLobby();
-                            },
+                          : () => _onJoinMatchPressed(context),
                       child: const Text(
                         'JOIN',
                         style: TextStyle(
@@ -103,5 +101,26 @@ class PendingMatchBox extends StatelessWidget {
         );
       },
     );
+  }
+
+  void _onJoinMatchPressed(BuildContext context) async {
+    final currentAccount = context.read<AccountCubit>().state.currentAccount;
+    if (currentAccount == null) {
+      context.showToastError('Failed to get account information');
+      return;
+    }
+
+    final doesNotHaveName = currentAccount.user.displayName.isNullOrBlank;
+    if (doesNotHaveName) {
+      final result = await NicknameDialog.show(context);
+      if (result != null) {
+        await Future.delayed(const Duration(milliseconds: 300));
+        if (context.mounted) {
+          _onJoinMatchPressed(context);
+        }
+      }
+      return;
+    }
+    context.read<MultiplayerCubit>().joinLobby();
   }
 }

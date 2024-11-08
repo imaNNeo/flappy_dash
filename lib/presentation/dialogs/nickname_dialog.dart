@@ -49,7 +49,7 @@ class _NicknameDialogState extends State<NicknameDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                'Your name',
+                'Your Nickname',
                 style: TextStyle(
                   fontFamily: 'Roboto',
                   fontSize: 28,
@@ -88,7 +88,7 @@ class _NicknameDialogState extends State<NicknameDialog> {
     final accountCubit = context.read<AccountCubit>();
     final newName = _textEditingController.text;
     accountCubit.updateUserDisplayName(newName);
-    Navigator.of(context).pop();
+    Navigator.of(context).pop(newName);
   }
 
   @override

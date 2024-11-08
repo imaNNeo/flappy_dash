@@ -2,7 +2,11 @@ import 'dart:async';
 
 import 'package:flappy_dash/domain/entities/match_event.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
+import 'package:flappy_dash/presentation/bloc/account/account_cubit.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
+import 'package:flappy_dash/presentation/dialogs/nickname_dialog.dart';
+import 'package:flappy_dash/presentation/extensions/build_context_extension.dart';
+import 'package:flappy_dash/domain/extensions/string_extension.dart';
 import 'package:flappy_dash/presentation/presentation_utils.dart';
 import 'package:flappy_dash/presentation/responsive/screen_size.dart';
 import 'package:flappy_dash/presentation/widget/big_button.dart';
