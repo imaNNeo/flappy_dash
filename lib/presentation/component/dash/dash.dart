@@ -3,17 +3,18 @@ import 'dart:ui';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+import 'package:flame/extensions.dart';
 import 'package:flappy_dash/domain/entities/dash_type.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/component/flappy_dash_root_component.dart';
+import 'package:flappy_dash/presentation/component/hidden_coin.dart';
+import 'package:flappy_dash/presentation/component/outlined_text_component.dart';
 import 'package:flappy_dash/presentation/component/pipe.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flutter/material.dart';
 
-import 'hidden_coin.dart';
-import 'outlined_text_component.dart';
 
 class Dash extends PositionComponent
     with CollisionCallbacks, HasGameRef<FlappyDashGame> {
@@ -35,6 +36,7 @@ class Dash extends PositionComponent
   final bool isMe;
   final DashType type;
   late final Sprite _dashSprite;
+  OutlinedTextComponent? _nameComponent;
 
   final double _gravity = 1400.0;
   double _velocityY = 0;
@@ -47,6 +49,19 @@ class Dash extends PositionComponent
   late double _multiplayerCorrectPositionAfter;
 
   UpdateDashStateEffect? _smoothUpdatingPositionEffect;
+
+  bool _isNameVisible = true;
+
+  bool get isNameVisible => _isNameVisible;
+
+  set isNameVisible(bool value) {
+    _isNameVisible = value;
+    if (value) {
+      _nameComponent?.text = displayName;
+    } else {
+      _nameComponent?.text = '';
+    }
+  }
 
   @override
   Future<void> onLoad() async {
@@ -62,8 +77,8 @@ class Dash extends PositionComponent
         collisionType: isMe ? CollisionType.active : CollisionType.inactive,
       ));
     }
-    add(OutlinedTextComponent(
-      text: displayName,
+    add(_nameComponent = OutlinedTextComponent(
+      text: _isNameVisible ? displayName : '',
       position: Vector2(size.x / 2, 0),
       textStyle: TextStyle(
         fontSize: 24,
@@ -73,7 +88,6 @@ class Dash extends PositionComponent
         color: AppColors.getDashColor(type),
       ),
     ));
-
     _resetCorrectPositionAfter();
   }
 
@@ -148,7 +162,9 @@ class Dash extends PositionComponent
 
   @override
   void renderTree(Canvas canvas) {
-    if (!isMe && currentPlayingState.isNotPlaying) {
+    if (!isMe &&
+        currentPlayingState.isNotPlaying &&
+        currentPlayingState.isNotIdle) {
       return;
     }
     super.renderTree(canvas);

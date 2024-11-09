@@ -169,6 +169,20 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
           case MatchFinishedEvent():
             _onGameFinished();
             break;
+          case PlayerWillSpawnAtEvent():
+            print('Received spawn event, sender: ${event.sender!.userId}, '
+                'currentUserId: ${state.currentUserId}');
+            if (state.currentUserId == event.sender!.userId) {
+              final spawnsAt = state
+                  .matchState!.players[event.sender!.userId]!.spawnsAgainAt;
+              final spawnsAfter = spawnsAt.difference(DateTime.now()).inSeconds;
+
+              emit(state.copyWith(
+                spawnsAgainAt: spawnsAt,
+                spawnRemainingSeconds: spawnsAfter,
+              ));
+            }
+            break;
           case _:
             break;
         }
@@ -237,6 +251,8 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     if (state.matchId.isBlank) {
       return;
     }
+    final pipesLength = state.matchState!.pipesPositions.length;
+    final pipesDistance = state.gameMode.gameConfig.pipesDistance;
     _multiplayerRepository.sendDispatchingEvent(
       state.matchId,
       DispatchingPlayerDiedEvent(
@@ -244,13 +260,12 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
         y,
         velocityY,
         DateTime.now().millisecondsSinceEpoch,
+        (Random().nextInt(pipesLength) * pipesDistance).toDouble(),
+        0.0,
       ),
     );
-    final spawnsAfter = state.gameMode.gameConfig.spawnAgainAfterSeconds;
     emit(state.copyWith(
       currentPlayingState: PlayingState.gameOver,
-      spawnsAgainAt: DateTime.now().add(Duration(seconds: spawnsAfter)),
-      spawnRemainingSeconds: spawnsAfter,
       diedCount: state.diedCount + 1,
       multiplayerDiedMessage: _getRandomMultiplayerDiedMessage(),
     ));

@@ -10,7 +10,7 @@ import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart
 import 'package:flappy_dash/presentation/component/multiplayer_controller.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 
-import 'dash.dart';
+import 'dash/dash.dart';
 import 'pipe_pair.dart';
 
 class FlappyDashRootComponent extends Component
@@ -55,21 +55,23 @@ class FlappyDashRootComponent extends Component
       priority: 10,
       speed: _config.dashMoveSpeed,
     ));
-    _restartGameForNewIdle();
+
+    _restartGameForNewIdle(isFirstTime: true);
     game.camera.follow(_dash, horizontalOnly: true);
+    game.camera.viewfinder.zoom = 0.2;
   }
 
   void _onMultiplayerStateChange(MultiplayerState state) {
     final restarted = state.currentPlayingState.isIdle &&
         _latestMultiplayerState?.currentPlayingState == PlayingState.gameOver;
     if (restarted) {
-      _restartGameForNewIdle();
+      _restartGameForNewIdle(isFirstTime: false);
     }
 
     _latestMultiplayerState = state;
   }
 
-  void _restartGameForNewIdle() {
+  void _restartGameForNewIdle({required bool isFirstTime}) {
     // Set a new position for the dash (zero for now)
     switch (game.gameMode) {
       case SinglePlayerGameMode():
@@ -80,15 +82,20 @@ class FlappyDashRootComponent extends Component
       case MultiplayerGameMode():
         final cubit = game.multiplayerCubit;
         final state = cubit.state;
-        final pipesLength = state.matchState!.pipesPositions.length;
-        final pipesDistance = state.gameMode.gameConfig.pipesDistance;
-        const y = 0.0;
-        final randomX =
-            (Random().nextInt(pipesLength) * pipesDistance).toDouble();
-        _dash.y = y;
-        _dash.x = randomX;
+        if (isFirstTime) {
+          final pipesLength = state.matchState!.pipesPositions.length;
+          final pipesDistance = state.gameMode.gameConfig.pipesDistance;
+          const y = 0.0;
+          final randomX =
+              (Random().nextInt(pipesLength) * pipesDistance).toDouble();
+          _dash.y = y;
+          _dash.x = randomX;
+        } else {
+          // position is randomized when dash is died (to spawn the portal)
+          _dash.x = state.matchState!.players[myId]!.lastKnownX;
+          _dash.y = state.matchState!.players[myId]!.lastKnownY;
+        }
         _dash.resetVelocity();
-
         cubit.dispatchIdleEvent(
           _dash.x,
           _dash.y,
@@ -187,7 +194,6 @@ class FlappyDashRootComponent extends Component
     final lastPipe = _removeAllPipesExceptLastOne();
     lastPipe.x = 0.0;
     _dash.x = 0.0;
-    // _background.x = 0.0;
     _pipeCounter = 0;
     _generatePipes(
       fromX: _config.pipesDistance,
@@ -197,7 +203,6 @@ class FlappyDashRootComponent extends Component
   @override
   void update(double dt) {
     super.update(dt);
-    // _background.x = _dash.x;
     _tryToLoopTheGame();
     if (_dash.x >= _lastPipe.x) {
       _generatePipes(

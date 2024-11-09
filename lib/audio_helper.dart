@@ -14,6 +14,8 @@ class AudioHelper {
     await _soLoud.init();
     _backgroundSource = await _soLoud.loadAsset('assets/audio/background.mp3');
     _scoreSource = await _soLoud.loadAsset('assets/audio/score.mp3');
+
+    _soLoud.setGlobalVolume(0.0);
   }
 
   void playBackgroundAudio() async {

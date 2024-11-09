@@ -2,15 +2,20 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:flame/components.dart';
+import 'package:flame/palette.dart';
 import 'package:flappy_dash/domain/entities/dash_type.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
 import 'package:flappy_dash/domain/entities/player_state.dart';
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
+import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
-import 'package:flappy_dash/presentation/component/dash.dart';
+import 'package:flappy_dash/presentation/component/dash/dash.dart';
 import 'package:flappy_dash/presentation/component/flappy_dash_root_component.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flutter/foundation.dart';
+
+import 'dash/dash_spawn_effect.dart';
+import 'dash/dash_spawn_portal.dart';
 
 class MultiplayerController extends Component
     with ParentIsA<FlappyDashRootComponent>, HasGameRef<FlappyDashGame> {
@@ -131,16 +136,29 @@ class MultiplayerController extends Component
           duration: 0.0,
         );
         break;
-      case PlayerIsIdleEvent():
-        // Idle animation or style (state is automatically updated)
-        // We just update the dash x position
-        final dash = _otherDashes[event.sender!.userId]!.dash;
-        dash.updateState(
-          event.dashX,
-          event.dashY,
-          event.dashVelocityY,
-          duration: 0.0,
+      case PlayerWillSpawnAtEvent():
+        final player = _cubit.state.matchState!.players[event.sender!.userId]!;
+        final spawnsAt = player.spawnsAgainAt;
+        final spawnsAfter =
+            spawnsAt.difference(DateTime.now()).inMilliseconds / 1000;
+        final newPos = Vector2(player.lastKnownX, player.lastKnownY);
+        _spawnPortalAndPlayer(
+          playerId: event.sender!.userId,
+          position: newPos,
+          spawnsAfter:
+              spawnsAfter * FlappyDashRootComponent.gameSpeedMultiplier,
         );
+        break;
+      case PlayerIsIdleEvent():
+        // // Idle animation or style (state is automatically updated)
+        // // We just update the dash x position
+        // final dash = _otherDashes[event.sender!.userId]!.dash;
+        // dash.updateState(
+        //   event.dashX,
+        //   event.dashY,
+        //   event.dashVelocityY,
+        //   duration: 0.0,
+        // );
         break;
       case PlayerCorrectPositionEvent():
         // We just mutate the position of the dash
@@ -162,6 +180,32 @@ class MultiplayerController extends Component
       case MatchWelcomeEvent():
         break;
     }
+  }
+
+  void _spawnPortalAndPlayer({
+    required String playerId,
+    required Vector2 position,
+    required double spawnsAfter,
+  }) async {
+    print('Spawning portal for player $playerId at $position');
+    final dash = _otherDashes[playerId]!.dash;
+    dash.position = position;
+    dash.scale = Vector2.all(0.0);
+    add(SpawningPortal(
+      position: position,
+      size: Vector2.all(dash.size.x),
+      color: AppColors.getDashColor(
+        DashType.fromUserId(playerId),
+      ).darken(0.2),
+      priority: -1,
+      hideAfter: spawnsAfter,
+      onHide: () {
+        dash.isNameVisible = false;
+        dash.add(DashSpawnEffect(
+          onComplete: () => dash.isNameVisible = true,
+        ));
+      },
+    ));
   }
 
   @override

@@ -72,12 +72,16 @@ class DispatchingPlayerDiedEvent extends DispatchingMatchEvent {
   final double positionY;
   final double velocityY;
   final int timestamp;
+  final double newPositionX;
+  final double newPositionY;
 
   DispatchingPlayerDiedEvent(
     this.positionX,
     this.positionY,
     this.velocityY,
     this.timestamp,
+    this.newPositionX,
+    this.newPositionY,
   );
 
   @override
@@ -86,6 +90,8 @@ class DispatchingPlayerDiedEvent extends DispatchingMatchEvent {
         'positionY': positionY,
         'velocityY': velocityY,
         'timestamp': timestamp,
+        'newPositionX': newPositionX,
+        'newPositionY': newPositionY,
       });
 }
 

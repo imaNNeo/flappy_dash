@@ -106,3 +106,11 @@ class PlayerCorrectPositionEvent extends MatchEvent {
 
   double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
 }
+
+class PlayerWillSpawnAtEvent extends MatchEvent {
+  PlayerWillSpawnAtEvent(super.matchData);
+
+  double get dashX => state.players[sender!.userId]!.lastKnownX;
+
+  double get dashY => state.players[sender!.userId]!.lastKnownY;
+}

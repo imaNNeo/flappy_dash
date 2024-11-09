@@ -14,5 +14,7 @@ enum PlayingState {
 
   bool get isIdle => this == PlayingState.idle;
 
+  bool get isNotIdle => !isIdle;
+
   bool get isPaused => this == PlayingState.paused;
 }

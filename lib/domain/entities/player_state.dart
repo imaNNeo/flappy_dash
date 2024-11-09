@@ -10,6 +10,7 @@ class PlayerState with EquatableMixin {
   final double lastKnownVelocityY;
   final int score;
   final PlayingState playingState;
+  final DateTime spawnsAgainAt;
 
   PlayerState({
     required this.userId,
@@ -20,6 +21,7 @@ class PlayerState with EquatableMixin {
     required this.lastKnownVelocityY,
     required this.score,
     required this.playingState,
+    required this.spawnsAgainAt,
   });
 
   factory PlayerState.fromJson(Map<String, dynamic> json) => PlayerState(
@@ -31,6 +33,9 @@ class PlayerState with EquatableMixin {
         lastKnownVelocityY: double.parse(json['lastKnownVelocityY'].toString()),
         score: json['score'],
         playingState: PlayingState.values[json['playingState']],
+        spawnsAgainAt: DateTime.fromMillisecondsSinceEpoch(
+          json['spawnsAgainAt'],
+        ),
       );
 
   @override
@@ -43,5 +48,6 @@ class PlayerState with EquatableMixin {
         lastKnownVelocityY,
         score,
         playingState,
+        spawnsAgainAt,
       ];
 }
