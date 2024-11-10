@@ -9,16 +9,7 @@ class MultiplayerDiedOverlayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<MultiplayerCubit, MultiplayerState>(
-      listener: (context, state) {
-        if (state.spawnsAgainAt != null) {
-          final secondsLeft =
-              state.spawnsAgainAt!.difference(DateTime.now()).inSeconds;
-          if (secondsLeft <= 0 && state.currentPlayingState.isGameOver) {
-            context.read<MultiplayerCubit>().continueGame();
-          }
-        }
-      },
+    return BlocBuilder<MultiplayerCubit, MultiplayerState>(
       builder: (context, state) {
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),

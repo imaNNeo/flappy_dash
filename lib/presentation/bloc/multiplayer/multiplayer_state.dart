@@ -55,7 +55,7 @@ class MultiplayerState with EquatableMixin {
     List<PlayerState>? inLobbyPlayers,
     bool? joinedInLobby,
     Account? currentAccount,
-    DateTime? spawnsAgainAt,
+    ValueWrapper<DateTime>? spawnsAgainAt,
     int? spawnRemainingSeconds,
     MultiplayerDiedMessage? multiplayerDiedMessage,
     int? diedCount,
@@ -76,7 +76,8 @@ class MultiplayerState with EquatableMixin {
         inLobbyPlayers: inLobbyPlayers ?? this.inLobbyPlayers,
         joinedInLobby: joinedInLobby ?? this.joinedInLobby,
         currentAccount: currentAccount ?? this.currentAccount,
-        spawnsAgainAt: spawnsAgainAt ?? this.spawnsAgainAt,
+        spawnsAgainAt:
+            spawnsAgainAt != null ? spawnsAgainAt.value : this.spawnsAgainAt,
         spawnRemainingSeconds:
             spawnRemainingSeconds ?? this.spawnRemainingSeconds,
         multiplayerDiedMessage:

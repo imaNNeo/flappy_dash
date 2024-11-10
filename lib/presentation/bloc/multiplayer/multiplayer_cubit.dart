@@ -11,6 +11,7 @@ import 'package:flappy_dash/domain/entities/match_state.dart';
 import 'package:flappy_dash/domain/entities/multiplayer_died_message.dart';
 import 'package:flappy_dash/domain/entities/player_state.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
+import 'package:flappy_dash/domain/entities/value_wrapper.dart';
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
 import 'package:flappy_dash/domain/repositories/game_repository.dart';
 import 'package:flappy_dash/domain/repositories/multiplayer_repository.dart';
@@ -42,6 +43,7 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     _timer = Timer.periodic(const Duration(milliseconds: 100), (_) {
       _refreshRemainingTime();
       _refreshRespawnTimer();
+      _tryToContinueGameAfterDied();
     });
     _listenToUserDisplayNameUpdates();
   }
@@ -144,7 +146,8 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
 
   void _onMatchEvent(MatchEvent event) {
     final phase = state.matchState?.currentPhase;
-    debugPrint('Received event: $event in phase: $phase');
+    debugPrint(
+        'Received event: $event in phase: $phase, sender: ${event.sender?.userId}');
     switch (phase) {
       case null || MatchPhase.waitingForPlayers:
         switch (event) {
@@ -170,15 +173,13 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
             _onGameFinished();
             break;
           case PlayerWillSpawnAtEvent():
-            print('Received spawn event, sender: ${event.sender!.userId}, '
-                'currentUserId: ${state.currentUserId}');
             if (state.currentUserId == event.sender!.userId) {
               final spawnsAt = state
                   .matchState!.players[event.sender!.userId]!.spawnsAgainAt;
               final spawnsAfter = spawnsAt.difference(DateTime.now()).inSeconds;
 
               emit(state.copyWith(
-                spawnsAgainAt: spawnsAt,
+                spawnsAgainAt: ValueWrapper(spawnsAt),
                 spawnRemainingSeconds: spawnsAfter,
               ));
             }
@@ -303,7 +304,6 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     if (state.matchId.isBlank) {
       return;
     }
-
     // First round
     if (state.diedCount == 0) {
       _audioHelper.playBackgroundAudio();
@@ -333,13 +333,28 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     _audioHelper.stopBackgroundAudio();
   }
 
-  void continueGame() {
-    if (state.matchId.isBlank) {
+  void _tryToContinueGameAfterDied() {
+    if (state.spawnsAgainAt == null) {
       return;
     }
-    emit(state.copyWith(
-      currentPlayingState: PlayingState.idle,
-    ));
+
+    if (state.matchId.isBlank) {
+      emit(state.copyWith(
+        spawnsAgainAt: ValueWrapper.nullValue(),
+      ));
+      return;
+    }
+
+    final secondsLeft =
+        state.spawnsAgainAt!.difference(DateTime.now()).inSeconds;
+
+
+    if (secondsLeft <= 0 && state.currentPlayingState.isGameOver) {
+      emit(state.copyWith(
+        spawnsAgainAt: ValueWrapper.nullValue(),
+        currentPlayingState: PlayingState.idle,
+      ));
+    }
   }
 
   void dispatchCorrectPosition(double x, double y, double yVelocity) {
