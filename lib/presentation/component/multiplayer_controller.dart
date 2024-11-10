@@ -149,17 +149,6 @@ class MultiplayerController extends Component
               spawnsAfter * FlappyDashRootComponent.gameSpeedMultiplier,
         );
         break;
-      case PlayerIsIdleEvent():
-        // // Idle animation or style (state is automatically updated)
-        // // We just update the dash x position
-        // final dash = _otherDashes[event.sender!.userId]!.dash;
-        // dash.updateState(
-        //   event.dashX,
-        //   event.dashY,
-        //   event.dashVelocityY,
-        //   duration: 0.0,
-        // );
-        break;
       case PlayerCorrectPositionEvent():
         // We just mutate the position of the dash
         final dash = _otherDashes[event.sender!.userId]!.dash;
@@ -170,6 +159,7 @@ class MultiplayerController extends Component
         );
         break;
       // We don't care about these events at the moment
+      case PlayerIsIdleEvent():
       case PlayerKickedFromTheLobbyEvent():
       case PlayerScoredEvent():
       case PlayerJoinedTheLobby():
@@ -189,7 +179,12 @@ class MultiplayerController extends Component
   }) async {
     print('Spawning portal for player $playerId at $position');
     final dash = _otherDashes[playerId]!.dash;
-    dash.position = position;
+    dash.updateState(
+      position.x,
+      position.y,
+      0.0,
+      duration: 0.0,
+    );
     dash.scale = Vector2.all(0.0);
 
     // It's okay to show the other dash while it's idle after spawning,

@@ -85,13 +85,12 @@ class FlappyDashRootComponent extends Component
         if (isFirstTime) {
           final pipesLength = state.matchState!.pipesPositions.length;
           final pipesDistance = state.gameMode.gameConfig.pipesDistance;
-          const y = 0.0;
           final randomX =
               (Random().nextInt(pipesLength) * pipesDistance).toDouble();
-          _dash.y = y;
+          _dash.y = 0.0;
           _dash.x = randomX;
         } else {
-          // position is randomized when dash is died (to spawn the portal)
+          // position is randomized when dash is died (to spawn in the portal)
           _dash.x = state.matchState!.players[myId]!.lastKnownX;
           _dash.y = state.matchState!.players[myId]!.lastKnownY;
         }
