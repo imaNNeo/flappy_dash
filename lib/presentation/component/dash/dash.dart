@@ -63,9 +63,12 @@ class Dash extends PositionComponent
     }
   }
 
+  late bool visibleOnIdle;
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    visibleOnIdle = isMe;
     _dashSprite = await game.loadSprite(type.flamePngAssetName);
     final radius = size.x / 2;
     final center = size / 2;
@@ -165,6 +168,9 @@ class Dash extends PositionComponent
     if (!isMe &&
         currentPlayingState.isNotPlaying &&
         currentPlayingState.isNotIdle) {
+      return;
+    }
+    if (!visibleOnIdle && currentPlayingState.isIdle) {
       return;
     }
     super.renderTree(canvas);

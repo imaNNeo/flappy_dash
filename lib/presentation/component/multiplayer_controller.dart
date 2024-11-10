@@ -191,6 +191,12 @@ class MultiplayerController extends Component
     final dash = _otherDashes[playerId]!.dash;
     dash.position = position;
     dash.scale = Vector2.all(0.0);
+
+    // It's okay to show the other dash while it's idle after spawning,
+    // Because we choose a correct place to spawn in the middle of pipes
+    // But the first spawn, is random so we don't show the dash
+    dash.visibleOnIdle = true;
+
     add(SpawningPortal(
       position: position,
       size: Vector2.all(dash.size.x),
