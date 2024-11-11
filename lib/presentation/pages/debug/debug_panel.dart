@@ -33,31 +33,38 @@ class _DebugPanelState extends State<DebugPanel> {
               children: [
                 SizedBox(
                   height: headerHeight,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Debug Panel (${state.debugMessages.length})',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'RobotoMono',
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        isExpanded = !isExpanded;
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Debug Panel (${state.debugMessages.length})',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'RobotoMono',
+                            ),
                           ),
                         ),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          isExpanded ? Icons.expand_less : Icons.expand_more,
-                          color: Colors.white,
+                        IconButton(
+                          icon: Icon(
+                            isExpanded ? Icons.expand_less : Icons.expand_more,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              isExpanded = !isExpanded;
+                            });
+                          },
                         ),
-                        onPressed: () {
-                          setState(() {
-                            isExpanded = !isExpanded;
-                          });
-                        },
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
