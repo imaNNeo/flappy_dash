@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flappy_dash/domain/entities/debug/debug_message.dart';
 import 'package:flappy_dash/domain/entities/game_config_entity.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
@@ -58,7 +59,6 @@ class FlappyDashRootComponent extends Component
 
     _restartGameForNewIdle(isFirstTime: true);
     game.camera.follow(_dash, horizontalOnly: true);
-    game.camera.viewfinder.zoom = 0.2;
   }
 
   void _onMultiplayerStateChange(MultiplayerState state) {
@@ -200,7 +200,7 @@ class FlappyDashRootComponent extends Component
     }
 
     // We loop if the dash is out of the screen
-    if (_dash.x < game.worldWidth) {
+    if (_dash.x <= game.worldWidth) {
       return;
     }
 

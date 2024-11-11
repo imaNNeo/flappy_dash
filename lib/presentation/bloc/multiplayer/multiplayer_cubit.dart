@@ -255,7 +255,7 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     }
     final pipesDistance = state.gameMode.gameConfig.pipesDistance;
     final spawnOnPipeIndex =
-        Random().nextInt(state.matchState!.pipesPositions.length);
+        Random().nextInt(state.matchState!.pipesPositions.length - 1);
     final newX = ((spawnOnPipeIndex + 1) * pipesDistance).toDouble();
     final newY = state.matchState!.pipesPositions[spawnOnPipeIndex] *
         state.gameMode.gameConfig.pipesPositionArea;
