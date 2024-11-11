@@ -20,6 +20,7 @@ class MultiplayerState with EquatableMixin {
     this.spawnRemainingSeconds = 0,
     this.multiplayerDiedMessage,
     this.diedCount = 0,
+    this.debugMessages = const [],
   });
 
   final MultiplayerGameMode gameMode;
@@ -40,6 +41,7 @@ class MultiplayerState with EquatableMixin {
   final int spawnRemainingSeconds;
   final MultiplayerDiedMessage? multiplayerDiedMessage;
   final int diedCount;
+  final List<DebugMessage> debugMessages;
 
   MultiplayerState copyWith({
     int? currentScore,
@@ -59,6 +61,7 @@ class MultiplayerState with EquatableMixin {
     int? spawnRemainingSeconds,
     MultiplayerDiedMessage? multiplayerDiedMessage,
     int? diedCount,
+    List<DebugMessage>? debugMessages,
   }) =>
       MultiplayerState(
         currentScore: currentScore ?? this.currentScore,
@@ -83,6 +86,7 @@ class MultiplayerState with EquatableMixin {
         multiplayerDiedMessage:
             multiplayerDiedMessage ?? this.multiplayerDiedMessage,
         diedCount: diedCount ?? this.diedCount,
+        debugMessages: debugMessages ?? this.debugMessages,
       );
 
   @override
@@ -105,5 +109,6 @@ class MultiplayerState with EquatableMixin {
         spawnRemainingSeconds,
         multiplayerDiedMessage,
         diedCount,
+        debugMessages,
       ];
 }

@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:equatable/equatable.dart';
 import 'package:flappy_dash/audio_helper.dart';
+import 'package:flappy_dash/domain/entities/debug/debug_message.dart';
 import 'package:flappy_dash/domain/entities/dispatching_match_event.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
@@ -15,7 +16,6 @@ import 'package:flappy_dash/domain/entities/value_wrapper.dart';
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
 import 'package:flappy_dash/domain/repositories/game_repository.dart';
 import 'package:flappy_dash/domain/repositories/multiplayer_repository.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nakama/nakama.dart';
 
@@ -46,6 +46,7 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
       _tryToContinueGameAfterDied();
     });
     _listenToUserDisplayNameUpdates();
+    _listenToDispatchingEvents();
   }
 
   void _listenToUserDisplayNameUpdates() {
@@ -146,8 +147,12 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
 
   void _onMatchEvent(MatchEvent event) {
     final phase = state.matchState?.currentPhase;
-    debugPrint(
-        'Received event: $event in phase: $phase, sender: ${event.sender?.userId}');
+    emit(state.copyWith(
+      debugMessages: [
+        ...state.debugMessages,
+        DebugIncomingEvent(event),
+      ],
+    ));
     switch (phase) {
       case null || MatchPhase.waitingForPlayers:
         switch (event) {
@@ -348,7 +353,6 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     final secondsLeft =
         state.spawnsAgainAt!.difference(DateTime.now()).inSeconds;
 
-
     if (secondsLeft <= 0 && state.currentPlayingState.isGameOver) {
       emit(state.copyWith(
         spawnsAgainAt: ValueWrapper.nullValue(),
@@ -378,6 +382,17 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
         DateTime.now().millisecondsSinceEpoch,
       ),
     );
+  }
+
+  void _listenToDispatchingEvents() {
+    _multiplayerRepository.onEventDispatched().listen((event) {
+      emit(state.copyWith(
+        debugMessages: [
+          ...state.debugMessages,
+          DebugDispatchingEvent(event),
+        ],
+      ));
+    });
   }
 
   @override

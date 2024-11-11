@@ -15,27 +15,30 @@ class MultiplayerRepository {
   Stream<MatchEvent> onMatchEvent(String matchId) =>
       _nakamaDataSource.onMatchEvent(matchId);
 
+  final _onEventDispatchedController =
+      StreamController<DispatchingMatchEvent>.broadcast();
+
+  Stream<DispatchingMatchEvent> onEventDispatched() =>
+      _onEventDispatchedController.stream;
+
   Future<Match> joinMatch(String matchId) =>
       _nakamaDataSource.joinMatch(matchId);
 
-  void joinLobby(String matchId) {
-    _nakamaDataSource.sendDispatchingEvent(
-      matchId,
-      DispatchingPlayerJoinedLobbyEvent(),
-    );
-  }
+  void joinLobby(String matchId) => sendDispatchingEvent(
+    matchId,
+    DispatchingPlayerJoinedLobbyEvent(),
+  );
 
   Future<void> leaveMatch(String matchId) =>
       _nakamaDataSource.leaveMatch(matchId);
 
-  void sendUserDisplayNameUpdatedEvent(String matchId) {
-    _nakamaDataSource.sendDispatchingEvent(
-      matchId,
-      DispatchingUserDisplayNameUpdatedEvent(),
-    );
-  }
+  void sendUserDisplayNameUpdatedEvent(String matchId) => sendDispatchingEvent(
+    matchId,
+    DispatchingUserDisplayNameUpdatedEvent(),
+  );
 
   void sendDispatchingEvent(String matchId, DispatchingMatchEvent event) {
+    _onEventDispatchedController.add(event);
     _nakamaDataSource.sendDispatchingEvent(
       matchId,
       event,

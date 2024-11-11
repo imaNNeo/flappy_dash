@@ -5,6 +5,7 @@ import 'package:flappy_dash/domain/repositories/multiplayer_repository.dart';
 import 'package:flappy_dash/presentation/bloc/account/account_cubit.dart';
 import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
+import 'package:flappy_dash/presentation/pages/debug/debug_panel.dart';
 import 'package:flappy_dash/service_locator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -63,7 +64,18 @@ class MyApp extends StatelessWidget {
       child: MaterialApp.router(
         routerConfig: AppRoutes.router,
         title: 'Flappy Dash',
-        builder: DevicePreview.appBuilder,
+        builder: (context, child) {
+          return Stack(
+            children: [
+              DevicePreview.appBuilder(context, child),
+              if (kDebugMode)
+                const Align(
+                  alignment: Alignment.bottomLeft,
+                  child: DebugPanel(),
+                ),
+            ],
+          );
+        },
         theme: ThemeData(
           fontFamily: 'Chewy',
           colorScheme: ColorScheme.fromSeed(
