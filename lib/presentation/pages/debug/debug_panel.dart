@@ -69,9 +69,13 @@ class _DebugPanelState extends State<DebugPanel> {
                 ),
                 Expanded(
                   child: ListView.builder(
-                    itemBuilder: (context, index) {
+                    reverse: true,
+                    itemBuilder: (context, reverseIndex) {
+                      final index = state.debugMessages.length - 1 - reverseIndex;
                       return DebugTextLine(
-                        words: state.debugMessages[index].toDebugMessage(),
+                        words: state.debugMessages[index].toDebugMessage(
+                          state.currentUserId,
+                        ),
                       );
                     },
                     itemCount: state.debugMessages.length,

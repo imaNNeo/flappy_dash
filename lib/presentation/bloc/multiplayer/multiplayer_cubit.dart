@@ -66,6 +66,7 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
 
   Timer? _timer;
   late StreamSubscription _matchEventsSubscription;
+  late StreamSubscription _dispatchingEventsSubscription;
 
   void _refreshRemainingTime() {
     final waitingRemaining =
@@ -147,12 +148,7 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
 
   void _onMatchEvent(MatchEvent event) {
     final phase = state.matchState?.currentPhase;
-    emit(state.copyWith(
-      debugMessages: [
-        ...state.debugMessages,
-        DebugIncomingEvent(event),
-      ],
-    ));
+    _addDebugMessage(DebugIncomingEvent(event));
     switch (phase) {
       case null || MatchPhase.waitingForPlayers:
         switch (event) {
@@ -385,20 +381,29 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
   }
 
   void _listenToDispatchingEvents() {
-    _multiplayerRepository.onEventDispatched().listen((event) {
-      emit(state.copyWith(
-        debugMessages: [
-          ...state.debugMessages,
-          DebugDispatchingEvent(event),
-        ],
-      ));
-    });
+    _dispatchingEventsSubscription =
+        _multiplayerRepository.onEventDispatched().listen(
+              (event) => _addDebugMessage(DebugDispatchingEvent(event)),
+            );
+  }
+
+  void addDebugMessage(DebugMessage message) => _addDebugMessage(message);
+
+  void _addDebugMessage(DebugMessage message) {
+    emit(state.copyWith(
+      debugMessages: [
+        ...state.debugMessages,
+        message,
+      ],
+    ));
   }
 
   @override
   Future<void> close() {
     _timer?.cancel();
     _matchEventsSubscription.cancel();
+    _dispatchingEventsSubscription.cancel();
+
     return super.close();
   }
 }

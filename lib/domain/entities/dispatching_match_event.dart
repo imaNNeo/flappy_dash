@@ -7,6 +7,8 @@ sealed class DispatchingMatchEvent {
   const DispatchingMatchEvent();
 
   List<int> toBytes();
+
+  String debugExtraInfo();
 }
 
 class DispatchingPlayerJoinedLobbyEvent extends DispatchingMatchEvent {
@@ -14,6 +16,9 @@ class DispatchingPlayerJoinedLobbyEvent extends DispatchingMatchEvent {
 
   @override
   List<int> toBytes() => [];
+
+  @override
+  String debugExtraInfo() => '';
 }
 
 class DispatchingPlayerStartedEvent extends DispatchingMatchEvent {
@@ -21,6 +26,9 @@ class DispatchingPlayerStartedEvent extends DispatchingMatchEvent {
 
   @override
   List<int> toBytes() => [];
+
+  @override
+  String debugExtraInfo() => '';
 }
 
 class DispatchingPlayerJumpedEvent extends DispatchingMatchEvent {
@@ -43,6 +51,9 @@ class DispatchingPlayerJumpedEvent extends DispatchingMatchEvent {
         'velocityY': velocityY,
         'timestamp': timestamp,
       });
+
+  @override
+  String debugExtraInfo() => '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
 }
 
 class DispatchingPlayerScoredEvent extends DispatchingMatchEvent {
@@ -65,6 +76,9 @@ class DispatchingPlayerScoredEvent extends DispatchingMatchEvent {
         'velocityY': velocityY,
         'timestamp': timestamp,
       });
+
+  @override
+  String debugExtraInfo() => '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
 }
 
 class DispatchingPlayerDiedEvent extends DispatchingMatchEvent {
@@ -93,6 +107,10 @@ class DispatchingPlayerDiedEvent extends DispatchingMatchEvent {
         'newPositionX': newPositionX,
         'newPositionY': newPositionY,
       });
+
+  @override
+  String debugExtraInfo() =>
+      '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)}) -> (${newPositionX.toStringAsFixed(1)}, ${newPositionY.toStringAsFixed(1)})';
 }
 
 class DispatchingPlayerIsIdleEvent extends DispatchingMatchEvent {
@@ -101,17 +119,20 @@ class DispatchingPlayerIsIdleEvent extends DispatchingMatchEvent {
   final int timestamp;
 
   DispatchingPlayerIsIdleEvent(
-      this.positionX,
-      this.positionY,
-      this.timestamp,
-      );
+    this.positionX,
+    this.positionY,
+    this.timestamp,
+  );
 
   @override
   List<int> toBytes() => _jsonToData({
-    'positionX': positionX,
-    'positionY': positionY,
-    'timestamp': timestamp,
-  });
+        'positionX': positionX,
+        'positionY': positionY,
+        'timestamp': timestamp,
+      });
+
+  @override
+  String debugExtraInfo() => '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
 }
 
 class DispatchingUserDisplayNameUpdatedEvent extends DispatchingMatchEvent {
@@ -119,6 +140,9 @@ class DispatchingUserDisplayNameUpdatedEvent extends DispatchingMatchEvent {
 
   @override
   List<int> toBytes() => [];
+
+  @override
+  String debugExtraInfo() => '';
 }
 
 class DispatchingPlayerCorrectPositionEvent extends DispatchingMatchEvent {
@@ -128,11 +152,11 @@ class DispatchingPlayerCorrectPositionEvent extends DispatchingMatchEvent {
   final int timestamp;
 
   DispatchingPlayerCorrectPositionEvent(
-      this.positionX,
-      this.positionY,
-      this.velocityY,
-      this.timestamp,
-      );
+    this.positionX,
+    this.positionY,
+    this.velocityY,
+    this.timestamp,
+  );
 
   @override
   List<int> toBytes() => _jsonToData({
@@ -141,4 +165,7 @@ class DispatchingPlayerCorrectPositionEvent extends DispatchingMatchEvent {
         'velocityY': velocityY,
         'timestamp': timestamp,
       });
+
+  @override
+  String debugExtraInfo() => '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
 }

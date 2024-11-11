@@ -112,6 +112,20 @@ class FlappyDashRootComponent extends Component
     _generatePipes(
       fromX: _dash.x + _config.pipesDistance,
     );
+
+    if (game.gameMode is MultiplayerGameMode) {
+      multiplayerCubit.addDebugMessage(
+        DebugFunctionCallEvent(
+          'FlappyDashRootComponent',
+          '_restartGameForNewIdle',
+          {
+            'isFirstTime': isFirstTime.toString(),
+            'x': _dash.x.toString(),
+            'y': _dash.y.toString(),
+          },
+        ),
+      );
+    }
   }
 
   double _getNewPipeYForMultiplayer(MultiplayerGameConfigEntity config) {
