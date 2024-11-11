@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 
 class AudioHelper {
@@ -15,7 +16,9 @@ class AudioHelper {
     _backgroundSource = await _soLoud.loadAsset('assets/audio/background.mp3');
     _scoreSource = await _soLoud.loadAsset('assets/audio/score.mp3');
 
-    _soLoud.setGlobalVolume(0.0);
+    if (kDebugMode) {
+      _soLoud.setGlobalVolume(0.0);
+    }
   }
 
   void playBackgroundAudio() async {
