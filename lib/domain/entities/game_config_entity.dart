@@ -44,7 +44,7 @@ class MultiplayerGameConfigEntity extends GameConfigEntity {
     this.pipesPositionArea = 300.0,
     this.pipesDistance = 420.0,
     this.pipeWidth = 82.0,
-    this.pipeHoleGap = 200,
+    this.pipeHoleGap = 240,
     this.correctPositionEvery = 5.0,
   });
 
