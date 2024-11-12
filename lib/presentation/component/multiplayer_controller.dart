@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flame/components.dart';
 import 'package:flame/palette.dart';
 import 'package:flappy_dash/domain/entities/dash_type.dart';
+import 'package:flappy_dash/domain/entities/debug/debug_message.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
 import 'package:flappy_dash/domain/entities/player_state.dart';
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
@@ -177,7 +178,6 @@ class MultiplayerController extends Component
     required Vector2 position,
     required double spawnsAfter,
   }) async {
-    print('Spawning portal for player $playerId at $position');
     final dash = _otherDashes[playerId]!.dash;
     dash.updateState(
       position.x,
@@ -192,6 +192,17 @@ class MultiplayerController extends Component
     // But the first spawn, is random so we don't show the dash
     dash.visibleOnIdle = true;
 
+    _cubit.addDebugMessage(
+      DebugFunctionCallEvent(
+        'MultiplayerController',
+        '_spawnPortalAndPlayer - portal spawned',
+        {
+          'playerId': playerId.split('-')[0],
+          'position': position.toStringWithMaxPrecision(2),
+          'spawnsAfter': spawnsAfter.toStringAsFixed(2),
+        },
+      ),
+    );
     add(SpawningPortal(
       position: position,
       size: Vector2.all(dash.size.x),
@@ -199,8 +210,19 @@ class MultiplayerController extends Component
         DashType.fromUserId(playerId),
       ).darken(0.2),
       priority: -1,
-      hideAfter: spawnsAfter,
+      hideAfter: spawnsAfter - 0.5,
       onHide: () {
+        _cubit.addDebugMessage(
+          DebugFunctionCallEvent(
+            'MultiplayerController',
+            '_spawnPortalAndPlayer - portal hidden',
+            {
+              'playerId': playerId.split('-')[0],
+              'dash.position': dash.position.toStringWithMaxPrecision(2),
+              'dash.visibleOnIdle': dash.visibleOnIdle.toString(),
+            },
+          ),
+        );
         dash.isNameVisible = false;
         dash.add(DashSpawnEffect(
           onComplete: () => dash.isNameVisible = true,

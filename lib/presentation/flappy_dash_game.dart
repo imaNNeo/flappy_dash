@@ -3,7 +3,6 @@ import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
-import 'package:flappy_dash/domain/extensions/string_extension.dart';
 import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/component/dash_parallax_background.dart';
@@ -38,7 +37,7 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
   }) =>
       switch (gameMode) {
         SinglePlayerGameMode() => singleplayerCubit.state.currentPlayingState,
-        MultiplayerGameMode() => otherPlayerId.isNotNullOrBlank
+        MultiplayerGameMode() => otherPlayerId != null
             ? multiplayerCubit
                 .state.matchState!.players[otherPlayerId]!.playingState
             : multiplayerCubit.state.currentPlayingState,
