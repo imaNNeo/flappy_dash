@@ -11,6 +11,8 @@ sealed class DispatchingMatchEvent {
   String debugExtraInfo();
 
   bool get hideInDebugPanel => false;
+
+  String get debugName;
 }
 
 class DispatchingPlayerJoinedLobbyEvent extends DispatchingMatchEvent {
@@ -21,6 +23,9 @@ class DispatchingPlayerJoinedLobbyEvent extends DispatchingMatchEvent {
 
   @override
   String debugExtraInfo() => '';
+
+  @override
+  String get debugName => 'PlayerJoinedLobby';
 }
 
 class DispatchingPlayerStartedEvent extends DispatchingMatchEvent {
@@ -31,6 +36,9 @@ class DispatchingPlayerStartedEvent extends DispatchingMatchEvent {
 
   @override
   String debugExtraInfo() => '';
+
+  @override
+  String get debugName => 'PlayerStarted';
 }
 
 class DispatchingPlayerJumpedEvent extends DispatchingMatchEvent {
@@ -57,6 +65,9 @@ class DispatchingPlayerJumpedEvent extends DispatchingMatchEvent {
   @override
   String debugExtraInfo() =>
       '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
+
+  @override
+  String get debugName => 'PlayerJumped';
 }
 
 class DispatchingPlayerScoredEvent extends DispatchingMatchEvent {
@@ -83,6 +94,9 @@ class DispatchingPlayerScoredEvent extends DispatchingMatchEvent {
   @override
   String debugExtraInfo() =>
       '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
+
+  @override
+  String get debugName => 'PlayerScored';
 }
 
 class DispatchingPlayerDiedEvent extends DispatchingMatchEvent {
@@ -115,6 +129,9 @@ class DispatchingPlayerDiedEvent extends DispatchingMatchEvent {
   @override
   String debugExtraInfo() =>
       '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)}) -> (${newPositionX.toStringAsFixed(1)}, ${newPositionY.toStringAsFixed(1)})';
+
+  @override
+  String get debugName => 'PlayerDied';
 }
 
 class DispatchingPlayerIsIdleEvent extends DispatchingMatchEvent {
@@ -138,6 +155,9 @@ class DispatchingPlayerIsIdleEvent extends DispatchingMatchEvent {
   @override
   String debugExtraInfo() =>
       '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
+
+  @override
+  String get debugName => 'PlayerIsIdle';
 }
 
 class DispatchingUserDisplayNameUpdatedEvent extends DispatchingMatchEvent {
@@ -148,6 +168,9 @@ class DispatchingUserDisplayNameUpdatedEvent extends DispatchingMatchEvent {
 
   @override
   String debugExtraInfo() => '';
+
+  @override
+  String get debugName => 'UserDisplayNameUpdated';
 }
 
 class DispatchingPlayerCorrectPositionEvent extends DispatchingMatchEvent {
@@ -174,6 +197,9 @@ class DispatchingPlayerCorrectPositionEvent extends DispatchingMatchEvent {
   @override
   String debugExtraInfo() =>
       '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
+
+  @override
+  String get debugName => 'PlayerCorrectPosition';
 }
 
 class DispatchingPingEvent extends DispatchingMatchEvent {
@@ -199,4 +225,7 @@ class DispatchingPingEvent extends DispatchingMatchEvent {
 
   @override
   bool get hideInDebugPanel => true;
+
+  @override
+  String get debugName => 'Ping';
 }

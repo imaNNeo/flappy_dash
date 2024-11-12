@@ -41,7 +41,7 @@ class DebugIncomingEvent extends DebugMessage {
     return [
       StyledText(time, normalColor),
       StyledText(' ↓ ', incomingEventColor, isBold: true),
-      StyledText('${event.runtimeType} ', incomingEventColor, isBold: true),
+      StyledText('${event.debugName} ', incomingEventColor, isBold: true),
       StyledText(
         'from: ',
         normalColor,
@@ -67,7 +67,7 @@ class DebugDispatchingEvent extends DebugMessage {
     return [
       StyledText(time, normalColor),
       StyledText(' ↑ ', outgoingEventColor, isBold: true),
-      StyledText('${event.runtimeType} ', outgoingEventColor, isBold: true),
+      StyledText('${event.debugName} ', outgoingEventColor, isBold: true),
       if (extraInfo.isNotNullOrBlank)
         StyledText(
           ' - ${event.debugExtraInfo()} ',

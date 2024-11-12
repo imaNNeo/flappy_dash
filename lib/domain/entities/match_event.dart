@@ -24,6 +24,8 @@ sealed class MatchEvent {
   late UserPresence? sender;
 
   bool get hideInDebugPanel => false;
+
+  String get debugName;
 }
 
 // Match events:
@@ -31,30 +33,45 @@ class MatchWelcomeEvent extends MatchEvent with HasMatchState {
   MatchWelcomeEvent(MatchData matchData) : super(matchData) {
     data = matchData;
   }
+
+  @override
+  String get debugName => 'MatchWelcome';
 }
 
 class MatchWaitingTimeIncreasedEvent extends MatchEvent with HasMatchState {
   MatchWaitingTimeIncreasedEvent(MatchData matchData) : super(matchData) {
     data = matchData;
   }
+
+  @override
+  String get debugName => 'MatchWaitingTimeIncreased';
 }
 
 class MatchPresencesUpdatedEvent extends MatchEvent with HasMatchState {
   MatchPresencesUpdatedEvent(MatchData matchData) : super(matchData) {
     data = matchData;
   }
+
+  @override
+  String get debugName => 'MatchPresencesUpdated';
 }
 
 class MatchStartedEvent extends MatchEvent with HasMatchState {
   MatchStartedEvent(MatchData matchData) : super(matchData) {
     data = matchData;
   }
+
+  @override
+  String get debugName => 'MatchStarted';
 }
 
 class MatchFinishedEvent extends MatchEvent with HasMatchState {
   MatchFinishedEvent(MatchData matchData) : super(matchData) {
     data = matchData;
   }
+
+  @override
+  String get debugName => 'MatchFinished';
 }
 
 class MatchPongEvent extends MatchEvent {
@@ -71,6 +88,9 @@ class MatchPongEvent extends MatchEvent {
 
   @override
   bool get hideInDebugPanel => true;
+
+  @override
+  String get debugName => 'MatchPong';
 }
 
 // Player Events:
@@ -78,6 +98,9 @@ class PlayerJoinedTheLobby extends MatchEvent with HasMatchState {
   PlayerJoinedTheLobby(MatchData matchData) : super(matchData) {
     data = matchData;
   }
+
+  @override
+  String get debugName => 'PlayerJoinedTheLobby';
 }
 
 class PlayerStartedEvent extends MatchEvent with HasMatchState {
@@ -90,6 +113,9 @@ class PlayerStartedEvent extends MatchEvent with HasMatchState {
   double get dashY => state.players[sender!.userId]!.lastKnownY;
 
   double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
+
+  @override
+  String get debugName => 'PlayerStarted';
 }
 
 class PlayerJumpedEvent extends MatchEvent with HasMatchState {
@@ -102,6 +128,9 @@ class PlayerJumpedEvent extends MatchEvent with HasMatchState {
   double get dashY => state.players[sender!.userId]!.lastKnownY;
 
   double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
+
+  @override
+  String get debugName => 'PlayerJumped';
 }
 
 class PlayerScoredEvent extends MatchEvent with HasMatchState {
@@ -114,6 +143,9 @@ class PlayerScoredEvent extends MatchEvent with HasMatchState {
   double get dashY => state.players[sender!.userId]!.lastKnownY;
 
   double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
+
+  @override
+  String get debugName => 'PlayerScored';
 }
 
 class PlayerDiedEvent extends MatchEvent with HasMatchState {
@@ -126,6 +158,9 @@ class PlayerDiedEvent extends MatchEvent with HasMatchState {
   double get dashY => state.players[sender!.userId]!.lastKnownY;
 
   double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
+
+  @override
+  String get debugName => 'PlayerDied';
 }
 
 class PlayerIsIdleEvent extends MatchEvent with HasMatchState {
@@ -138,12 +173,18 @@ class PlayerIsIdleEvent extends MatchEvent with HasMatchState {
   double get dashY => state.players[sender!.userId]!.lastKnownY;
 
   double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
+
+  @override
+  String get debugName => 'PlayerIsIdle';
 }
 
 class PlayerKickedFromTheLobbyEvent extends MatchEvent with HasMatchState {
   PlayerKickedFromTheLobbyEvent(MatchData matchData) : super(matchData) {
     data = matchData;
   }
+
+  @override
+  String get debugName => 'PlayerKickedFromTheLobby';
 }
 
 class PlayerCorrectPositionEvent extends MatchEvent with HasMatchState {
@@ -156,6 +197,9 @@ class PlayerCorrectPositionEvent extends MatchEvent with HasMatchState {
   double get dashY => state.players[sender!.userId]!.lastKnownY;
 
   double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
+
+  @override
+  String get debugName => 'PlayerCorrectPosition';
 }
 
 class PlayerWillSpawnAtEvent extends MatchEvent with HasMatchState {
@@ -166,4 +210,7 @@ class PlayerWillSpawnAtEvent extends MatchEvent with HasMatchState {
   double get dashX => state.players[sender!.userId]!.lastKnownX;
 
   double get dashY => state.players[sender!.userId]!.lastKnownY;
+
+  @override
+  String get debugName => 'PlayerWillSpawnAt';
 }
