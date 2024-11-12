@@ -138,6 +138,15 @@ class FlappyDashRootComponent extends Component
     int count = 1,
     required double fromX,
   }) {
+    _cubit.addDebugMessage(DebugFunctionCallEvent(
+      'FlappyDashRootComponent',
+      '_generatePipes',
+      {
+        'count': count.toString(),
+        'fromX': fromX.toString(),
+      },
+    ));
+
     for (int i = 0; i < count; i++) {
       final area = _config.pipesPositionArea;
 
@@ -176,6 +185,9 @@ class FlappyDashRootComponent extends Component
 
   void _jump() {
     _checkToStart();
+    if (game.getCurrentPlayingState().isNotPlaying) {
+      return;
+    }
     _dash.jump();
     game.playerJumped(_dash.x, _dash.y, _dash.velocityY);
   }
@@ -206,7 +218,7 @@ class FlappyDashRootComponent extends Component
 
     final lastPipe = _removeAllPipesExceptLastOne();
     lastPipe.x = 0.0;
-    _dash.x = 0.0;
+    _dash.x = _dash.x - game.worldWidth;
     _pipeCounter = 0;
     _generatePipes(
       fromX: _config.pipesDistance,
@@ -217,7 +229,7 @@ class FlappyDashRootComponent extends Component
   void update(double dt) {
     super.update(dt);
     _tryToLoopTheGame();
-    if (_dash.x >= _lastPipe.x) {
+    if (_dash.x > _lastPipe.x) {
       _generatePipes(
         fromX: _lastPipe.x + _config.pipesDistance,
       );

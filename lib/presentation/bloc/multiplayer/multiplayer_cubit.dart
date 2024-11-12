@@ -263,6 +263,17 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     final newX = ((spawnOnPipeIndex + 1) * pipesDistance).toDouble();
     final newY = state.matchState!.pipesPositions[spawnOnPipeIndex] *
         state.gameMode.gameConfig.pipesPositionArea;
+    _addDebugMessage(DebugFunctionCallEvent(
+      'MultiplayerCubit',
+      'playerDied',
+      {
+        'x': x.toStringAsFixed(2),
+        'y': y.toStringAsFixed(2),
+        'newPosPipeIndex': spawnOnPipeIndex.toString(),
+        'newX': newX.toStringAsFixed(2),
+        'newY': newY.toStringAsFixed(2),
+      },
+    ));
     _multiplayerRepository.sendDispatchingEvent(
       state.matchId,
       DispatchingPlayerDiedEvent(

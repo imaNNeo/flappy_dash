@@ -153,6 +153,10 @@ class MultiplayerController extends Component
       case PlayerCorrectPositionEvent():
         // We just mutate the position of the dash
         final dash = _otherDashes[event.sender!.userId]!.dash;
+        if (_cubit.state.matchState!.players[event.sender!.userId]!.playingState
+            .isNotPlaying) {
+          return;
+        }
         dash.updateState(
           event.dashX,
           event.dashY,
