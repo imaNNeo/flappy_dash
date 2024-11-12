@@ -161,7 +161,9 @@ class NakamaDataSource {
       _websocketClient.leaveMatch(matchId);
 
   void sendDispatchingEvent(String matchId, DispatchingMatchEvent event) async {
-    debugPrint('Sending event: $event');
+    if (!event.hideInDebugPanel) {
+      debugPrint('Sending event: $event');
+    }
     _websocketClient.sendMatchData(
       matchId: matchId,
       opCode: MatchEventOpCode.fromDispatchingEvent(event).opCode,
