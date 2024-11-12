@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
+import 'package:flappy_dash/domain/app_constants.dart';
 import 'package:flappy_dash/domain/repositories/game_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nakama/nakama.dart';

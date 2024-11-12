@@ -9,6 +9,8 @@ enum MatchEventOpCode {
   matchPresencesUpdated(102),
   matchStarted(103),
   matchFinished(104),
+  matchPing(105),
+  matchPong(106),
   // Player events
   playerJoinedTheLobby(200),
   playerStarted(201),
@@ -33,6 +35,7 @@ enum MatchEventOpCode {
           MatchPresencesUpdatedEvent(data),
         MatchEventOpCode.matchStarted => MatchStartedEvent(data),
         MatchEventOpCode.matchFinished => MatchFinishedEvent(data),
+        MatchEventOpCode.matchPong => MatchPongEvent(data),
         MatchEventOpCode.playerJoinedTheLobby => PlayerJoinedTheLobby(data),
         MatchEventOpCode.playerStarted => PlayerStartedEvent(data),
         MatchEventOpCode.playerJumped => PlayerJumpedEvent(data),
@@ -43,9 +46,10 @@ enum MatchEventOpCode {
           PlayerKickedFromTheLobbyEvent(data),
         MatchEventOpCode.playerCorrectPosition =>
           PlayerCorrectPositionEvent(data),
+        MatchEventOpCode.playerWillSpawnsAt => PlayerWillSpawnAtEvent(data),
+        MatchEventOpCode.matchPing ||
         MatchEventOpCode.playerDisplayNameUpdated =>
           throw UnimplementedError('It is not an incoming event'),
-        MatchEventOpCode.playerWillSpawnsAt => PlayerWillSpawnAtEvent(data),
       };
 
   static MatchEventOpCode fromDispatchingEvent(DispatchingMatchEvent event) =>
@@ -61,5 +65,6 @@ enum MatchEventOpCode {
           MatchEventOpCode.playerDisplayNameUpdated,
         DispatchingPlayerCorrectPositionEvent() =>
           MatchEventOpCode.playerCorrectPosition,
+        DispatchingPingEvent() => MatchEventOpCode.matchPing,
       };
 }

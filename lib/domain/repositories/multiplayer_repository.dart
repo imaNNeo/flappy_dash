@@ -3,12 +3,15 @@ import 'package:flappy_dash/data/remote/nakama_data_source.dart';
 import 'package:flappy_dash/domain/entities/dispatching_match_event.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
 import 'package:flappy_dash/domain/entities/match_result_entity.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:nakama/nakama.dart';
 
 class MultiplayerRepository {
   final NakamaDataSource _nakamaDataSource;
 
   MultiplayerRepository(this._nakamaDataSource);
+
+  ValueNotifier<Match?> currentMatch = ValueNotifier(null);
 
   Future<String> getWaitingMatchId() => _nakamaDataSource.getWaitingMatchId();
 
@@ -21,21 +24,26 @@ class MultiplayerRepository {
   Stream<DispatchingMatchEvent> onEventDispatched() =>
       _onEventDispatchedController.stream;
 
-  Future<Match> joinMatch(String matchId) =>
-      _nakamaDataSource.joinMatch(matchId);
+  Future<Match> joinMatch(String matchId) async {
+    final match = await _nakamaDataSource.joinMatch(matchId);
+    currentMatch.value = match;
+    return match;
+  }
 
   void joinLobby(String matchId) => sendDispatchingEvent(
-    matchId,
-    DispatchingPlayerJoinedLobbyEvent(),
-  );
+        matchId,
+        DispatchingPlayerJoinedLobbyEvent(),
+      );
 
-  Future<void> leaveMatch(String matchId) =>
-      _nakamaDataSource.leaveMatch(matchId);
+  Future<void> leaveMatch(String matchId) async {
+    await _nakamaDataSource.leaveMatch(matchId);
+    currentMatch.value = null;
+  }
 
   void sendUserDisplayNameUpdatedEvent(String matchId) => sendDispatchingEvent(
-    matchId,
-    DispatchingUserDisplayNameUpdatedEvent(),
-  );
+        matchId,
+        DispatchingUserDisplayNameUpdatedEvent(),
+      );
 
   void sendDispatchingEvent(String matchId, DispatchingMatchEvent event) {
     _onEventDispatchedController.add(event);

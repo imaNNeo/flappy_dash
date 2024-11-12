@@ -157,7 +157,9 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
           case MatchPresencesUpdatedEvent():
           case PlayerJoinedTheLobby():
           case PlayerKickedFromTheLobbyEvent():
-            _updateLobby(event.state);
+            if (event is HasMatchState) {
+              _updateLobby((event as HasMatchState).state);
+            }
             break;
           case MatchStartedEvent():
             _onMatchStarted(event.state);
@@ -168,7 +170,9 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
         }
         break;
       case MatchPhase.running:
-        emit(state.copyWith(matchState: event.state));
+        if (event is HasMatchState) {
+          emit(state.copyWith(matchState: (event as HasMatchState).state));
+        }
         switch (event) {
           case MatchFinishedEvent():
             _onGameFinished();
@@ -390,6 +394,14 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
   void addDebugMessage(DebugMessage message) => _addDebugMessage(message);
 
   void _addDebugMessage(DebugMessage message) {
+    final isHidden = switch (message) {
+      DebugIncomingEvent() => message.event.hideInDebugPanel,
+      DebugDispatchingEvent() => message.event.hideInDebugPanel,
+      DebugFunctionCallEvent() => false,
+    };
+    if (isHidden) {
+      return;
+    }
     emit(state.copyWith(
       debugMessages: [
         ...state.debugMessages,

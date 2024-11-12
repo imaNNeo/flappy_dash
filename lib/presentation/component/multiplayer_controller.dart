@@ -169,6 +169,7 @@ class MultiplayerController extends Component
       case MatchPresencesUpdatedEvent():
       case MatchWaitingTimeIncreasedEvent():
       case MatchWelcomeEvent():
+      case MatchPongEvent():
         break;
     }
   }

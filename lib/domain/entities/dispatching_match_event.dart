@@ -9,6 +9,8 @@ sealed class DispatchingMatchEvent {
   List<int> toBytes();
 
   String debugExtraInfo();
+
+  bool get hideInDebugPanel => false;
 }
 
 class DispatchingPlayerJoinedLobbyEvent extends DispatchingMatchEvent {
@@ -53,7 +55,8 @@ class DispatchingPlayerJumpedEvent extends DispatchingMatchEvent {
       });
 
   @override
-  String debugExtraInfo() => '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
+  String debugExtraInfo() =>
+      '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
 }
 
 class DispatchingPlayerScoredEvent extends DispatchingMatchEvent {
@@ -78,7 +81,8 @@ class DispatchingPlayerScoredEvent extends DispatchingMatchEvent {
       });
 
   @override
-  String debugExtraInfo() => '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
+  String debugExtraInfo() =>
+      '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
 }
 
 class DispatchingPlayerDiedEvent extends DispatchingMatchEvent {
@@ -132,7 +136,8 @@ class DispatchingPlayerIsIdleEvent extends DispatchingMatchEvent {
       });
 
   @override
-  String debugExtraInfo() => '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
+  String debugExtraInfo() =>
+      '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
 }
 
 class DispatchingUserDisplayNameUpdatedEvent extends DispatchingMatchEvent {
@@ -167,5 +172,31 @@ class DispatchingPlayerCorrectPositionEvent extends DispatchingMatchEvent {
       });
 
   @override
-  String debugExtraInfo() => '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
+  String debugExtraInfo() =>
+      '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
+}
+
+class DispatchingPingEvent extends DispatchingMatchEvent {
+  final int previousPing;
+  final String pingId;
+  final DateTime sentAt;
+
+  DispatchingPingEvent(
+    this.previousPing,
+    this.pingId,
+    this.sentAt,
+  );
+
+  @override
+  List<int> toBytes() => _jsonToData({
+        'previousPing': previousPing,
+        'pingId': pingId,
+        'sentAt': sentAt.toIso8601String(),
+      });
+
+  @override
+  String debugExtraInfo() => '';
+
+  @override
+  bool get hideInDebugPanel => true;
 }
