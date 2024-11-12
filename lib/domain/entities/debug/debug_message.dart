@@ -1,7 +1,9 @@
+import 'package:flappy_dash/domain/entities/dash_type.dart';
 import 'package:flappy_dash/domain/entities/dispatching_match_event.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
 import 'package:flappy_dash/domain/entities/styled_text.dart';
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
+import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flutter/material.dart';
 
 sealed class DebugMessage {
@@ -31,14 +33,24 @@ class DebugIncomingEvent extends DebugMessage {
   @override
   List<StyledText> toDebugMessage(String currentUserId) {
     final isMe = event.sender?.userId == currentUserId;
+    final senderColor = currentUserId.isNullOrBlank
+        ? incomingEventColor
+        : AppColors.getDashColor(
+            DashType.fromUserId(currentUserId),
+          );
     return [
       StyledText(time, normalColor),
       StyledText(' ↓ ', incomingEventColor, isBold: true),
       StyledText('${event.runtimeType} ', incomingEventColor, isBold: true),
-      StyledText('from: ', normalColor),
+      StyledText(
+        'from: ',
+        normalColor,
+        isBold: true,
+      ),
       StyledText(
         '${event.sender?.userId.split('-')[0]} ${isMe ? 'me' : ''}',
-        incomingEventColor,
+        senderColor,
+        isBold: true,
       ),
     ];
   }

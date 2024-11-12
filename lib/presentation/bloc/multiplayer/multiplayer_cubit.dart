@@ -162,9 +162,9 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
           case MatchStartedEvent():
             _onMatchStarted(event.state);
             break;
-
           case _:
-            throw StateError('Invalid $event in this phase: $phase');
+            // Do nothing
+            break;
         }
         break;
       case MatchPhase.running:
