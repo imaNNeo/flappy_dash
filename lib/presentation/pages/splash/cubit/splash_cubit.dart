@@ -28,7 +28,9 @@ class SplashCubit extends Cubit<SplashState> {
       if (difference < _splashDuration) {
         await Future.delayed(_splashDuration - difference);
       }
-
+      emit(state.copyWith(
+        isSplashInitialized: true,
+      ));
       _openHomePage();
     } catch (e, stack) {
       print('error: $e, $stack');
@@ -36,7 +38,7 @@ class SplashCubit extends Cubit<SplashState> {
   }
 
   void _openHomePage() async {
-    emit(state.copyWith(openHomePage: true));
-    emit(state.copyWith(openHomePage: false));
+    emit(state.copyWith(openTheNextPage: true));
+    emit(state.copyWith(openTheNextPage: false));
   }
 }

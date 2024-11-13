@@ -121,7 +121,7 @@ class NakamaDataSource {
       session: _currentSession,
       id: 'get_waiting_match',
     );
-    if (matchId == null) {
+    if (matchId == null || matchId.isBlank) {
       throw Exception('Failed to get match id');
     }
     return matchId;

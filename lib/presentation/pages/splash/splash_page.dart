@@ -1,32 +1,19 @@
-import 'package:flappy_dash/domain/repositories/game_repository.dart';
-import 'package:flappy_dash/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'cubit/splash_cubit.dart';
 
-class SplashPage extends StatelessWidget {
-  const SplashPage({super.key});
+class SplashPage extends StatefulWidget {
+  const SplashPage({super.key, this.redirectTo});
+
+  final String? redirectTo;
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => SplashCubit(getIt.get<GameRepository>()),
-      child: const SplashPageContent(),
-    );
-  }
+  State<SplashPage> createState() => _SplashPageState();
 }
 
-class SplashPageContent extends StatefulWidget {
-  const SplashPageContent({super.key});
-
-  @override
-  State<SplashPageContent> createState() => _SplashPageContentState();
-}
-
-class _SplashPageContentState extends State<SplashPageContent> {
-
+class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     context.read<SplashCubit>().onPageOpen();
@@ -37,8 +24,12 @@ class _SplashPageContentState extends State<SplashPageContent> {
   Widget build(BuildContext context) {
     return BlocConsumer<SplashCubit, SplashState>(
       listener: (context, state) {
-        if (state.openHomePage) {
-          GoRouter.of(context).replace('/');
+        if (state.openTheNextPage) {
+          if (widget.redirectTo != null) {
+            GoRouter.of(context).replace(widget.redirectTo!);
+          } else {
+            GoRouter.of(context).replace('/');
+          }
         }
       },
       builder: (context, state) {
@@ -59,7 +50,7 @@ class _SplashPageContentState extends State<SplashPageContent> {
                       Text(
                         'Flappy Dash',
                         style:
-                        TextStyle(fontSize: 28, color: Color(0xFF25165F)),
+                            TextStyle(fontSize: 28, color: Color(0xFF25165F)),
                       ),
                     ],
                   ),

@@ -7,6 +7,7 @@ import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/ping/ping_cubit.dart';
 import 'package:flappy_dash/presentation/pages/debug/debug_panel.dart';
+import 'package:flappy_dash/presentation/pages/splash/cubit/splash_cubit.dart';
 import 'package:flappy_dash/service_locator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -66,6 +67,11 @@ class MyApp extends StatelessWidget {
             getIt.get<MultiplayerRepository>(),
           ),
           lazy: false,
+        ),
+        BlocProvider(
+          create: (context) => SplashCubit(
+            getIt.get<GameRepository>(),
+          ),
         ),
       ],
       child: MaterialApp.router(

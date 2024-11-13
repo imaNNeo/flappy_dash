@@ -3,24 +3,29 @@ part of 'splash_cubit.dart';
 class SplashState with EquatableMixin {
   const SplashState({
     this.isLoading = false,
-    this.openHomePage = false,
+    this.openTheNextPage = false,
+    this.isSplashInitialized = false,
   });
 
   final bool isLoading;
-  final bool openHomePage;
+  final bool openTheNextPage;
+  final bool isSplashInitialized;
 
   SplashState copyWith({
     bool? isLoading,
-    bool? openHomePage,
+    bool? openTheNextPage,
+    bool? isSplashInitialized,
   }) =>
       SplashState(
         isLoading: isLoading ?? this.isLoading,
-        openHomePage: openHomePage ?? this.openHomePage,
+        openTheNextPage: openTheNextPage ?? this.openTheNextPage,
+        isSplashInitialized: isSplashInitialized ?? this.isSplashInitialized,
       );
 
   @override
   List<Object> get props => [
         isLoading,
-        openHomePage,
+        openTheNextPage,
+        isSplashInitialized,
       ];
 }

@@ -28,10 +28,9 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (BuildContext context) =>
-          HomeCubit(
-            getIt.get<MultiplayerRepository>(),
-          ),
+      create: (BuildContext context) => HomeCubit(
+        getIt.get<MultiplayerRepository>(),
+      ),
       child: const HomePageContent(),
     );
   }
@@ -83,9 +82,9 @@ class HomePageContent extends StatelessWidget {
                       ),
                       const SizedBox(height: 18),
                       MultiPlayerButton(
-                        onPressed: () {
-                          context.read<HomeCubit>().onMultiPlayerButtonPressed();
-                        },
+                        onPressed: context
+                            .read<HomeCubit>()
+                            .onMultiPlayerButtonPressed,
                         showLoading: state.multiPlayerMatchIdLoading,
                       ),
                       const SizedBox(height: 8),
@@ -114,8 +113,8 @@ class HomePageContent extends StatelessWidget {
                         ),
                         Expanded(
                             child: Container(
-                              height: 0,
-                            )),
+                          height: 0,
+                        )),
                         const ProfileOverlay(),
                         const SizedBox(
                           width: PresentationConstants.defaultPadding,
