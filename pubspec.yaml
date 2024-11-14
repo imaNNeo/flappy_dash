@@ -45,6 +45,7 @@ dependencies:
     git:
       url: 'https://github.com/heroiclabs/nakama-dart.git'
       path: nakama
+      ref: a829932e3c41f56377355b4942811e6a3725162e
   flutter_svg: ^2.0.10+1
   android_id: ^0.4.0
   device_info_plus: ^10.1.2

@@ -465,8 +465,8 @@ packages:
     dependency: "direct main"
     description:
       path: nakama
-      ref: HEAD
-      resolved-ref: "06c60cb31ebbd34309ee9a19dc0c3c4bcefa6e58"
+      ref: a829932e3c41f56377355b4942811e6a3725162e
+      resolved-ref: a829932e3c41f56377355b4942811e6a3725162e
       url: "https://github.com/heroiclabs/nakama-dart.git"
     source: git
     version: "1.1.0"
@@ -887,18 +887,26 @@ packages:
     dependency: transitive
     description:
       name: web
-      sha256: d43c1d6b787bf0afad444700ae7f4db8827f701bc61c255ac8d328c6f4d52062
+      sha256: cd3543bd5798f6ad290ea73d210f423502e71900302dde696f8bff84bf89a1cb
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0"
+    version: "1.1.0"
+  web_socket:
+    dependency: transitive
+    description:
+      name: web_socket
+      sha256: "3c12d96c0c9a4eec095246debcea7b86c0324f22df69893d538fcc6f1b8cce83"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.6"
   web_socket_channel:
     dependency: transitive
     description:
       name: web_socket_channel
-      sha256: d88238e5eac9a42bb43ca4e721edba3c08c6354d4a53063afaa568516217621b
+      sha256: "9f187088ed104edd8662ca07af4b124465893caf063ba29758f97af57e61da8f"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.0"
+    version: "3.0.1"
   win32:
     dependency: transitive
     description:
