@@ -1,5 +1,6 @@
 import 'package:flappy_dash/domain/repositories/multiplayer_repository.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
+import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/extensions/build_context_extension.dart';
 import 'package:flappy_dash/presentation/responsive/screen_size.dart';
 import 'package:flappy_dash/presentation/widget/app_version_widget.dart';
@@ -37,8 +38,19 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class HomePageContent extends StatelessWidget {
+class HomePageContent extends StatefulWidget {
   const HomePageContent({super.key});
+
+  @override
+  State<HomePageContent> createState() => _HomePageContentState();
+}
+
+class _HomePageContentState extends State<HomePageContent> {
+  @override
+  void didChangeDependencies() {
+    context.read<MultiplayerCubit>().refreshLastMatchOverview();
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {

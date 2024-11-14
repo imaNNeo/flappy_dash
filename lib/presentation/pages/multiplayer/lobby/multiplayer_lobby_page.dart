@@ -7,7 +7,7 @@ import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart
 import 'package:flappy_dash/presentation/dialogs/nickname_dialog.dart';
 import 'package:flappy_dash/presentation/extensions/build_context_extension.dart';
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
-import 'package:flappy_dash/presentation/pages/multiplayer/game/parts/last_match_widget.dart';
+import 'package:flappy_dash/presentation/pages/multiplayer/game/parts/last_match_winner_widget.dart';
 import 'package:flappy_dash/presentation/presentation_utils.dart';
 import 'package:flappy_dash/presentation/responsive/screen_size.dart';
 import 'package:flappy_dash/presentation/widget/big_button.dart';
@@ -42,8 +42,6 @@ class _MultiPlayerLobbyPageContentState extends State<MultiPlayerLobbyPage> {
 
   late StreamSubscription<MatchEvent> _matchEventsSubscription;
 
-  final _lobbyBoxKey = GlobalKey();
-
   @override
   void initState() {
     _multiplayerCubit = context.read<MultiplayerCubit>();
@@ -51,6 +49,7 @@ class _MultiPlayerLobbyPageContentState extends State<MultiPlayerLobbyPage> {
     _matchEventsSubscription = _multiplayerCubit.matchEvents.listen(
       _onMatchEvent,
     );
+    _multiplayerCubit.refreshLastMatchOverview();
     super.initState();
   }
 
@@ -85,20 +84,6 @@ class _MultiPlayerLobbyPageContentState extends State<MultiPlayerLobbyPage> {
       ScreenSize.large || ScreenSize.extraLarge => 18.0,
     };
 
-    const lobbyBoxMargin = EdgeInsets.symmetric(horizontal: 48);
-    const lastWinnerHeight = 40.0;
-
-    (double, double)? boxTopLeft;
-    RenderBox? box =
-        _lobbyBoxKey.currentContext?.findRenderObject() as RenderBox?;
-    if (box != null) {
-      Offset position = box.localToGlobal(Offset.zero);
-      double y = position.dy;
-      double x = position.dx + lobbyBoxMargin.left;
-      boxTopLeft = (y, x);
-      print('boxTopLeft: $boxTopLeft');
-    }
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
@@ -119,9 +104,7 @@ class _MultiPlayerLobbyPageContentState extends State<MultiPlayerLobbyPage> {
                   SizedBox(height: boxVerticalSpacing * 1.5),
                   Expanded(
                     child: PendingMatchBox(
-                      key: _lobbyBoxKey,
                       horizontalPadding: boxHorizontalPadding,
-                      margin: lobbyBoxMargin,
                     ),
                   ),
                   SizedBox(height: boxVerticalSpacing),
@@ -155,14 +138,6 @@ class _MultiPlayerLobbyPageContentState extends State<MultiPlayerLobbyPage> {
               ),
             ),
           ),
-          if (boxTopLeft != null)
-            Positioned(
-              left: boxTopLeft.$2 + 28,
-              top: boxTopLeft.$1 - lastWinnerHeight,
-              child: const LastMatchWidget(
-                height: lastWinnerHeight,
-              ),
-            ),
         ],
       ),
     );

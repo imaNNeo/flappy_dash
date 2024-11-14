@@ -4,6 +4,7 @@ import 'dart:isolate';
 
 import 'package:flappy_dash/domain/entities/dispatching_match_event.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
+import 'package:flappy_dash/domain/entities/match_overview_entity.dart';
 import 'package:flappy_dash/domain/entities/match_result_entity.dart';
 import 'package:flappy_dash/domain/entities/server_config_entity.dart';
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
@@ -197,5 +198,16 @@ class NakamaDataSource {
       throw Exception('Failed to get server config');
     }
     return ServerConfigEntity.fromJson(jsonDecode(response));
+  }
+
+  Future<MatchOverviewEntity> getLastMatchOverview() async {
+    final response = await client.rpc(
+      session: _currentSession,
+      id: 'get_last_match_overview',
+    );
+    if (response == null || response.isBlank) {
+      throw Exception('Failed to get last match');
+    }
+    return MatchOverviewEntity.fromJson(jsonDecode(response));
   }
 }

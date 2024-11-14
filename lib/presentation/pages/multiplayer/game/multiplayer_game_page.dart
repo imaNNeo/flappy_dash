@@ -65,6 +65,7 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
         if (state.matchState != null &&
             state.matchState!.currentPhase == MatchPhase.finished) {
           _onGameFinished();
+          multiplayerCubit.refreshLastMatchOverview();
         }
       },
       child: BlocBuilder<MultiplayerCubit, MultiplayerState>(

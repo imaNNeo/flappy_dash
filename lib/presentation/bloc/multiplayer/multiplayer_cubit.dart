@@ -7,6 +7,7 @@ import 'package:flappy_dash/domain/entities/debug/debug_message.dart';
 import 'package:flappy_dash/domain/entities/dispatching_match_event.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
+import 'package:flappy_dash/domain/entities/match_overview_entity.dart';
 import 'package:flappy_dash/domain/entities/match_phase.dart';
 import 'package:flappy_dash/domain/entities/match_state.dart';
 import 'package:flappy_dash/domain/entities/multiplayer_died_message.dart';
@@ -418,6 +419,13 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
         ...state.debugMessages,
         message,
       ],
+    ));
+  }
+
+  void refreshLastMatchOverview() async {
+    final overview = await _multiplayerRepository.getLastMatchOverview();
+    emit(state.copyWith(
+      lastMatchOverview: ValueWrapper(overview),
     ));
   }
 

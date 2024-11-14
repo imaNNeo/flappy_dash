@@ -21,6 +21,7 @@ class MultiplayerState with EquatableMixin {
     this.multiplayerDiedMessage,
     this.diedCount = 0,
     this.debugMessages = const [],
+    this.lastMatchOverview,
   });
 
   final MultiplayerGameMode gameMode;
@@ -42,6 +43,7 @@ class MultiplayerState with EquatableMixin {
   final MultiplayerDiedMessage? multiplayerDiedMessage;
   final int diedCount;
   final List<DebugMessage> debugMessages;
+  final MatchOverviewEntity? lastMatchOverview;
 
   MultiplayerState copyWith({
     int? currentScore,
@@ -62,6 +64,7 @@ class MultiplayerState with EquatableMixin {
     MultiplayerDiedMessage? multiplayerDiedMessage,
     int? diedCount,
     List<DebugMessage>? debugMessages,
+    ValueWrapper<MatchOverviewEntity>? lastMatchOverview,
   }) =>
       MultiplayerState(
         currentScore: currentScore ?? this.currentScore,
@@ -87,6 +90,9 @@ class MultiplayerState with EquatableMixin {
             multiplayerDiedMessage ?? this.multiplayerDiedMessage,
         diedCount: diedCount ?? this.diedCount,
         debugMessages: debugMessages ?? this.debugMessages,
+        lastMatchOverview: lastMatchOverview != null
+            ? lastMatchOverview.value
+            : this.lastMatchOverview,
       );
 
   @override
@@ -110,5 +116,6 @@ class MultiplayerState with EquatableMixin {
         multiplayerDiedMessage,
         diedCount,
         debugMessages,
+        lastMatchOverview,
       ];
 }
