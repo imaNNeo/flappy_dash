@@ -58,6 +58,7 @@ class AppBlocRegistry extends StatelessWidget {
         BlocProvider(
           create: (context) => SplashCubit(
             getIt.get<GameRepository>(),
+            getIt.get<SettingsRepository>(),
           ),
         ),
         BlocProvider(

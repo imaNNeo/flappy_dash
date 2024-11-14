@@ -39,6 +39,7 @@ Future<void> setupServiceLocator() async {
   getIt.registerLazySingleton<SettingsRepository>(
     () => SettingsRepository(
       getIt.get<SettingsDataSource>(),
+      getIt.get<NakamaDataSource>(),
     ),
   );
 }
