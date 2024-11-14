@@ -2,6 +2,7 @@ import 'package:flappy_dash/domain/repositories/multiplayer_repository.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/extensions/build_context_extension.dart';
 import 'package:flappy_dash/presentation/responsive/screen_size.dart';
+import 'package:flappy_dash/presentation/widget/app_version_widget.dart';
 import 'package:flappy_dash/presentation/widget/big_button.dart';
 import 'package:flappy_dash/presentation/widget/blurred_background.dart';
 import 'package:flappy_dash/presentation/widget/game_title.dart';
@@ -124,6 +125,10 @@ class HomePageContent extends StatelessWidget {
                   ),
                 ),
               ),
+              const Align(
+                alignment: Alignment.bottomRight,
+                child: AppVersionWidget(),
+              )
             ],
           ),
         );

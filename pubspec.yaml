@@ -57,6 +57,7 @@ dependencies:
   toastification: ^2.3.0
   flame_svg: ^1.11.1
   share_plus_dialog: ^2.0.1
+  package_info_plus: ^8.1.1
 
 dev_dependencies:
   flutter_test:

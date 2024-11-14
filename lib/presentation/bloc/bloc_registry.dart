@@ -1,6 +1,8 @@
 import 'package:flappy_dash/audio_helper.dart';
 import 'package:flappy_dash/domain/repositories/game_repository.dart';
 import 'package:flappy_dash/domain/repositories/multiplayer_repository.dart';
+import 'package:flappy_dash/domain/repositories/settings_repository.dart';
+import 'package:flappy_dash/presentation/bloc/settings/settings_cubit.dart';
 import 'package:flappy_dash/presentation/pages/splash/cubit/splash_cubit.dart';
 import 'package:flappy_dash/service_locator.dart';
 import 'package:flutter/cupertino.dart';
@@ -58,6 +60,11 @@ class AppBlocRegistry extends StatelessWidget {
             getIt.get<GameRepository>(),
           ),
         ),
+        BlocProvider(
+          create: (context) => SettingsCubit(
+            getIt.get<SettingsRepository>(),
+          ),
+        )
       ],
       child: child,
     );
