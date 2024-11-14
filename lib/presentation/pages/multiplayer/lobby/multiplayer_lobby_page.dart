@@ -105,6 +105,7 @@ class _MultiPlayerLobbyPageContentState extends State<MultiPlayerLobbyPage> {
                   Expanded(
                     child: PendingMatchBox(
                       horizontalPadding: boxHorizontalPadding,
+                      screenSize: screenSize,
                     ),
                   ),
                   SizedBox(height: boxVerticalSpacing),

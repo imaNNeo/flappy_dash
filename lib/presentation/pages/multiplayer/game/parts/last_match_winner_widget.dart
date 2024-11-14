@@ -37,7 +37,7 @@ class _AnimatedLastMatchWidget extends StatefulWidget {
 
   final double height;
   final double width;
-  static const ratio = 126 / 61;
+  static const ratio = 110 / 61;
 
   final MatchOverviewEntity? lastMatch;
 
@@ -103,7 +103,7 @@ class _AnimatedLastMatchWidgetState extends State<_AnimatedLastMatchWidget> {
               '$timeAgo ago',
               style: TextStyle(
                 color: Colors.white60,
-                fontSize: width * 0.07,
+                fontSize: width * 0.08,
               ),
             ),
           ],
