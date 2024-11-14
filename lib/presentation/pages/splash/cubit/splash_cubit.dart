@@ -32,8 +32,13 @@ class SplashCubit extends Cubit<SplashState> {
         isSplashInitialized: true,
       ));
       _openHomePage();
-    } catch (e, stack) {
-      print('error: $e, $stack');
+    } catch (e) {
+      emit(state.copyWith(
+        initializationError: e.toString(),
+      ));
+      emit(state.copyWith(
+        initializationError: '',
+      ));
     }
   }
 

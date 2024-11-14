@@ -1,3 +1,4 @@
+import 'package:flappy_dash/presentation/extensions/build_context_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -30,6 +31,10 @@ class _SplashPageState extends State<SplashPage> {
           } else {
             GoRouter.of(context).replace('/');
           }
+        }
+
+        if (state.initializationError.isNotEmpty) {
+          context.showToastError(state.initializationError);
         }
       },
       builder: (context, state) {

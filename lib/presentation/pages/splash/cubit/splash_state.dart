@@ -5,21 +5,25 @@ class SplashState with EquatableMixin {
     this.isLoading = false,
     this.openTheNextPage = false,
     this.isSplashInitialized = false,
+    this.initializationError = '',
   });
 
   final bool isLoading;
   final bool openTheNextPage;
   final bool isSplashInitialized;
+  final String initializationError;
 
   SplashState copyWith({
     bool? isLoading,
     bool? openTheNextPage,
     bool? isSplashInitialized,
+    String? initializationError,
   }) =>
       SplashState(
         isLoading: isLoading ?? this.isLoading,
         openTheNextPage: openTheNextPage ?? this.openTheNextPage,
         isSplashInitialized: isSplashInitialized ?? this.isSplashInitialized,
+        initializationError: initializationError ?? this.initializationError,
       );
 
   @override
@@ -27,5 +31,6 @@ class SplashState with EquatableMixin {
         isLoading,
         openTheNextPage,
         isSplashInitialized,
+        initializationError,
       ];
 }
