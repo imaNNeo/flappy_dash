@@ -1,22 +1,13 @@
 import 'package:device_preview/device_preview.dart';
-import 'package:flappy_dash/audio_helper.dart';
-import 'package:flappy_dash/domain/repositories/game_repository.dart';
-import 'package:flappy_dash/domain/repositories/multiplayer_repository.dart';
-import 'package:flappy_dash/presentation/bloc/account/account_cubit.dart';
-import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
-import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
-import 'package:flappy_dash/presentation/bloc/multiplayer/ping/ping_cubit.dart';
 import 'package:flappy_dash/presentation/pages/debug/debug_panel.dart';
-import 'package:flappy_dash/presentation/pages/splash/cubit/splash_cubit.dart';
 import 'package:flappy_dash/service_locator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'presentation/app_routes.dart';
 import 'presentation/app_style.dart';
-import 'presentation/bloc/singleplayer/singleplayer_game_cubit.dart';
+import 'presentation/bloc/bloc_registry.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,44 +27,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => SingleplayerGameCubit(
-            getIt.get<AudioHelper>(),
-            getIt.get<GameRepository>(),
-          ),
-        ),
-        BlocProvider(
-          create: (context) => MultiplayerCubit(
-            getIt.get<MultiplayerRepository>(),
-            getIt.get<GameRepository>(),
-            getIt.get<AudioHelper>(),
-          ),
-        ),
-        BlocProvider(
-          create: (context) => AccountCubit(
-            getIt.get<GameRepository>(),
-          ),
-        ),
-        BlocProvider(
-          create: (context) => LeaderboardCubit(
-            getIt.get<GameRepository>(),
-          ),
-          lazy: false,
-        ),
-        BlocProvider(
-          create: (context) => PingCubit(
-            getIt.get<MultiplayerRepository>(),
-          ),
-          lazy: false,
-        ),
-        BlocProvider(
-          create: (context) => SplashCubit(
-            getIt.get<GameRepository>(),
-          ),
-        ),
-      ],
+    return AppBlocRegistry(
       child: MaterialApp.router(
         routerConfig: AppRoutes.router,
         title: 'Flappy Dash',
