@@ -12,7 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class LastMatchWinnerWidget extends StatelessWidget {
   const LastMatchWinnerWidget({
     super.key,
-    this.height = 72.0,
+    required this.height,
   });
 
   final double height;
@@ -37,7 +37,7 @@ class _AnimatedLastMatchWidget extends StatefulWidget {
 
   final double height;
   final double width;
-  static const ratio = 110 / 61;
+  static const ratio = 120 / 67;
 
   final MatchOverviewEntity? lastMatch;
 
@@ -81,7 +81,7 @@ class _AnimatedLastMatchWidgetState extends State<_AnimatedLastMatchWidget> {
               'Last winner',
               style: TextStyle(
                 color: AppColors.leaderboardGoldenColor,
-                fontSize: width * 0.09,
+                fontSize: width * 0.1,
               ),
             ),
             Row(
@@ -94,7 +94,7 @@ class _AnimatedLastMatchWidgetState extends State<_AnimatedLastMatchWidget> {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: AppColors.getDashColor(dashType),
-                    fontSize: width * 0.11,
+                    fontSize: width * 0.13,
                   ),
                 ),
               ],
@@ -103,7 +103,7 @@ class _AnimatedLastMatchWidgetState extends State<_AnimatedLastMatchWidget> {
               '$timeAgo ago',
               style: TextStyle(
                 color: Colors.white60,
-                fontSize: width * 0.08,
+                fontSize: width * 0.1,
               ),
             ),
           ],

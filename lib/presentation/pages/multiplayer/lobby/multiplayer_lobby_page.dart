@@ -78,10 +78,30 @@ class _MultiPlayerLobbyPageContentState extends State<MultiPlayerLobbyPage> {
       ScreenSize.medium => 22.0,
       ScreenSize.large || ScreenSize.extraLarge => 28.0,
     };
+    final boxHorizontalMargin = switch (screenSize) {
+      ScreenSize.extraSmall => 8.0,
+      ScreenSize.small => 12.0,
+      ScreenSize.medium => 22.0,
+      ScreenSize.large || ScreenSize.extraLarge => 48.0,
+    };
     final appTitleTopPadding = switch (screenSize) {
       ScreenSize.extraSmall || ScreenSize.small => 92.0,
       ScreenSize.medium => 102.0,
       ScreenSize.large || ScreenSize.extraLarge => 18.0,
+    };
+
+    final lastWinnerBadgeHeight = switch (screenSize) {
+      ScreenSize.extraSmall || ScreenSize.small => 54.0,
+      ScreenSize.medium => 58.0,
+      ScreenSize.large || ScreenSize.extraLarge => 64.0,
+    };
+
+    final boxExtraTopMarginForWinnerBadge = switch (screenSize) {
+      ScreenSize.extraSmall => lastWinnerBadgeHeight * 0.7,
+      ScreenSize.small => lastWinnerBadgeHeight * 0.5,
+      ScreenSize.medium => lastWinnerBadgeHeight * 0.2,
+      ScreenSize.large => 0.1,
+      ScreenSize.extraLarge => 0,
     };
 
     return Scaffold(
@@ -101,11 +121,17 @@ class _MultiPlayerLobbyPageContentState extends State<MultiPlayerLobbyPage> {
                     screenSize: screenSize,
                     showMultiplayerText: true,
                   ),
-                  SizedBox(height: boxVerticalSpacing * 1.5),
+                  SizedBox(
+                    height: (boxVerticalSpacing * 1.5) +
+                        boxExtraTopMarginForWinnerBadge,
+                  ),
                   Expanded(
                     child: PendingMatchBox(
                       horizontalPadding: boxHorizontalPadding,
-                      screenSize: screenSize,
+                      lastWinnerHeight: lastWinnerBadgeHeight,
+                      margin: EdgeInsets.symmetric(
+                        horizontal: boxHorizontalMargin,
+                      ),
                     ),
                   ),
                   SizedBox(height: boxVerticalSpacing),

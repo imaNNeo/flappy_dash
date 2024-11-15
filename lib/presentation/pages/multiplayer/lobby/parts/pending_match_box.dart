@@ -4,23 +4,20 @@ class PendingMatchBox extends StatelessWidget {
   const PendingMatchBox({
     super.key,
     required this.horizontalPadding,
-    required this.screenSize,
+    required this.lastWinnerHeight,
+    required this.margin,
   });
 
   final double horizontalPadding;
-  final ScreenSize screenSize;
+  final double lastWinnerHeight;
+  final EdgeInsets margin;
 
   @override
   Widget build(BuildContext context) {
-    final lastWinnerHeight = switch (screenSize) {
-      ScreenSize.extraSmall => 32.0,
-      ScreenSize.small => 42.0,
-      ScreenSize.medium => 52.0,
-      ScreenSize.large || ScreenSize.extraLarge => 60.0,
-    };
     return BlocBuilder<MultiplayerCubit, MultiplayerState>(
       builder: (context, state) {
         return TransparentContentBox(
+          margin: margin,
           child: Stack(
             children: [
               Column(
