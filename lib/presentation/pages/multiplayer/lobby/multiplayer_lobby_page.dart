@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:flappy_dash/domain/app_constants.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/bloc/account/account_cubit.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/dialogs/nickname_dialog.dart';
+import 'package:flappy_dash/presentation/dialogs/share_lobby_dialog.dart';
 import 'package:flappy_dash/presentation/extensions/build_context_extension.dart';
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
 import 'package:flappy_dash/presentation/pages/multiplayer/game/parts/last_match_winner_widget.dart';
@@ -20,6 +22,7 @@ import 'package:flappy_dash/presentation/widget/transparent_content_box.dart';
 import 'package:flappy_dash/presentation/widget/watch_on_youtube_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 part 'parts/pending_match_box.dart';

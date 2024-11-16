@@ -59,6 +59,7 @@ dependencies:
   share_plus_dialog: ^2.0.1
   package_info_plus: ^8.1.1
   web: ^1.1.0
+  qr: ^3.0.2
 
 dev_dependencies:
   flutter_test:

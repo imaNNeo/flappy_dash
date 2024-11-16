@@ -22,17 +22,45 @@ class PendingMatchBox extends StatelessWidget {
             children: [
               Column(
                 children: [
-                  const SizedBox(height: 16),
-                  Text(
-                    PresentationUtils.formatSeconds(
-                      state.matchWaitingRemainingSeconds,
-                    ),
-                    style: const TextStyle(
-                      color: AppColors.whiteTextColor,
-                      fontSize: 36,
+                  SizedBox(
+                    height: 72,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(width: horizontalPadding),
+                        Expanded(child: Container()),
+                        Text(
+                          PresentationUtils.formatSeconds(
+                            state.matchWaitingRemainingSeconds,
+                          ),
+                          style: const TextStyle(
+                            color: AppColors.whiteTextColor,
+                            fontSize: 36,
+                          ),
+                        ),
+                        Expanded(
+                          child: state.matchId.isNotBlank
+                              ? Align(
+                                  alignment: Alignment.centerRight,
+                                  child: IconButton(
+                                    icon: Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: SvgPicture.asset(
+                                        'assets/icons/ic_qr.svg',
+                                      ),
+                                    ),
+                                    onPressed: () =>
+                                        _shareLobby(context, state.matchId),
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                        SizedBox(width: horizontalPadding),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 16),
                   Expanded(
                     child: Align(
                       alignment: const Alignment(0, -0.5),
@@ -133,5 +161,15 @@ class PendingMatchBox extends StatelessWidget {
       return;
     }
     context.read<MultiplayerCubit>().joinLobby();
+  }
+
+  void _shareLobby(BuildContext context, String matchId) {
+    final currentRoute = GoRouterState.of(context).uri.toString();
+    final url = '${AppConstants.baseUrl}$currentRoute';
+    ShareQRContentDialog.show(
+      context,
+      title: 'Share Lobby',
+      data: url,
+    );
   }
 }
