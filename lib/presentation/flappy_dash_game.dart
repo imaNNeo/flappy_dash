@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
@@ -27,6 +29,7 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
           ),
         );
 
+  final Random random = Random();
   final GameMode gameMode;
   final SingleplayerGameCubit singleplayerCubit;
   final MultiplayerCubit multiplayerCubit;
@@ -125,6 +128,8 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
 class FlappyDashWorld extends World
     with TapCallbacks, HasGameRef<FlappyDashGame> {
   late FlappyDashRootComponent _rootComponent;
+
+  FlappyDashRootComponent get rootComponent => _rootComponent;
 
   @override
   Future<void> onLoad() async {

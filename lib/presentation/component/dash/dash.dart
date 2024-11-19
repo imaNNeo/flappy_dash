@@ -15,6 +15,7 @@ import 'package:flappy_dash/presentation/component/pipe.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flutter/material.dart';
 
+import 'auto_jump_dash.dart';
 
 class Dash extends PositionComponent
     with CollisionCallbacks, HasGameRef<FlappyDashGame> {
@@ -23,6 +24,7 @@ class Dash extends PositionComponent
     required this.playerId,
     required this.displayName,
     required this.isMe,
+    this.autoJump = false,
     super.priority,
   })  : type = DashType.fromUserId(playerId),
         super(
@@ -38,10 +40,13 @@ class Dash extends PositionComponent
   late final Sprite _dashSprite;
   OutlinedTextComponent? _nameComponent;
 
-  final double _gravity = 1400.0;
   double _velocityY = 0;
 
   double get velocityY => _velocityY;
+
+  double get gravity => gameRef.world.rootComponent.gravity;
+
+  double get jumpForce => _jumpForce;
 
   final double _jumpForce = -500;
   final double speed;
@@ -53,6 +58,8 @@ class Dash extends PositionComponent
   bool _isNameVisible = true;
 
   bool get isNameVisible => _isNameVisible;
+
+  final bool autoJump;
 
   set isNameVisible(bool value) {
     _isNameVisible = value;
@@ -92,6 +99,10 @@ class Dash extends PositionComponent
       ),
     ));
     _resetCorrectPositionAfter();
+
+    if (autoJump) {
+      add(AutoJumpDash());
+    }
   }
 
   void _resetCorrectPositionAfter() {
@@ -126,7 +137,7 @@ class Dash extends PositionComponent
   }
 
   void _updatePositionNormally(double dt) {
-    _velocityY += _gravity * dt;
+    _velocityY += gravity * dt;
     position.y += _velocityY * dt;
     position.x += speed * dt;
   }
@@ -218,7 +229,7 @@ class Dash extends PositionComponent
       final scaledDuration =
           duration * FlappyDashRootComponent.gameSpeedMultiplier;
       final newX = positionX + (speed * scaledDuration);
-      final newVelocity = velocityY + _gravity * scaledDuration;
+      final newVelocity = velocityY + gravity * scaledDuration;
       final newY = positionY + (newVelocity * scaledDuration);
       _smoothUpdatingPositionEffect?.removeFromParent();
       add(

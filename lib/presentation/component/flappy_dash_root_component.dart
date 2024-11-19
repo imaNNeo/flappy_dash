@@ -35,6 +35,8 @@ class FlappyDashRootComponent extends Component
   // We use it for temporary debugging
   static double gameSpeedMultiplier = 1.0;
 
+  double get gravity => 1400.0;
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
