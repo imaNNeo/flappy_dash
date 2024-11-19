@@ -39,7 +39,7 @@ class AutoJumpDash extends Component with ParentIsA<Dash> {
   }
 
   PipePair? _getNextPipe() {
-    if (_nextPipe != null &&
+    if (_nextPipe != null && !_nextPipe!.isRemoving &&
         myLeft < _nextPipe!.position.x + _nextPipe!.pipeWidth) {
       return _nextPipe!;
     }
@@ -78,13 +78,13 @@ class AutoJumpDash extends Component with ParentIsA<Dash> {
     }
 
     final nearToPipe = (position.x - nextPipe.position.x).abs() < 100;
-    print('randomFail: $randomFail, failByExtraJump: $failByExtraJump, nearToPipe: $nearToPipe');
     if (nearToPipe && randomFail) {
       if (failByExtraJump) {
         parent.jump();
       } else {
         return;
       }
+      randomFail = false;
     }
 
     if (position.y > getBottomLineEdge(nextPipe) && velocityY > 10) {
@@ -97,10 +97,9 @@ class AutoJumpDash extends Component with ParentIsA<Dash> {
     super.render(canvas);
     if (debugMode) {
       // Draw a line to the next pipe
-      final nextPipe = _getNextPipe();
-      if (nextPipe != null) {
-        final targetX = nextPipe.position.x + nextPipe.pipeWidth / 2;
-        final targetY = getBottomLineEdge(nextPipe);
+      if (_nextPipe != null) {
+        final targetX = _nextPipe!.position.x + _nextPipe!.pipeWidth / 2;
+        final targetY = getBottomLineEdge(_nextPipe!);
         canvas.drawLine(
           (parent.size / 2).toOffset(),
           Offset(
