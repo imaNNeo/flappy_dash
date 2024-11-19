@@ -350,7 +350,7 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     _audioHelper.stopBackgroundAudio();
   }
 
-  void _tryToContinueGameAfterDied() {
+  void _tryToContinueGameAfterDied() async {
     if (state.spawnsAgainAt == null) {
       return;
     }
@@ -370,6 +370,10 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
         spawnsAgainAt: ValueWrapper.nullValue(),
         currentPlayingState: PlayingState.idle,
       ));
+      if (state.isCurrentPlayerAutoJump) {
+        const Duration(milliseconds: 300);
+        startPlaying();
+      }
     }
   }
 
@@ -426,6 +430,25 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     final overview = await _multiplayerRepository.getLastMatchOverview();
     emit(state.copyWith(
       lastMatchOverview: ValueWrapper(overview),
+    ));
+  }
+
+  void tappedOnAutoJumpArea() {
+    if (state.countToTapForAutoJump <= 0) {
+      return;
+    }
+    final countToTap = state.countToTapForAutoJump - 1;
+    emit(state.copyWith(
+      countToTapForAutoJump: countToTap,
+    ));
+    if (countToTap <= 0) {
+      setAutoJumpEnabled(true);
+    }
+  }
+
+  void setAutoJumpEnabled(bool enabled) {
+    emit(state.copyWith(
+      isCurrentPlayerAutoJump: enabled,
     ));
   }
 

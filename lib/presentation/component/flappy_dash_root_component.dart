@@ -57,6 +57,7 @@ class FlappyDashRootComponent extends Component
       isMe: true,
       priority: 10,
       speed: _config.dashMoveSpeed,
+      autoJump: game.multiplayerCubit.state.isCurrentPlayerAutoJump,
     ));
 
     _restartGameForNewIdle(isFirstTime: true);

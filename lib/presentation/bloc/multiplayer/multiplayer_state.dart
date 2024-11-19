@@ -22,6 +22,8 @@ class MultiplayerState with EquatableMixin {
     this.diedCount = 0,
     this.debugMessages = const [],
     this.lastMatchOverview,
+    this.isCurrentPlayerAutoJump = false,
+    this.countToTapForAutoJump = 10,
   });
 
   final MultiplayerGameMode gameMode;
@@ -44,6 +46,8 @@ class MultiplayerState with EquatableMixin {
   final int diedCount;
   final List<DebugMessage> debugMessages;
   final MatchOverviewEntity? lastMatchOverview;
+  final bool isCurrentPlayerAutoJump;
+  final int countToTapForAutoJump;
 
   MultiplayerState copyWith({
     int? currentScore,
@@ -65,6 +69,8 @@ class MultiplayerState with EquatableMixin {
     int? diedCount,
     List<DebugMessage>? debugMessages,
     ValueWrapper<MatchOverviewEntity>? lastMatchOverview,
+    bool? isCurrentPlayerAutoJump,
+    int? countToTapForAutoJump,
   }) =>
       MultiplayerState(
         currentScore: currentScore ?? this.currentScore,
@@ -93,6 +99,10 @@ class MultiplayerState with EquatableMixin {
         lastMatchOverview: lastMatchOverview != null
             ? lastMatchOverview.value
             : this.lastMatchOverview,
+        isCurrentPlayerAutoJump:
+            isCurrentPlayerAutoJump ?? this.isCurrentPlayerAutoJump,
+        countToTapForAutoJump:
+            countToTapForAutoJump ?? this.countToTapForAutoJump,
       );
 
   @override
@@ -117,5 +127,7 @@ class MultiplayerState with EquatableMixin {
         diedCount,
         debugMessages,
         lastMatchOverview,
+        isCurrentPlayerAutoJump,
+        countToTapForAutoJump,
       ];
 }

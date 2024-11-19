@@ -111,19 +111,27 @@ class PendingMatchBox extends StatelessWidget {
                   Padding(
                     padding:
                         EdgeInsets.symmetric(horizontal: horizontalPadding),
-                    child: BigButton(
-                      strokeColor: Colors.white,
-                      bgColor: AppColors.blueButtonBgColor,
-                      onPressed: state.joinedInLobby
-                          ? null
-                          : () => _onJoinMatchPressed(context),
-                      child: const Text(
-                        'JOIN',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 42,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: AutoJumpWidget(state: state),
                         ),
-                      ),
+                        BigButton(
+                          strokeColor: Colors.white,
+                          bgColor: AppColors.blueButtonBgColor,
+                          onPressed: state.joinedInLobby
+                              ? null
+                              : () => _onJoinMatchPressed(context),
+                          child: const Text(
+                            'JOIN',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 42,
+                            ),
+                          ),
+                        ),
+                        Expanded(child: Container()),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 24),
