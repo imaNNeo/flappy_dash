@@ -53,6 +53,7 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
       multiplayerCubit,
       leaderboardCubit,
     );
+    multiplayerCubit.onGamePageOpened(widget.matchId);
     super.initState();
   }
 

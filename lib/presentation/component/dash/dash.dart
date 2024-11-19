@@ -61,6 +61,8 @@ class Dash extends PositionComponent
 
   final bool autoJump;
 
+  AutoJumpDash? _autoJumpDash;
+
   set isNameVisible(bool value) {
     _isNameVisible = value;
     if (value) {
@@ -101,7 +103,7 @@ class Dash extends PositionComponent
     _resetCorrectPositionAfter();
 
     if (autoJump) {
-      add(AutoJumpDash());
+      add(_autoJumpDash = AutoJumpDash());
     }
   }
 
@@ -260,6 +262,7 @@ class Dash extends PositionComponent
       other.removeFromParent();
     } else if (other is Pipe) {
       game.gameOver(x, y, _velocityY);
+      _autoJumpDash?.onDashDied();
     }
   }
 }

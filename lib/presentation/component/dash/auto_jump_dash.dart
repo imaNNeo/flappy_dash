@@ -84,12 +84,16 @@ class AutoJumpDash extends Component with ParentIsA<Dash> {
       } else {
         return;
       }
-      randomFail = false;
     }
 
     if (position.y > getBottomLineEdge(nextPipe) && velocityY > 10) {
       parent.jump();
     }
+  }
+
+  void onDashDied() {
+    randomFail = false;
+    _nextPipe = null;
   }
 
   @override

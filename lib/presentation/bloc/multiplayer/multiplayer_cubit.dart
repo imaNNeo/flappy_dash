@@ -372,7 +372,9 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
       ));
       if (state.isCurrentPlayerAutoJump) {
         const Duration(milliseconds: 300);
-        startPlaying();
+        if (!isClosed) {
+          startPlaying();
+        }
       }
     }
   }
@@ -459,5 +461,15 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     _dispatchingEventsSubscription.cancel();
 
     return super.close();
+  }
+
+  void onGamePageOpened(String matchId) async {
+    assert(matchId == state.matchId);
+    if (state.isCurrentPlayerAutoJump) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      if (!isClosed) {
+        startPlaying();
+      }
+    }
   }
 }
