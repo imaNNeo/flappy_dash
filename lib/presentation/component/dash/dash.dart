@@ -88,6 +88,9 @@ class Dash extends PositionComponent
         anchor: Anchor.center,
         collisionType: isMe ? CollisionType.active : CollisionType.inactive,
       ));
+      if (autoJump) {
+        add(_autoJumpDash = AutoJumpDash());
+      }
     }
     add(_nameComponent = OutlinedTextComponent(
       text: _isNameVisible ? displayName : '',
@@ -101,10 +104,6 @@ class Dash extends PositionComponent
       ),
     ));
     _resetCorrectPositionAfter();
-
-    if (autoJump) {
-      add(_autoJumpDash = AutoJumpDash());
-    }
   }
 
   void _resetCorrectPositionAfter() {

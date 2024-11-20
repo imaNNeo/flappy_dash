@@ -27,6 +27,14 @@ class AutoJumpDash extends Component with ParentIsA<Dash> {
   bool randomFail = false;
   bool failByExtraJump = false;
 
+  late double canJumpIn;
+
+  final double jumpEvery;
+
+  AutoJumpDash({
+    this.jumpEvery = 0.2,
+  }) : canJumpIn = jumpEvery;
+
   @override
   void update(double dt) {
     super.update(dt);
@@ -34,12 +42,13 @@ class AutoJumpDash extends Component with ParentIsA<Dash> {
     if (currentPlayingState.isNotPlaying) {
       return;
     }
-
+    canJumpIn -= dt;
     _makeJumpDecision(_getNextPipe(), dt);
   }
 
   PipePair? _getNextPipe() {
-    if (_nextPipe != null && !_nextPipe!.isRemoving &&
+    if (_nextPipe != null &&
+        !_nextPipe!.isRemoving &&
         myLeft < _nextPipe!.position.x + _nextPipe!.pipeWidth) {
       return _nextPipe!;
     }
@@ -80,15 +89,23 @@ class AutoJumpDash extends Component with ParentIsA<Dash> {
     final nearToPipe = (position.x - nextPipe.position.x).abs() < 100;
     if (nearToPipe && randomFail) {
       if (failByExtraJump) {
-        parent.jump();
+        _jump();
       } else {
         return;
       }
     }
 
     if (position.y > getBottomLineEdge(nextPipe) && velocityY > 10) {
-      parent.jump();
+      _jump();
     }
+  }
+
+  void _jump() {
+    if (canJumpIn > 0) {
+      return;
+    }
+    canJumpIn = jumpEvery;
+    gameRef.world.rootComponent.onSpaceDown();
   }
 
   void onDashDied() {
