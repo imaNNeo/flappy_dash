@@ -370,12 +370,6 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
         spawnsAgainAt: ValueWrapper.nullValue(),
         currentPlayingState: PlayingState.idle,
       ));
-      if (state.isCurrentPlayerAutoJump) {
-        await Future.delayed(const Duration(milliseconds: 400));
-        if (!isClosed) {
-          startPlaying();
-        }
-      }
     }
   }
 

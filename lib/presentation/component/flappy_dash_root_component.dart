@@ -69,6 +69,10 @@ class FlappyDashRootComponent extends Component
         _latestMultiplayerState?.currentPlayingState == PlayingState.gameOver;
     if (restarted) {
       _restartGameForNewIdle(isFirstTime: false);
+      // Auto start for auto jump
+      if (state.isCurrentPlayerAutoJump) {
+        onSpaceDown();
+      }
     }
 
     _latestMultiplayerState = state;
