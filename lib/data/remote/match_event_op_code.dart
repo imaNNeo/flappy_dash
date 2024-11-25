@@ -6,22 +6,23 @@ enum MatchEventOpCode {
   // Match events
   matchWelcome(100),
   matchWaitingTimeIncreased(101),
-  matchPresencesUpdated(102),
-  matchStarted(103),
-  matchFinished(104),
-  matchPing(105),
-  matchPong(106),
+  matchPlayersJoined(102),
+  matchPlayersLeft(103),
+  matchPlayerNameUpdated(104),
+  matchStarted(105),
+  matchFinished(106),
+  matchPing(107),
+  matchPong(108),
+
   // Player events
   playerJoinedTheLobby(200),
-  playerStarted(201),
-  playerJumped(202),
-  playerScored(203),
-  playerDied(204),
-  playerIsIdle(205),
+  playerTickUpdate(201),
+  playerStarted(202),
+  playerJumped(203),
+  playerScored(204),
+  playerDied(205),
   playerKickedFromTheLobby(206),
-  playerCorrectPosition(207),
-  playerDisplayNameUpdated(208),
-  playerWillSpawnsAt(209);
+  playerFullStateNeeded(207);
 
   final int opCode;
 
@@ -31,25 +32,25 @@ enum MatchEventOpCode {
         MatchEventOpCode.matchWelcome => MatchWelcomeEvent(data),
         MatchEventOpCode.matchWaitingTimeIncreased =>
           MatchWaitingTimeIncreasedEvent(data),
-        MatchEventOpCode.matchPresencesUpdated =>
-          MatchPresencesUpdatedEvent(data),
+        MatchEventOpCode.matchPlayersJoined => MatchPlayersJoined(data),
+        MatchEventOpCode.matchPlayersLeft => MatchPlayersLeft(data),
+        MatchEventOpCode.matchPlayerNameUpdated =>
+          MatchPlayerNameUpdatedEvent(data),
         MatchEventOpCode.matchStarted => MatchStartedEvent(data),
         MatchEventOpCode.matchFinished => MatchFinishedEvent(data),
         MatchEventOpCode.matchPong => MatchPongEvent(data),
         MatchEventOpCode.playerJoinedTheLobby => PlayerJoinedTheLobby(data),
-        MatchEventOpCode.playerStarted => PlayerStartedEvent(data),
-        MatchEventOpCode.playerJumped => PlayerJumpedEvent(data),
-        MatchEventOpCode.playerScored => PlayerScoredEvent(data),
-        MatchEventOpCode.playerDied => PlayerDiedEvent(data),
-        MatchEventOpCode.playerIsIdle => PlayerIsIdleEvent(data),
         MatchEventOpCode.playerKickedFromTheLobby =>
           PlayerKickedFromTheLobbyEvent(data),
-        MatchEventOpCode.playerCorrectPosition =>
-          PlayerCorrectPositionEvent(data),
-        MatchEventOpCode.playerWillSpawnsAt => PlayerWillSpawnAtEvent(data),
-        MatchEventOpCode.matchPing ||
-        MatchEventOpCode.playerDisplayNameUpdated =>
-          throw UnimplementedError('It is not an incoming event'),
+        MatchEventOpCode.playerTickUpdate => PlayerTickUpdateEvent(data),
+        MatchEventOpCode.playerFullStateNeeded =>
+          PlayerFullStateNeededEvent(data),
+        MatchEventOpCode.playerStarted ||
+        MatchEventOpCode.playerJumped ||
+        MatchEventOpCode.playerScored ||
+        MatchEventOpCode.playerDied ||
+        MatchEventOpCode.matchPing =>
+          throw StateError('$this is not a valid incoming event'),
       };
 
   static MatchEventOpCode fromDispatchingEvent(DispatchingMatchEvent event) =>
@@ -60,11 +61,10 @@ enum MatchEventOpCode {
         DispatchingPlayerJumpedEvent() => MatchEventOpCode.playerJumped,
         DispatchingPlayerScoredEvent() => MatchEventOpCode.playerScored,
         DispatchingPlayerDiedEvent() => MatchEventOpCode.playerDied,
-        DispatchingPlayerIsIdleEvent() => MatchEventOpCode.playerIsIdle,
         DispatchingUserDisplayNameUpdatedEvent() =>
-          MatchEventOpCode.playerDisplayNameUpdated,
-        DispatchingPlayerCorrectPositionEvent() =>
-          MatchEventOpCode.playerCorrectPosition,
+          MatchEventOpCode.matchPlayerNameUpdated,
         DispatchingPingEvent() => MatchEventOpCode.matchPing,
+        DispatchingPlayerFullStateNeededEvent() =>
+          MatchEventOpCode.playerFullStateNeeded,
       };
 }

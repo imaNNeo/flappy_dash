@@ -28,6 +28,19 @@ class DispatchingPlayerJoinedLobbyEvent extends DispatchingMatchEvent {
   String get debugName => 'PlayerJoinedLobby';
 }
 
+class DispatchingUserDisplayNameUpdatedEvent extends DispatchingMatchEvent {
+  DispatchingUserDisplayNameUpdatedEvent();
+
+  @override
+  List<int> toBytes() => [];
+
+  @override
+  String debugExtraInfo() => '';
+
+  @override
+  String get debugName => 'UserDisplayNameUpdated';
+}
+
 class DispatchingPlayerStartedEvent extends DispatchingMatchEvent {
   DispatchingPlayerStartedEvent();
 
@@ -42,126 +55,7 @@ class DispatchingPlayerStartedEvent extends DispatchingMatchEvent {
 }
 
 class DispatchingPlayerJumpedEvent extends DispatchingMatchEvent {
-  final double positionX;
-  final double positionY;
-  final double velocityY;
-  final int timestamp;
-
-  DispatchingPlayerJumpedEvent(
-    this.positionX,
-    this.positionY,
-    this.velocityY,
-    this.timestamp,
-  );
-
-  @override
-  List<int> toBytes() => _jsonToData({
-        'positionX': positionX,
-        'positionY': positionY,
-        'velocityY': velocityY,
-        'timestamp': timestamp,
-      });
-
-  @override
-  String debugExtraInfo() =>
-      '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
-
-  @override
-  String get debugName => 'PlayerJumped';
-}
-
-class DispatchingPlayerScoredEvent extends DispatchingMatchEvent {
-  final double positionX;
-  final double positionY;
-  final double velocityY;
-  final int timestamp;
-
-  DispatchingPlayerScoredEvent(
-    this.positionX,
-    this.positionY,
-    this.velocityY,
-    this.timestamp,
-  );
-
-  @override
-  List<int> toBytes() => _jsonToData({
-        'positionX': positionX,
-        'positionY': positionY,
-        'velocityY': velocityY,
-        'timestamp': timestamp,
-      });
-
-  @override
-  String debugExtraInfo() =>
-      '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
-
-  @override
-  String get debugName => 'PlayerScored';
-}
-
-class DispatchingPlayerDiedEvent extends DispatchingMatchEvent {
-  final double positionX;
-  final double positionY;
-  final double velocityY;
-  final int timestamp;
-  final double newPositionX;
-  final double newPositionY;
-
-  DispatchingPlayerDiedEvent(
-    this.positionX,
-    this.positionY,
-    this.velocityY,
-    this.timestamp,
-    this.newPositionX,
-    this.newPositionY,
-  );
-
-  @override
-  List<int> toBytes() => _jsonToData({
-        'positionX': positionX,
-        'positionY': positionY,
-        'velocityY': velocityY,
-        'timestamp': timestamp,
-        'newPositionX': newPositionX,
-        'newPositionY': newPositionY,
-      });
-
-  @override
-  String debugExtraInfo() =>
-      '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)}) -> (${newPositionX.toStringAsFixed(1)}, ${newPositionY.toStringAsFixed(1)})';
-
-  @override
-  String get debugName => 'PlayerDied';
-}
-
-class DispatchingPlayerIsIdleEvent extends DispatchingMatchEvent {
-  final double positionX;
-  final double positionY;
-  final int timestamp;
-
-  DispatchingPlayerIsIdleEvent(
-    this.positionX,
-    this.positionY,
-    this.timestamp,
-  );
-
-  @override
-  List<int> toBytes() => _jsonToData({
-        'positionX': positionX,
-        'positionY': positionY,
-        'timestamp': timestamp,
-      });
-
-  @override
-  String debugExtraInfo() =>
-      '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
-
-  @override
-  String get debugName => 'PlayerIsIdle';
-}
-
-class DispatchingUserDisplayNameUpdatedEvent extends DispatchingMatchEvent {
-  DispatchingUserDisplayNameUpdatedEvent();
+  DispatchingPlayerJumpedEvent();
 
   @override
   List<int> toBytes() => [];
@@ -170,36 +64,46 @@ class DispatchingUserDisplayNameUpdatedEvent extends DispatchingMatchEvent {
   String debugExtraInfo() => '';
 
   @override
-  String get debugName => 'UserDisplayNameUpdated';
+  String get debugName => 'PlayerJumped';
 }
 
-class DispatchingPlayerCorrectPositionEvent extends DispatchingMatchEvent {
-  final double positionX;
-  final double positionY;
-  final double velocityY;
-  final int timestamp;
-
-  DispatchingPlayerCorrectPositionEvent(
-    this.positionX,
-    this.positionY,
-    this.velocityY,
-    this.timestamp,
-  );
+class DispatchingPlayerScoredEvent extends DispatchingMatchEvent {
+  DispatchingPlayerScoredEvent();
 
   @override
-  List<int> toBytes() => _jsonToData({
-        'positionX': positionX,
-        'positionY': positionY,
-        'velocityY': velocityY,
-        'timestamp': timestamp,
-      });
+  List<int> toBytes() => [];
 
   @override
-  String debugExtraInfo() =>
-      '(${positionX.toStringAsFixed(1)}, ${positionY.toStringAsFixed(1)})';
+  String debugExtraInfo() => '';
 
   @override
-  String get debugName => 'PlayerCorrectPosition';
+  String get debugName => 'PlayerScored';
+}
+
+class DispatchingPlayerDiedEvent extends DispatchingMatchEvent {
+  DispatchingPlayerDiedEvent();
+
+  @override
+  List<int> toBytes() => [];
+
+  @override
+  String debugExtraInfo() => '';
+
+  @override
+  String get debugName => 'PlayerDied';
+}
+
+class DispatchingPlayerFullStateNeededEvent extends DispatchingMatchEvent {
+  DispatchingPlayerFullStateNeededEvent();
+
+  @override
+  List<int> toBytes() => [];
+
+  @override
+  String debugExtraInfo() => '';
+
+  @override
+  String get debugName => 'PlayerFullStateNeeded';
 }
 
 class DispatchingPingEvent extends DispatchingMatchEvent {

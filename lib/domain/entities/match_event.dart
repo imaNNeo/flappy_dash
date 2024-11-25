@@ -1,17 +1,13 @@
 import 'dart:convert';
 
+import 'package:flappy_dash/domain/entities/match_diff_entity.dart';
+import 'package:flappy_dash/domain/entities/player_state.dart';
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
 import 'package:nakama/nakama.dart';
 
 import 'match_state.dart';
 
-mixin HasMatchState {
-  late final MatchData data;
-
-  late MatchState state = MatchState.fromJson(
-    jsonDecode(utf8.decode(data.data!)),
-  );
-}
+mixin HasMatchState {}
 
 sealed class MatchEvent {
   MatchEvent(MatchData matchData) {
@@ -19,7 +15,10 @@ sealed class MatchEvent {
         matchData.presence == null || matchData.presence!.userId.isNullOrBlank
             ? null
             : matchData.presence!;
+    matchId = matchData.matchId;
   }
+
+  late String matchId;
 
   late UserPresence? sender;
 
@@ -30,45 +29,81 @@ sealed class MatchEvent {
 
 // Match events:
 class MatchWelcomeEvent extends MatchEvent with HasMatchState {
-  MatchWelcomeEvent(MatchData matchData) : super(matchData) {
-    data = matchData;
-  }
+  MatchWelcomeEvent(super.matchData)
+      : matchState = MatchState.fromJson(
+          jsonDecode(utf8.decode(matchData.data!)),
+        );
+
+  final MatchState matchState;
 
   @override
   String get debugName => 'MatchWelcome';
 }
 
 class MatchWaitingTimeIncreasedEvent extends MatchEvent with HasMatchState {
-  MatchWaitingTimeIncreasedEvent(MatchData matchData) : super(matchData) {
-    data = matchData;
-  }
+  MatchWaitingTimeIncreasedEvent(super.matchData)
+      : newMatchRunsAt = DateTime.fromMillisecondsSinceEpoch(
+          jsonDecode(utf8.decode(matchData.data!))['newMatchRunsAt'],
+        );
+
+  final DateTime newMatchRunsAt;
 
   @override
   String get debugName => 'MatchWaitingTimeIncreased';
 }
 
-class MatchPresencesUpdatedEvent extends MatchEvent with HasMatchState {
-  MatchPresencesUpdatedEvent(MatchData matchData) : super(matchData) {
-    data = matchData;
-  }
+class MatchPlayersJoined extends MatchEvent with HasMatchState {
+  MatchPlayersJoined(super.matchData)
+      : joinedPlayersInfo = (jsonDecode(utf8.decode(matchData.data!)) as Map)
+            .map(
+              (key, value) => MapEntry(
+                key,
+                PlayerState.fromJson(value),
+              ),
+            );
+
+  final Map<String, PlayerState> joinedPlayersInfo;
 
   @override
-  String get debugName => 'MatchPresencesUpdated';
+  String get debugName => 'MatchPlayersJoined';
+}
+
+class MatchPlayersLeft extends MatchEvent with HasMatchState {
+  MatchPlayersLeft(super.matchData)
+      : leftPlayerIds =
+            (jsonDecode(utf8.decode(matchData.data!)) as List).cast<String>();
+
+  final List<String> leftPlayerIds;
+
+  @override
+  String get debugName => 'MatchPlayersLeft';
+}
+
+class MatchPlayerNameUpdatedEvent extends MatchEvent with HasMatchState {
+  MatchPlayerNameUpdatedEvent(super.matchData)
+      : newDisplayName =
+            jsonDecode(utf8.decode(matchData.data!))['newDisplayName'];
+
+  final String newDisplayName;
+
+  @override
+  String get debugName => 'MatchPlayerNameUpdated';
 }
 
 class MatchStartedEvent extends MatchEvent with HasMatchState {
-  MatchStartedEvent(MatchData matchData) : super(matchData) {
-    data = matchData;
-  }
+  MatchStartedEvent(super.matchData)
+      : matchState = MatchState.fromJson(
+          jsonDecode(utf8.decode(matchData.data!)),
+        );
+
+  final MatchState matchState;
 
   @override
   String get debugName => 'MatchStarted';
 }
 
 class MatchFinishedEvent extends MatchEvent with HasMatchState {
-  MatchFinishedEvent(MatchData matchData) : super(matchData) {
-    data = matchData;
-  }
+  MatchFinishedEvent(super.matchData);
 
   @override
   String get debugName => 'MatchFinished';
@@ -95,122 +130,43 @@ class MatchPongEvent extends MatchEvent {
 
 // Player Events:
 class PlayerJoinedTheLobby extends MatchEvent with HasMatchState {
-  PlayerJoinedTheLobby(MatchData matchData) : super(matchData) {
-    data = matchData;
-  }
+  PlayerJoinedTheLobby(super.matchData)
+      : joinedPlayer = PlayerState.fromJson(
+          jsonDecode(utf8.decode(matchData.data!)),
+        );
+
+  final PlayerState joinedPlayer;
 
   @override
   String get debugName => 'PlayerJoinedTheLobby';
 }
 
-class PlayerStartedEvent extends MatchEvent with HasMatchState {
-  PlayerStartedEvent(MatchData matchData) : super(matchData) {
-    data = matchData;
-  }
+class PlayerTickUpdateEvent extends MatchEvent with HasMatchState {
+  PlayerTickUpdateEvent(super.matchData)
+      : diff = MatchDiffEntity.fromJson(
+          jsonDecode(utf8.decode(matchData.data!)),
+        );
 
-  double get dashX => state.players[sender!.userId]!.lastKnownX;
-
-  double get dashY => state.players[sender!.userId]!.lastKnownY;
-
-  double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
+  final MatchDiffEntity diff;
 
   @override
-  String get debugName => 'PlayerStarted';
-}
-
-class PlayerJumpedEvent extends MatchEvent with HasMatchState {
-  PlayerJumpedEvent(MatchData matchData) : super(matchData) {
-    data = matchData;
-  }
-
-  double get dashX => state.players[sender!.userId]!.lastKnownX;
-
-  double get dashY => state.players[sender!.userId]!.lastKnownY;
-
-  double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
-
-  @override
-  String get debugName => 'PlayerJumped';
-}
-
-class PlayerScoredEvent extends MatchEvent with HasMatchState {
-  PlayerScoredEvent(MatchData matchData) : super(matchData) {
-    data = matchData;
-  }
-
-  double get dashX => state.players[sender!.userId]!.lastKnownX;
-
-  double get dashY => state.players[sender!.userId]!.lastKnownY;
-
-  double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
-
-  @override
-  String get debugName => 'PlayerScored';
-}
-
-class PlayerDiedEvent extends MatchEvent with HasMatchState {
-  PlayerDiedEvent(MatchData matchData) : super(matchData) {
-    data = matchData;
-  }
-
-  double get dashX => state.players[sender!.userId]!.lastKnownX;
-
-  double get dashY => state.players[sender!.userId]!.lastKnownY;
-
-  double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
-
-  @override
-  String get debugName => 'PlayerDied';
-}
-
-class PlayerIsIdleEvent extends MatchEvent with HasMatchState {
-  PlayerIsIdleEvent(MatchData matchData) : super(matchData) {
-    data = matchData;
-  }
-
-  double get dashX => state.players[sender!.userId]!.lastKnownX;
-
-  double get dashY => state.players[sender!.userId]!.lastKnownY;
-
-  double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
-
-  @override
-  String get debugName => 'PlayerIsIdle';
+  String get debugName => 'PlayerTickUpdate';
 }
 
 class PlayerKickedFromTheLobbyEvent extends MatchEvent with HasMatchState {
-  PlayerKickedFromTheLobbyEvent(MatchData matchData) : super(matchData) {
-    data = matchData;
-  }
+  PlayerKickedFromTheLobbyEvent(super.matchData);
 
   @override
   String get debugName => 'PlayerKickedFromTheLobby';
 }
 
-class PlayerCorrectPositionEvent extends MatchEvent with HasMatchState {
-  PlayerCorrectPositionEvent(MatchData matchData) : super(matchData) {
-    data = matchData;
-  }
-
-  double get dashX => state.players[sender!.userId]!.lastKnownX;
-
-  double get dashY => state.players[sender!.userId]!.lastKnownY;
-
-  double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
+class PlayerFullStateNeededEvent extends MatchEvent with HasMatchState {
+  PlayerFullStateNeededEvent(super.matchData)
+      : matchState = MatchState.fromJson(
+          jsonDecode(utf8.decode(matchData.data!)),
+        );
+  final MatchState matchState;
 
   @override
-  String get debugName => 'PlayerCorrectPosition';
-}
-
-class PlayerWillSpawnAtEvent extends MatchEvent with HasMatchState {
-  PlayerWillSpawnAtEvent(MatchData matchData) : super(matchData) {
-    data = matchData;
-  }
-
-  double get dashX => state.players[sender!.userId]!.lastKnownX;
-
-  double get dashY => state.players[sender!.userId]!.lastKnownY;
-
-  @override
-  String get debugName => 'PlayerWillSpawnAt';
+  String get debugName => 'PlayerFullStateNeeded';
 }
