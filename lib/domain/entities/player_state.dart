@@ -1,41 +1,82 @@
 import 'package:equatable/equatable.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
+import 'package:flappy_dash/domain/entities/value_wrapper.dart';
 
 class PlayerState with EquatableMixin {
   final String userId;
   final String displayName;
   final bool isInLobby;
-  final double lastKnownX;
-  final double lastKnownY;
-  final double lastKnownVelocityY;
+  final num x;
+  final num y;
+  final num velocityX;
+  final num velocityY;
   final int score;
+  final int diedCount;
   final PlayingState playingState;
-  final DateTime spawnsAgainAt;
+  final double? spawnsAgainIn;
+  final num jumpForce;
 
   PlayerState({
     required this.userId,
     required this.displayName,
     required this.isInLobby,
-    required this.lastKnownX,
-    required this.lastKnownY,
-    required this.lastKnownVelocityY,
+    required this.x,
+    required this.y,
+    required this.velocityX,
+    required this.velocityY,
     required this.score,
+    required this.diedCount,
     required this.playingState,
-    required this.spawnsAgainAt,
+    required this.spawnsAgainIn,
+    required this.jumpForce,
   });
 
   factory PlayerState.fromJson(Map<String, dynamic> json) => PlayerState(
         userId: json['userId'],
         displayName: json['displayName'],
         isInLobby: json['isInLobby'],
-        lastKnownX: double.parse(json['lastKnownX'].toString()),
-        lastKnownY: double.parse(json['lastKnownY'].toString()),
-        lastKnownVelocityY: double.parse(json['lastKnownVelocityY'].toString()),
+        x: json['x'] as num,
+        y: json['y'] as num,
+        velocityX: json['velocityX'] as num,
+        velocityY: json['velocityY'] as num,
         score: json['score'],
+        diedCount: json['diedCount'],
         playingState: PlayingState.values[json['playingState']],
-        spawnsAgainAt: DateTime.fromMillisecondsSinceEpoch(
-          json['spawnsAgainAt'],
-        ),
+        spawnsAgainIn: json.containsKey('spawnsAgainIn')
+            ? json['spawnsAgainIn']
+            : null,
+        jumpForce: json['jumpForce'] as num,
+      );
+
+  // copyWith
+  PlayerState copyWith({
+    String? userId,
+    String? displayName,
+    bool? isInLobby,
+    double? x,
+    double? y,
+    double? velocityX,
+    double? velocityY,
+    int? score,
+    int? diedCount,
+    PlayingState? playingState,
+    ValueWrapper<double>? spawnsAgainIn,
+    double? jumpForce,
+  }) =>
+      PlayerState(
+        userId: userId ?? this.userId,
+        displayName: displayName ?? this.displayName,
+        isInLobby: isInLobby ?? this.isInLobby,
+        x: x ?? this.x,
+        y: y ?? this.y,
+        velocityX: velocityX ?? this.velocityX,
+        velocityY: velocityY ?? this.velocityY,
+        score: score ?? this.score,
+        diedCount: diedCount ?? this.diedCount,
+        playingState: playingState ?? this.playingState,
+        spawnsAgainIn:
+            spawnsAgainIn != null ? spawnsAgainIn.value : this.spawnsAgainIn,
+        jumpForce: jumpForce ?? this.jumpForce,
       );
 
   @override
@@ -43,11 +84,14 @@ class PlayerState with EquatableMixin {
         userId,
         displayName,
         isInLobby,
-        lastKnownX,
-        lastKnownY,
-        lastKnownVelocityY,
+        x,
+        y,
+        velocityX,
+        velocityY,
         score,
+        diedCount,
         playingState,
-        spawnsAgainAt,
+        spawnsAgainIn,
+        jumpForce,
       ];
 }
