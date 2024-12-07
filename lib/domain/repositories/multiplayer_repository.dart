@@ -18,10 +18,8 @@ class MultiplayerRepository {
 
   final matchUpdatesBufferedQueue = <PlayerTickUpdateEvent>[];
 
-  final _generalEventsController =
-      StreamController<MatchGeneralEvent>.broadcast();
-  final _updateTickEventController =
-      StreamController<PlayerTickUpdateEvent>.broadcast();
+  late StreamController<MatchGeneralEvent> _generalEventsController;
+  late StreamController<PlayerTickUpdateEvent> _updateTickEventController;
 
   final Map<String, StreamSubscription> _matchIdAndSubscription = {};
 
@@ -49,6 +47,10 @@ class MultiplayerRepository {
         _updateTickEventController.add(matchUpdatesBufferedQueue.removeAt(i));
       }
     });
+
+    _generalEventsController = StreamController<MatchGeneralEvent>.broadcast();
+    _updateTickEventController =
+        StreamController<PlayerTickUpdateEvent>.broadcast();
     final baseSubscription =
         _nakamaDataSource.onMatchEvent(matchId).listen((event) {
       if (!event.hideInDebugPanel) {
@@ -97,6 +99,10 @@ class MultiplayerRepository {
             _startListeningToUpdateTicks(matchId);
           }
           _generalEventsController.add(event as MatchGeneralEvent);
+
+          if (event is MatchFinishedEvent) {
+            clearCurrentMatchResources();
+          }
           break;
       }
     });
@@ -130,8 +136,13 @@ class MultiplayerRepository {
 
   Future<void> leaveMatch(String matchId) async {
     await _nakamaDataSource.leaveMatch(matchId);
+    clearCurrentMatchResources();
+  }
+
+  void clearCurrentMatchResources() {
+    assert(currentMatch.value != null);
+    _matchIdAndSubscription[currentMatch.value!.matchId]?.cancel();
     currentMatch.value = null;
-    _matchIdAndSubscription[matchId]?.cancel();
   }
 
   void sendUserDisplayNameUpdatedEvent(String matchId) => sendDispatchingEvent(

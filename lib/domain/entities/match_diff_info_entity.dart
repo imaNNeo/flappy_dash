@@ -176,7 +176,7 @@ class MatchDiffInfoPlayerDied extends MatchDiffInfoEntity {
         json['userId'] as String,
         json['x'] as double,
         json['y'] as double,
-        json['spawnsAgainIn'] as double,
+        (json['spawnsAgainIn'] as num) / 1000,
         json['newX'] as double,
         json['newY'] as double,
         json['diedCount'] as int,
@@ -229,7 +229,7 @@ class MatchDiffInfoPlayerSpawnTimeDecreased extends MatchDiffInfoEntity {
           Map<String, dynamic> json) =>
       MatchDiffInfoPlayerSpawnTimeDecreased(
         json['userId'] as String,
-        json['spawnsAgainIn'] as double,
+        (json['spawnsAgainIn'] as num) / 1000,
       );
 
   @override

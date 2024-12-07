@@ -84,26 +84,27 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
                       );
                     },
                   ),
-                if (state.currentPlayingState.isGameOver)
+                if (state.localPlayerState?.playingState.isGameOver ?? false)
                   const MultiplayerDiedOverlayWidget(),
-                if (state.currentPlayingState.isIdle)
+                if (state.localPlayerState?.playingState.isIdle ?? false)
                   const Align(
                     alignment: Alignment(0, 0.2),
                     child: TapToPlay(),
                   ),
-                SafeArea(
-                  child: Column(
-                    children: [
-                      TopScore(
-                        currentScore: state.currentScore,
-                        customColor: AppColors.getDashColor(
-                          dashType,
+                if (state.localPlayerState != null)
+                  SafeArea(
+                    child: Column(
+                      children: [
+                        TopScore(
+                          currentScore: state.currentScore,
+                          customColor: AppColors.getDashColor(
+                            dashType,
+                          ),
                         ),
-                      ),
-                      _RemainingPlayingTimer(),
-                    ],
+                        _RemainingPlayingTimer(),
+                      ],
+                    ),
                   ),
-                ),
                 Align(
                   alignment: Alignment.topCenter,
                   child: SafeArea(

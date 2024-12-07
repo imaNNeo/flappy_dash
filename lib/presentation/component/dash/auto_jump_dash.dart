@@ -20,7 +20,7 @@ class AutoJumpDash extends Component with ParentIsA<Dash> {
 
   double get velocityY => parent.velocityY;
 
-  double get gravity => parent.gravity;
+  double get gravity => parent.gravityY;
 
   double get jumpForce => parent.jumpForce;
 

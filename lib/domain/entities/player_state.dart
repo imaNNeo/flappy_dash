@@ -6,15 +6,15 @@ class PlayerState with EquatableMixin {
   final String userId;
   final String displayName;
   final bool isInLobby;
-  final num x;
-  final num y;
-  final num velocityX;
-  final num velocityY;
+  final double x;
+  final double y;
+  final double velocityX;
+  final double velocityY;
   final int score;
   final int diedCount;
   final PlayingState playingState;
   final double? spawnsAgainIn;
-  final num jumpForce;
+  final double jumpForce;
 
   PlayerState({
     required this.userId,
@@ -35,17 +35,16 @@ class PlayerState with EquatableMixin {
         userId: json['userId'],
         displayName: json['displayName'],
         isInLobby: json['isInLobby'],
-        x: json['x'] as num,
-        y: json['y'] as num,
-        velocityX: json['velocityX'] as num,
-        velocityY: json['velocityY'] as num,
+        x: (json['x'] as num).toDouble(),
+        y: (json['y'] as num).toDouble(),
+        velocityX: (json['velocityX'] as num).toDouble(),
+        velocityY: (json['velocityY'] as num).toDouble(),
         score: json['score'],
         diedCount: json['diedCount'],
         playingState: PlayingState.values[json['playingState']],
-        spawnsAgainIn: json.containsKey('spawnsAgainIn')
-            ? json['spawnsAgainIn']
-            : null,
-        jumpForce: json['jumpForce'] as num,
+        spawnsAgainIn:
+            json.containsKey('spawnsAgainIn') ? json['spawnsAgainIn'] : null,
+        jumpForce: (json['jumpForce'] as num).toDouble(),
       );
 
   // copyWith

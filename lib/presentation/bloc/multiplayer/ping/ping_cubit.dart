@@ -40,10 +40,11 @@ class PingCubit extends Cubit<PingState> {
     if (_streamSubscription == null ||
         _streamSubscription!.matchId != matchId) {
       _streamSubscription?.subscription.cancel();
+      _multiplayerRepository.matchUpdatesBufferedQueue;
       _streamSubscription = (
-        subscription: _multiplayerRepository.onMatchEvent(matchId).listen(
-              _onMatchEvent,
-            ),
+        subscription: _multiplayerRepository.generalMatchEvents
+            .where((event) => event.matchId == matchId)
+            .listen(_onMatchEvent),
         matchId: matchId,
       );
     }

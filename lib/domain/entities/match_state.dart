@@ -7,11 +7,11 @@ import 'player_state.dart';
 class MatchState with EquatableMixin {
   final int playingTickRate;
   final int playingTickNumber;
-  final num pipesDistance;
-  final List<num> pipesNormalizedYPositions;
-  final num pipesHoleGap;
-  final num pipesYRange;
-  final num pipeWidth;
+  final double pipesDistance;
+  final List<double> pipesNormalizedYPositions;
+  final double pipesHoleGap;
+  final double pipesYRange;
+  final double pipeWidth;
   final DateTime matchInitializedAt;
   final DateTime matchRunsAt;
   final DateTime matchFinishesAt;
@@ -19,7 +19,8 @@ class MatchState with EquatableMixin {
   final List<UserPresence> presences;
   final num gravityY;
   final Map<String, PlayerState> players;
-  final num playersInitialXSpeed;
+  final double playersInitialXSpeed;
+  final double playerSpawnsAgainAfter;
 
   MatchState({
     required this.playingTickRate,
@@ -37,6 +38,7 @@ class MatchState with EquatableMixin {
     required this.gravityY,
     required this.players,
     required this.playersInitialXSpeed,
+    required this.playerSpawnsAgainAfter,
   });
 
   MatchState copyWith({
@@ -55,6 +57,7 @@ class MatchState with EquatableMixin {
     double? gravityY,
     Map<String, PlayerState>? players,
     double? playersInitialXSpeed,
+    double? playerSpawnsAgainAfter,
   }) =>
       MatchState(
         playingTickRate: playingTickRate ?? this.playingTickRate,
@@ -73,17 +76,20 @@ class MatchState with EquatableMixin {
         gravityY: gravityY ?? this.gravityY,
         players: players ?? this.players,
         playersInitialXSpeed: playersInitialXSpeed ?? this.playersInitialXSpeed,
+        playerSpawnsAgainAfter:
+            playerSpawnsAgainAfter ?? this.playerSpawnsAgainAfter,
       );
 
   factory MatchState.fromJson(Map<String, dynamic> json) => MatchState(
         playingTickRate: json['playingTickRate'] as int,
         playingTickNumber: json['playingTickNumber'] as int,
-        pipesDistance: json['pipesDistance'] as num,
-        pipesNormalizedYPositions:
-            (json['pipesNormalizedYPositions'] as List).cast<num>(),
-        pipesHoleGap: json['pipesHoleGap'] as num,
-        pipesYRange: json['pipesYRange'] as num,
-        pipeWidth: json['pipeWidth'] as num,
+        pipesDistance: (json['pipesDistance'] as num).toDouble(),
+        pipesNormalizedYPositions: (json['pipesNormalizedYPositions'] as List)
+            .map((e) => (e as num).toDouble())
+            .toList(),
+        pipesHoleGap: (json['pipesHoleGap'] as num).toDouble(),
+        pipesYRange: (json['pipesYRange'] as num).toDouble(),
+        pipeWidth: (json['pipeWidth'] as num).toDouble(),
         matchInitializedAt:
             DateTime.fromMillisecondsSinceEpoch(json['matchInitializedAt']),
         matchRunsAt: DateTime.fromMillisecondsSinceEpoch(json['matchRunsAt']),
@@ -98,11 +104,13 @@ class MatchState with EquatableMixin {
                   persistence: false,
                 ))
             .toList(),
-        gravityY: json['gravityY'] as num,
+        gravityY: (json['gravityY'] as num).toDouble(),
         players: (json['players'] as Map<String, dynamic>).map(
           (k, v) => MapEntry(k, PlayerState.fromJson(v)),
         ),
-        playersInitialXSpeed: json['playersInitialXSpeed'] as num,
+        playersInitialXSpeed: (json['playersInitialXSpeed'] as num).toDouble(),
+        playerSpawnsAgainAfter:
+            (json['playerSpawnsAgainAfter'] as num) / 1000,
       );
 
   @override
@@ -122,5 +130,6 @@ class MatchState with EquatableMixin {
         gravityY,
         players,
         playersInitialXSpeed,
+        playerSpawnsAgainAfter,
       ];
 }

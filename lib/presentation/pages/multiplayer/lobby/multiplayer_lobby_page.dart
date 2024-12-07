@@ -50,7 +50,7 @@ class _MultiPlayerLobbyPageContentState extends State<MultiPlayerLobbyPage> {
   void initState() {
     _multiplayerCubit = context.read<MultiplayerCubit>();
     _multiplayerCubit.joinMatch(widget.matchId);
-    _matchEventsSubscription = _multiplayerCubit.matchEvents.listen(
+    _matchEventsSubscription = _multiplayerCubit.matchGeneralEvents.listen(
       _onMatchEvent,
     );
     _multiplayerCubit.refreshLastMatchOverview();

@@ -8,10 +8,10 @@ import 'package:flappy_dash/domain/entities/game_config_entity.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
+import 'package:flappy_dash/presentation/component/dash/dash.dart';
 import 'package:flappy_dash/presentation/component/multiplayer_controller.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 
-import 'dash/dash.dart';
 import 'pipe_pair.dart';
 
 class FlappyDashRootComponent extends Component
@@ -35,12 +35,24 @@ class FlappyDashRootComponent extends Component
   // We use it for temporary debugging
   static double gameSpeedMultiplier = 1.0;
 
-  double get gravity => 1400.0;
+  double get pipesDistance => switch (_config) {
+        SinglePlayerGameConfigEntity() => _config.pipesDistance,
+        MultiplayerGameConfigEntity() =>
+          game.multiplayerCubit.state.matchState!.pipesDistance,
+      };
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    _config = game.gameMode.gameConfig;
     _cubit = game.multiplayerCubit;
+    add(_dash = Dash(
+      playerId: myId,
+      displayName: '',
+      isMe: true,
+      priority: 10,
+      autoJump: game.multiplayerCubit.state.isCurrentPlayerAutoJump,
+    ));
     if (game.gameMode == const MultiplayerGameMode()) {
       multiplayerCubit = game.multiplayerCubit;
       _multiplayerCubitSubscription = multiplayerCubit.stream.listen(
@@ -48,20 +60,19 @@ class FlappyDashRootComponent extends Component
       );
       add(MultiplayerController(
         priority: 9,
+        myDash: _dash,
       ));
     }
-    _config = game.gameMode.gameConfig;
-    add(_dash = Dash(
-      playerId: myId,
-      displayName: '',
-      isMe: true,
-      priority: 10,
-      speed: _config.dashMoveSpeed,
-      autoJump: game.multiplayerCubit.state.isCurrentPlayerAutoJump,
-    ));
+  }
 
+  @override
+  void onMount() {
+    super.onMount();
     _restartGameForNewIdle(isFirstTime: true);
-    game.camera.follow(_dash, horizontalOnly: true);
+    game.camera.follow(
+      _dash,
+      horizontalOnly: true,
+    );
   }
 
   void _onMultiplayerStateChange(MultiplayerState state) {
@@ -79,35 +90,21 @@ class FlappyDashRootComponent extends Component
   }
 
   void _restartGameForNewIdle({required bool isFirstTime}) {
+    print('Restarting game for new idle');
     // Set a new position for the dash (zero for now)
     switch (game.gameMode) {
       case SinglePlayerGameMode():
         _dash.x = 0.0;
         _dash.y = 0.0;
-        _dash.resetVelocity();
         break;
       case MultiplayerGameMode():
         final cubit = game.multiplayerCubit;
         final state = cubit.state;
-        if (isFirstTime) {
-          final pipesLength = state.matchState!.pipesPositions.length;
-          final pipesDistance = state.gameMode.gameConfig.pipesDistance;
-          final randomX =
-              (Random().nextInt(pipesLength) * pipesDistance).toDouble();
-          _dash.y = 0.0;
-          _dash.x = randomX;
-        } else {
-          // position is randomized when dash is died (to spawn in the portal)
-          _dash.x = state.matchState!.players[myId]!.lastKnownX;
-          _dash.y = state.matchState!.players[myId]!.lastKnownY;
-        }
-        _dash.resetVelocity();
-        cubit.dispatchIdleEvent(
-          _dash.x,
-          _dash.y,
-        );
+        _dash.x = state.matchState!.players[myId]!.x;
+        _dash.y = state.matchState!.players[myId]!.y;
         break;
     }
+    // Todo: _dash.resetVelocity();
 
     // Remove all pipes
     children.whereType<PipePair>().forEach((pipe) {
@@ -115,9 +112,9 @@ class FlappyDashRootComponent extends Component
     });
 
     // Generate new pipes
-    _pipeCounter = _dash.x ~/ _config.pipesDistance;
+    _pipeCounter = _dash.x ~/ pipesDistance;
     _generatePipes(
-      fromX: _dash.x + _config.pipesDistance,
+      fromX: _dash.x + pipesDistance,
     );
 
     if (game.gameMode is MultiplayerGameMode) {
@@ -136,9 +133,10 @@ class FlappyDashRootComponent extends Component
   }
 
   double _getNewPipeYForMultiplayer(MultiplayerGameConfigEntity config) {
-    final pipesPosition = _cubit.state.matchState!.pipesPositions;
+    final matchState = _cubit.state.matchState!;
+    final pipesPosition = matchState.pipesNormalizedYPositions;
     final posIndex = _pipeCounter % pipesPosition.length;
-    return pipesPosition[posIndex] * _config.pipesPositionArea;
+    return (pipesPosition[posIndex] * matchState.pipesYRange).toDouble();
   }
 
   void _generatePipes({
@@ -154,19 +152,33 @@ class FlappyDashRootComponent extends Component
       },
     ));
 
+    final y = switch (_config) {
+      SinglePlayerGameConfigEntity() =>
+      (Random().nextDouble() * _cubit.state.matchState!.pipesYRange) -
+          (_cubit.state.matchState!.pipesYRange / 2),
+      MultiplayerGameConfigEntity() => _getNewPipeYForMultiplayer(_config),
+    };
+
+    final pipesDistance = switch(_config) {
+      SinglePlayerGameConfigEntity() => _config.pipesDistance,
+      MultiplayerGameConfigEntity() => _cubit.state.matchState!.pipesDistance,
+    };
+
+    final pipeHoleGap = switch(_config) {
+      SinglePlayerGameConfigEntity() => _config.pipeHoleGap,
+      MultiplayerGameConfigEntity() => _cubit.state.matchState!.pipesHoleGap,
+    };
+
+    final pipeWidth = switch(_config) {
+      SinglePlayerGameConfigEntity() => _config.pipeWidth,
+      MultiplayerGameConfigEntity() => _cubit.state.matchState!.pipeWidth,
+    };
+
     for (int i = 0; i < count; i++) {
-      final area = _config.pipesPositionArea;
-
-      final y = switch (_config) {
-        SinglePlayerGameConfigEntity() =>
-          (Random().nextDouble() * area) - (area / 2),
-        MultiplayerGameConfigEntity() => _getNewPipeYForMultiplayer(_config),
-      };
-
       add(_lastPipe = PipePair(
-        position: Vector2(fromX + (i * _config.pipesDistance), y),
-        gap: _config.pipeHoleGap,
-        pipeWidth: _config.pipeWidth,
+        position: Vector2(fromX + (i * pipesDistance), y),
+        gap: pipeHoleGap,
+        pipeWidth: pipeWidth,
         priority: 3,
       ));
       _pipeCounter++;
@@ -195,8 +207,8 @@ class FlappyDashRootComponent extends Component
     if (game.getCurrentPlayingState().isNotPlaying) {
       return;
     }
+    game.playerJumped();
     _dash.jump();
-    game.playerJumped(_dash.x, _dash.y, _dash.velocityY);
   }
 
   void _checkToStart() {
@@ -225,10 +237,10 @@ class FlappyDashRootComponent extends Component
 
     final lastPipe = _removeAllPipesExceptLastOne();
     lastPipe.x = 0.0;
-    _dash.x = _dash.x - game.worldWidth;
+    _dash.x -= game.worldWidth;
     _pipeCounter = 0;
     _generatePipes(
-      fromX: _config.pipesDistance,
+      fromX: pipesDistance,
     );
   }
 
@@ -238,7 +250,7 @@ class FlappyDashRootComponent extends Component
     _tryToLoopTheGame();
     if (_dash.x > _lastPipe.x) {
       _generatePipes(
-        fromX: _lastPipe.x + _config.pipesDistance,
+        fromX: _lastPipe.x + pipesDistance,
       );
       _removeLastPipes();
     }

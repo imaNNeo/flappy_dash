@@ -1,4 +1,5 @@
 import 'package:flame/components.dart';
+import 'package:flappy_dash/domain/entities/game_config_entity.dart';
 import 'package:flappy_dash/presentation/component/pipe.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 
@@ -14,6 +15,15 @@ class PipePair extends PositionComponent with HasGameRef<FlappyDashGame> {
 
   final double gap;
   final double pipeWidth;
+
+  GameConfigEntity get _config => game.gameMode.gameConfig;
+
+  double get pipesHoleGap => switch (_config) {
+        SinglePlayerGameConfigEntity() =>
+          (_config as SinglePlayerGameConfigEntity).pipeHoleGap,
+        MultiplayerGameConfigEntity() =>
+          game.multiplayerCubit.state.matchState!.pipesHoleGap,
+      };
 
   @override
   Future<void> onLoad() async {
@@ -31,7 +41,7 @@ class PipePair extends PositionComponent with HasGameRef<FlappyDashGame> {
       ),
       HiddenCoin(
         position: Vector2(30, 0),
-        size: Vector2(40, game.gameMode.gameConfig.pipeHoleGap * 0.9),
+        size: Vector2(40, pipesHoleGap * 0.9),
       ),
     ]);
   }

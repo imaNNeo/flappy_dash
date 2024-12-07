@@ -5,6 +5,7 @@ import 'package:flame/components.dart';
 import 'package:flame/palette.dart';
 import 'package:flappy_dash/domain/entities/dash_type.dart';
 import 'package:flappy_dash/domain/entities/debug/debug_message.dart';
+import 'package:flappy_dash/domain/entities/match_diff_info_entity.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
 import 'package:flappy_dash/domain/entities/player_state.dart';
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
@@ -21,23 +22,29 @@ import 'dash/dash_spawn_portal.dart';
 class MultiplayerController extends Component
     with ParentIsA<FlappyDashRootComponent>, HasGameRef<FlappyDashGame> {
   MultiplayerController({
-    super.priority,
+    required super.priority,
+    required this.myDash,
   });
 
   late StreamSubscription<MultiplayerState> _stateStreamSubscription;
-  late StreamSubscription<MatchEvent> _eventStreamSubscription;
+  late StreamSubscription<(PlayerTickUpdateEvent, MultiplayerState)>
+      _updateTickEventStreamSubscription;
 
   final Map<String, _OtherDashBundle> _otherDashes = {};
 
   MultiplayerState? _previousState;
   late MultiplayerCubit _cubit;
 
+  String get myId => game.leaderboardCubit.state.currentAccount!.user.id;
+  final Dash myDash;
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
     _cubit = game.multiplayerCubit;
     _stateStreamSubscription = _cubit.stream.listen(_onNewState);
-    _eventStreamSubscription = _cubit.matchEvents.listen(_onNewEvent);
+    _updateTickEventStreamSubscription =
+        _cubit.matchUpdateEvents.listen(_onNewTickUpdateEvent);
   }
 
   void _onNewState(MultiplayerState state) {
@@ -78,10 +85,9 @@ class MultiplayerController extends Component
               ? playerState.displayName
               : dashType.name,
           isMe: false,
-          speed: game.gameMode.gameConfig.dashMoveSpeed,
         );
         add(dash);
-        dash.position.x = playerState.lastKnownX;
+        dash.position.x = playerState.x.toDouble();
         _otherDashes[playerState.userId] = _OtherDashBundle(
           dash: dash,
           playerState: playerState,
@@ -90,91 +96,52 @@ class MultiplayerController extends Component
     }
   }
 
-  void _onNewEvent(MatchEvent event) {
-    final senderId = event.sender?.userId;
-    if (senderId == null) {
-      // We don't care about events without a sender id (server events)
-      return;
-    }
+  void _onNewTickUpdateEvent((PlayerTickUpdateEvent, MultiplayerState) pair) {
+    final tickUpdate = pair.$1;
 
-    if (senderId == _cubit.state.currentAccount!.user.id) {
-      // It's my own event
-      return;
-    }
-    if (!_otherDashes.containsKey(senderId)) {
-      // We don't have a dash for this player yet
-      return;
-    }
-    print('Controller received event: $event');
-    switch (event) {
-      case PlayerStartedEvent():
-        final dash = _otherDashes[event.sender!.userId]!.dash;
-        dash.updateState(
-          event.dashX,
-          event.dashY,
-          event.dashVelocityY,
-          duration: 0.0,
-        );
-        dash.jump();
-        break;
-      case PlayerJumpedEvent():
-        final dash = _otherDashes[event.sender!.userId]!.dash;
-        dash.updateState(
-          event.dashX,
-          event.dashY,
-          event.dashVelocityY,
-          duration: 0.0,
-        );
-        dash.jump();
-        break;
-      case PlayerDiedEvent():
-        // Die animation? (state is automatically updated)
-        final dash = _otherDashes[event.sender!.userId]!.dash;
-        dash.updateState(
-          event.dashX,
-          event.dashY,
-          event.dashVelocityY,
-          duration: 0.0,
-        );
-        break;
-      case PlayerWillSpawnAtEvent():
-        final player = _cubit.state.matchState!.players[event.sender!.userId]!;
-        final spawnsAt = player.spawnsAgainAt;
-        final spawnsAfter =
-            spawnsAt.difference(DateTime.now()).inMilliseconds / 1000;
-        final newPos = Vector2(player.lastKnownX, player.lastKnownY);
-        _spawnPortalAndPlayer(
-          playerId: event.sender!.userId,
-          position: newPos,
-          spawnsAfter:
-              spawnsAfter * FlappyDashRootComponent.gameSpeedMultiplier,
-        );
-        break;
-      case PlayerCorrectPositionEvent():
-        // We just mutate the position of the dash
-        final dash = _otherDashes[event.sender!.userId]!.dash;
-        if (_cubit.state.matchState!.players[event.sender!.userId]!.playingState
-            .isNotPlaying) {
-          return;
-        }
-        dash.updateState(
-          event.dashX,
-          event.dashY,
-          event.dashVelocityY,
-        );
-        break;
-      // We don't care about these events at the moment
-      case PlayerIsIdleEvent():
-      case PlayerKickedFromTheLobbyEvent():
-      case PlayerScoredEvent():
-      case PlayerJoinedTheLobby():
-      case MatchFinishedEvent():
-      case MatchStartedEvent():
-      case MatchPresencesUpdatedEvent():
-      case MatchWaitingTimeIncreasedEvent():
-      case MatchWelcomeEvent():
-      case MatchPongEvent():
-        break;
+    for (final diffInfo in tickUpdate.diff.diffInfo) {
+      switch (diffInfo) {
+        case MatchDiffInfoPlayerSpawned():
+          // set the position
+          final userId = diffInfo.userId;
+          final isMe = userId == myId;
+          final dash = isMe ? myDash : _otherDashes[userId]!.dash;
+          dash.updateState(diffInfo.x, diffInfo.y, duration: 0.0);
+          break;
+        case MatchDiffInfoPlayerStarted():
+          // Update the velocityX?
+          break;
+        case MatchDiffInfoPlayerJumped():
+          // Update the velocityY?
+          break;
+        case MatchDiffInfoPlayerMoved():
+          // Update the position
+          final userId = diffInfo.userId;
+          if (userId != myId) {
+            final dash = _otherDashes[userId]!.dash;
+            dash.updateState(diffInfo.x, diffInfo.y, duration: 0.0);
+          }
+          break;
+        case MatchDiffInfoPlayerScored():
+          // Nothing!
+          break;
+        case MatchDiffInfoPlayerSpawnTimeDecreased():
+          // Nothing!
+          break;
+        case MatchDiffInfoPlayerDied():
+          // Die animation at [diffInfo.x, diffInfo.y]
+
+          // Spawn portal
+          final userId = diffInfo.userId;
+          if (userId != myId) {
+            _spawnPortalAndPlayer(
+              playerId: userId,
+              position: Vector2(diffInfo.newX, diffInfo.newY),
+              spawnsAfter: diffInfo.spawnsAgainIn,
+            );
+          }
+          break;
+      }
     }
   }
 
@@ -187,7 +154,6 @@ class MultiplayerController extends Component
     dash.updateState(
       position.x,
       position.y,
-      0.0,
       duration: 0.0,
     );
     dash.scale = Vector2.all(0.0);
@@ -240,7 +206,7 @@ class MultiplayerController extends Component
   void onRemove() {
     super.onRemove();
     _stateStreamSubscription.cancel();
-    _eventStreamSubscription.cancel();
+    _updateTickEventStreamSubscription.cancel();
   }
 }
 

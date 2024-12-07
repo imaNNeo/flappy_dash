@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
+import 'package:flappy_dash/domain/entities/game_config_entity.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
@@ -43,12 +44,26 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
         MultiplayerGameMode() => otherPlayerId != null
             ? multiplayerCubit
                 .state.matchState!.players[otherPlayerId]!.playingState
-            : multiplayerCubit.state.currentPlayingState,
+            : multiplayerCubit.state.localPlayerState!.playingState,
       };
 
-  double get worldWidth =>
-      gameMode.gameConfig.pipesDistance *
-      multiplayerCubit.state.matchState!.pipesPositions.length;
+  GameConfigEntity get _config => gameMode.gameConfig;
+
+  double get pipesDistance => switch (_config) {
+        SinglePlayerGameConfigEntity() =>
+          (_config as SinglePlayerGameConfigEntity).pipesDistance,
+        MultiplayerGameConfigEntity() =>
+          multiplayerCubit.state.matchState!.pipesDistance,
+      };
+
+  double get worldWidth {
+    assert(
+      gameMode is MultiplayerGameMode,
+      'worldWidth is only available in multiplayer mode',
+    );
+    return pipesDistance *
+        multiplayerCubit.state.matchState!.pipesNormalizedYPositions.length;
+  }
 
   @override
   KeyEventResult onKeyEvent(
@@ -66,25 +81,25 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
     return KeyEventResult.ignored;
   }
 
-  void gameOver(double x, double y, double velocityY) async {
+  void gameOver() async {
     switch (gameMode) {
       case SinglePlayerGameMode():
         await singleplayerCubit.gameOver();
         leaderboardCubit.refreshLeaderboard();
         break;
       case MultiplayerGameMode():
-        multiplayerCubit.playerDied(x, y, velocityY);
+        multiplayerCubit.playerDied();
         break;
     }
   }
 
-  void increaseScore(double x, double y, double velocityY) {
+  void increaseScore() {
     switch (gameMode) {
       case SinglePlayerGameMode():
         singleplayerCubit.increaseScore();
         break;
       case MultiplayerGameMode():
-        multiplayerCubit.increaseScore(x, y, velocityY);
+        multiplayerCubit.increaseScore();
         break;
     }
   }
@@ -100,13 +115,13 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
     }
   }
 
-  void playerJumped(double x, double y, double velocityY) {
-    switch(gameMode) {
+  void playerJumped() {
+    switch (gameMode) {
       case SinglePlayerGameMode():
         // Does nothing
         break;
       case MultiplayerGameMode():
-        multiplayerCubit.dispatchJumpEvent(x, y, velocityY);
+        multiplayerCubit.dispatchJumpEvent();
         break;
     }
   }

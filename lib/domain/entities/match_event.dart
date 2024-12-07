@@ -27,8 +27,12 @@ sealed class MatchEvent {
   String get debugName;
 }
 
+sealed class MatchGeneralEvent extends MatchEvent {
+  MatchGeneralEvent(super.matchData);
+}
+
 // Match events:
-class MatchWelcomeEvent extends MatchEvent with HasMatchState {
+class MatchWelcomeEvent extends MatchGeneralEvent with HasMatchState {
   MatchWelcomeEvent(super.matchData)
       : matchState = MatchState.fromJson(
           jsonDecode(utf8.decode(matchData.data!)),
@@ -40,7 +44,7 @@ class MatchWelcomeEvent extends MatchEvent with HasMatchState {
   String get debugName => 'MatchWelcome';
 }
 
-class MatchWaitingTimeIncreasedEvent extends MatchEvent with HasMatchState {
+class MatchWaitingTimeIncreasedEvent extends MatchGeneralEvent with HasMatchState {
   MatchWaitingTimeIncreasedEvent(super.matchData)
       : newMatchRunsAt = DateTime.fromMillisecondsSinceEpoch(
           jsonDecode(utf8.decode(matchData.data!))['newMatchRunsAt'],
@@ -52,7 +56,7 @@ class MatchWaitingTimeIncreasedEvent extends MatchEvent with HasMatchState {
   String get debugName => 'MatchWaitingTimeIncreased';
 }
 
-class MatchPlayersJoined extends MatchEvent with HasMatchState {
+class MatchPlayersJoined extends MatchGeneralEvent with HasMatchState {
   MatchPlayersJoined(super.matchData)
       : joinedPlayersInfo = (jsonDecode(utf8.decode(matchData.data!)) as Map)
             .map(
@@ -68,7 +72,7 @@ class MatchPlayersJoined extends MatchEvent with HasMatchState {
   String get debugName => 'MatchPlayersJoined';
 }
 
-class MatchPlayersLeft extends MatchEvent with HasMatchState {
+class MatchPlayersLeft extends MatchGeneralEvent with HasMatchState {
   MatchPlayersLeft(super.matchData)
       : leftPlayerIds =
             (jsonDecode(utf8.decode(matchData.data!)) as List).cast<String>();
@@ -79,7 +83,7 @@ class MatchPlayersLeft extends MatchEvent with HasMatchState {
   String get debugName => 'MatchPlayersLeft';
 }
 
-class MatchPlayerNameUpdatedEvent extends MatchEvent with HasMatchState {
+class MatchPlayerNameUpdatedEvent extends MatchGeneralEvent with HasMatchState {
   MatchPlayerNameUpdatedEvent(super.matchData)
       : newDisplayName =
             jsonDecode(utf8.decode(matchData.data!))['newDisplayName'];
@@ -90,7 +94,7 @@ class MatchPlayerNameUpdatedEvent extends MatchEvent with HasMatchState {
   String get debugName => 'MatchPlayerNameUpdated';
 }
 
-class MatchStartedEvent extends MatchEvent with HasMatchState {
+class MatchStartedEvent extends MatchGeneralEvent with HasMatchState {
   MatchStartedEvent(super.matchData)
       : matchState = MatchState.fromJson(
           jsonDecode(utf8.decode(matchData.data!)),
@@ -102,14 +106,14 @@ class MatchStartedEvent extends MatchEvent with HasMatchState {
   String get debugName => 'MatchStarted';
 }
 
-class MatchFinishedEvent extends MatchEvent with HasMatchState {
+class MatchFinishedEvent extends MatchGeneralEvent with HasMatchState {
   MatchFinishedEvent(super.matchData);
 
   @override
   String get debugName => 'MatchFinished';
 }
 
-class MatchPongEvent extends MatchEvent {
+class MatchPongEvent extends MatchGeneralEvent {
   MatchPongEvent(MatchData matchData) : super(matchData) {
     final json = jsonDecode(utf8.decode(matchData.data!));
     serverReceiveTime = DateTime.fromMillisecondsSinceEpoch(
@@ -129,7 +133,7 @@ class MatchPongEvent extends MatchEvent {
 }
 
 // Player Events:
-class PlayerJoinedTheLobby extends MatchEvent with HasMatchState {
+class PlayerJoinedTheLobby extends MatchGeneralEvent with HasMatchState {
   PlayerJoinedTheLobby(super.matchData)
       : joinedPlayer = PlayerState.fromJson(
           jsonDecode(utf8.decode(matchData.data!)),
@@ -141,26 +145,14 @@ class PlayerJoinedTheLobby extends MatchEvent with HasMatchState {
   String get debugName => 'PlayerJoinedTheLobby';
 }
 
-class PlayerTickUpdateEvent extends MatchEvent with HasMatchState {
-  PlayerTickUpdateEvent(super.matchData)
-      : diff = MatchDiffEntity.fromJson(
-          jsonDecode(utf8.decode(matchData.data!)),
-        );
-
-  final MatchDiffEntity diff;
-
-  @override
-  String get debugName => 'PlayerTickUpdate';
-}
-
-class PlayerKickedFromTheLobbyEvent extends MatchEvent with HasMatchState {
+class PlayerKickedFromTheLobbyEvent extends MatchGeneralEvent with HasMatchState {
   PlayerKickedFromTheLobbyEvent(super.matchData);
 
   @override
   String get debugName => 'PlayerKickedFromTheLobby';
 }
 
-class PlayerFullStateNeededEvent extends MatchEvent with HasMatchState {
+class PlayerFullStateNeededEvent extends MatchGeneralEvent with HasMatchState {
   PlayerFullStateNeededEvent(super.matchData)
       : matchState = MatchState.fromJson(
           jsonDecode(utf8.decode(matchData.data!)),
@@ -169,4 +161,19 @@ class PlayerFullStateNeededEvent extends MatchEvent with HasMatchState {
 
   @override
   String get debugName => 'PlayerFullStateNeeded';
+}
+
+class PlayerTickUpdateEvent extends MatchEvent with HasMatchState {
+  PlayerTickUpdateEvent(super.matchData)
+      : diff = MatchDiffEntity.fromJson(
+    jsonDecode(utf8.decode(matchData.data!)),
+  );
+
+  final MatchDiffEntity diff;
+
+  @override
+  bool get hideInDebugPanel => true;
+
+  @override
+  String get debugName => 'PlayerTickUpdate';
 }

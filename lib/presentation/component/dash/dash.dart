@@ -5,6 +5,7 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/extensions.dart';
 import 'package:flappy_dash/domain/entities/dash_type.dart';
+import 'package:flappy_dash/domain/entities/game_config_entity.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
@@ -20,7 +21,6 @@ import 'auto_jump_dash.dart';
 class Dash extends PositionComponent
     with CollisionCallbacks, HasGameRef<FlappyDashGame> {
   Dash({
-    required this.speed,
     required this.playerId,
     required this.displayName,
     required this.isMe,
@@ -40,18 +40,29 @@ class Dash extends PositionComponent
   late final Sprite _dashSprite;
   OutlinedTextComponent? _nameComponent;
 
-  double _velocityY = 0;
-
   double get velocityY => _velocityY;
 
-  double get gravity => gameRef.world.rootComponent.gravity;
+  double _velocityY = 0;
+  double _velocityX = 0;
 
-  double get jumpForce => _jumpForce;
+  double get gravityY {
+    final GameConfigEntity gameConfig = game.gameMode.gameConfig;
+    return switch (gameConfig) {
+      SinglePlayerGameConfigEntity() => gameConfig.gravityY,
+      MultiplayerGameConfigEntity() =>
+        gameRef.multiplayerCubit.state.matchState!.gravityY.toDouble(),
+    };
+  }
 
-  final double _jumpForce = -500;
-  final double speed;
-
-  late double _multiplayerCorrectPositionAfter;
+  double get jumpForce {
+    final config = game.gameMode.gameConfig;
+    return switch (config) {
+      SinglePlayerGameConfigEntity() => config.jumpForce,
+      MultiplayerGameConfigEntity() => gameRef
+          .multiplayerCubit.state.matchState!.players[playerId]!.jumpForce
+          .toDouble()
+    };
+  }
 
   UpdateDashStateEffect? _smoothUpdatingPositionEffect;
 
@@ -103,16 +114,6 @@ class Dash extends PositionComponent
         color: AppColors.getDashColor(type),
       ),
     ));
-    _resetCorrectPositionAfter();
-  }
-
-  void _resetCorrectPositionAfter() {
-    if (game.gameMode is! MultiplayerGameMode) {
-      return;
-    }
-    _multiplayerCorrectPositionAfter =
-        (game.gameMode as MultiplayerGameMode).gameConfig.correctPositionEvery *
-            FlappyDashRootComponent.gameSpeedMultiplier;
   }
 
   PlayingState get currentPlayingState => game.getCurrentPlayingState(
@@ -126,21 +127,21 @@ class Dash extends PositionComponent
       return;
     }
     if (isMe) {
-      _updatePositionNormally(dt);
-    } else {
-      if (_smoothUpdatingPositionEffect == null) {
-        _updatePositionNormally(dt);
-      }
+      _tryToUpdatePositionNormally(dt);
+      _checkIfDashIsOutOfBounds();
     }
-
-    _checkIfDashIsOutOfBounds();
-    _checkToDispatchMyPosition(dt);
   }
 
-  void _updatePositionNormally(double dt) {
-    _velocityY += gravity * dt;
+  void _tryToUpdatePositionNormally(double dt) {
+    final config = game.gameMode.gameConfig;
+    _velocityX = switch (config) {
+      SinglePlayerGameConfigEntity() => config.dashMoveSpeed,
+      MultiplayerGameConfigEntity() =>
+        gameRef.multiplayerCubit.state.localPlayerState!.velocityX,
+    };
+    _velocityY += gravityY * dt;
     position.y += _velocityY * dt;
-    position.x += speed * dt;
+    position.x += _velocityX * dt;
   }
 
   void _checkIfDashIsOutOfBounds() {
@@ -148,31 +149,8 @@ class Dash extends PositionComponent
       return;
     }
     if (position.y.abs() > (game.size.y / 2) + 20) {
-      game.gameOver(x, y, _velocityY);
+      game.gameOver();
     }
-  }
-
-  void _checkToDispatchMyPosition(double dt) {
-    if (!isMe) {
-      return;
-    }
-    if (game.gameMode is! MultiplayerGameMode) {
-      return;
-    }
-
-    _multiplayerCorrectPositionAfter -= dt;
-    if (_multiplayerCorrectPositionAfter > 0) {
-      return;
-    }
-    game.multiplayerCubit.dispatchCorrectPosition(x, y, _velocityY);
-    _resetCorrectPositionAfter();
-  }
-
-  void jump() {
-    if (currentPlayingState.isNotPlaying) {
-      return;
-    }
-    _velocityY = _jumpForce;
   }
 
   @override
@@ -214,24 +192,14 @@ class Dash extends PositionComponent
     );
   }
 
-  void resetVelocity() {
-    _velocityY = 0;
-  }
-
-  void updateState(double positionX, double positionY, double velocityY,
-      {double duration = 0.15}) {
-    assert(game.gameMode is MultiplayerGameMode && !isMe);
-    final xDiff = (positionX - x).abs();
+  void updateState(double newX, double newY, {required double duration}) {
+    final xDiff = (newX - x).abs();
     if (xDiff > 200 || duration == 0) {
-      x = positionX;
-      y = positionY;
-      _velocityY = velocityY;
+      x = newX;
+      y = newY;
     } else {
       final scaledDuration =
           duration * FlappyDashRootComponent.gameSpeedMultiplier;
-      final newX = positionX + (speed * scaledDuration);
-      final newVelocity = velocityY + gravity * scaledDuration;
-      final newY = positionY + (newVelocity * scaledDuration);
       _smoothUpdatingPositionEffect?.removeFromParent();
       add(
         _smoothUpdatingPositionEffect = UpdateDashStateEffect(
@@ -240,7 +208,6 @@ class Dash extends PositionComponent
           ),
           positionX: newX,
           positionY: newY,
-          velocityY: newVelocity,
           onComplete: () {
             _smoothUpdatingPositionEffect?.removeFromParent();
             _smoothUpdatingPositionEffect = null;
@@ -257,12 +224,19 @@ class Dash extends PositionComponent
       return;
     }
     if (other is HiddenCoin) {
-      game.increaseScore(x, y, _velocityY);
+      game.increaseScore();
       other.removeFromParent();
     } else if (other is Pipe) {
-      game.gameOver(x, y, _velocityY);
+      game.gameOver();
       _autoJumpDash?.onDashDied();
     }
+  }
+
+  void jump() {
+    if (currentPlayingState.isNotPlaying) {
+      return;
+    }
+    _velocityY = jumpForce;
   }
 }
 
@@ -271,31 +245,26 @@ class UpdateDashStateEffect extends ComponentEffect<Dash> {
     super.controller, {
     required this.positionX,
     required this.positionY,
-    required this.velocityY,
     super.onComplete,
   });
 
   final double positionX;
   final double positionY;
-  final double velocityY;
 
   late final double initialX;
   late final double initialY;
-  late final double initialVelocityY;
 
   @override
   void onMount() {
     super.onMount();
     initialX = target.x;
     initialY = target.y;
-    initialVelocityY = target.velocityY;
   }
 
   @override
   void apply(double progress) {
     final newX = lerpDouble(initialX, positionX, progress)!;
     final newY = lerpDouble(initialY, positionY, progress)!;
-    final newVelocityY = lerpDouble(initialVelocityY, velocityY, progress)!;
-    target.updateState(newX, newY, newVelocityY, duration: 0);
+    target.updateState(newX, newY, duration: 0);
   }
 }

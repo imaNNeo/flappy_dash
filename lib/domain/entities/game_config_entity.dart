@@ -2,33 +2,32 @@ import 'package:equatable/equatable.dart';
 
 sealed class GameConfigEntity with EquatableMixin {
   const GameConfigEntity();
-
-  final double dashMoveSpeed = 160.0;
-  abstract final double pipesPositionArea;
-  abstract final double pipesDistance;
-  abstract final double pipeWidth;
-  abstract final double pipeHoleGap;
 }
 
 class SinglePlayerGameConfigEntity extends GameConfigEntity {
   const SinglePlayerGameConfigEntity({
+    this.gravityY = 1400.0,
     this.pipesPositionArea = 300.0,
     this.pipesDistance = 420.0,
     this.pipeWidth = 82.0,
     this.pipeHoleGap = 240,
+    this.dashMoveSpeed = 160.0,
+    this.jumpForce = -500.0,
   });
 
-  @override
+  final double gravityY;
+
   final double pipesPositionArea;
 
-  @override
   final double pipesDistance;
 
-  @override
   final double pipeWidth;
 
-  @override
   final double pipeHoleGap;
+
+  final double dashMoveSpeed;
+
+  final double jumpForce;
 
   @override
   List<Object?> get props => [
@@ -36,38 +35,14 @@ class SinglePlayerGameConfigEntity extends GameConfigEntity {
         pipesDistance,
         pipeWidth,
         pipeHoleGap,
+        dashMoveSpeed,
+        jumpForce,
       ];
 }
 
 class MultiplayerGameConfigEntity extends GameConfigEntity {
-  const MultiplayerGameConfigEntity({
-    this.pipesPositionArea = 300.0,
-    this.pipesDistance = 420.0,
-    this.pipeWidth = 82.0,
-    this.pipeHoleGap = 240,
-    this.correctPositionEvery = 5.0,
-  });
+  const MultiplayerGameConfigEntity();
 
   @override
-  final double pipesPositionArea;
-
-  @override
-  final double pipesDistance;
-
-  @override
-  final double pipeWidth;
-
-  @override
-  final double pipeHoleGap;
-
-  final double correctPositionEvery;
-
-  @override
-  List<Object?> get props => [
-        pipesPositionArea,
-        pipesDistance,
-        pipeWidth,
-        pipeHoleGap,
-        correctPositionEvery,
-      ];
+  List<Object?> get props => [];
 }
