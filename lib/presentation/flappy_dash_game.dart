@@ -22,12 +22,9 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
     this.multiplayerCubit,
     this.leaderboardCubit,
   ) : super(
-          world: FlappyDashWorld(),
-          camera: CameraComponent.withFixedResolution(
-            width: 600,
-            height: 1000,
-          ),
-        );
+        world: FlappyDashWorld(),
+        camera: CameraComponent.withFixedResolution(width: 600, height: 1000),
+      );
 
   final Random random = Random();
   final GameMode gameMode;
@@ -35,15 +32,17 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
   final MultiplayerCubit multiplayerCubit;
   final LeaderboardCubit leaderboardCubit;
 
-  PlayingState getCurrentPlayingState({
-    String? otherPlayerId,
-  }) =>
+  PlayingState getCurrentPlayingState({String? otherPlayerId}) =>
       switch (gameMode) {
         SinglePlayerGameMode() => singleplayerCubit.state.currentPlayingState,
-        MultiplayerGameMode() => otherPlayerId != null
-            ? multiplayerCubit
-                .state.matchState!.players[otherPlayerId]!.playingState
-            : multiplayerCubit.state.currentPlayingState,
+        MultiplayerGameMode() =>
+          otherPlayerId != null
+              ? multiplayerCubit
+                    .state
+                    .matchState!
+                    .players[otherPlayerId]!
+                    .playingState
+              : multiplayerCubit.state.currentPlayingState,
       };
 
   double get worldWidth =>
@@ -101,7 +100,7 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
   }
 
   void playerJumped(double x, double y, double velocityY) {
-    switch(gameMode) {
+    switch (gameMode) {
       case SinglePlayerGameMode():
         // Does nothing
         break;
@@ -126,7 +125,7 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
 }
 
 class FlappyDashWorld extends World
-    with TapCallbacks, HasGameRef<FlappyDashGame> {
+    with TapCallbacks, HasGameReference<FlappyDashGame> {
   late FlappyDashRootComponent _rootComponent;
 
   FlappyDashRootComponent get rootComponent => _rootComponent;

@@ -30,8 +30,7 @@ class DeviceDataSource {
   }
 
   Future<String?> _readDeviceId() async {
-    return (await SharedPreferences.getInstance())
-        .getString(_deviceIdKey);
+    return (await SharedPreferences.getInstance()).getString(_deviceIdKey);
   }
 
   Future<void> _writeDeviceId(String deviceId) async {

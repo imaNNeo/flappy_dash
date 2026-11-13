@@ -6,14 +6,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'raw_scores_list_dialog.dart';
 
 class LeaderBoardDialog extends StatefulWidget {
-
-  static Future<T?> show<T>(BuildContext context) =>
-      showDialog<T?>(
-        context: context,
-        builder: (context) {
-          return const LeaderBoardDialog();
-        },
-      );
+  static Future<T?> show<T>(BuildContext context) => showDialog<T?>(
+    context: context,
+    builder: (context) {
+      return const LeaderBoardDialog();
+    },
+  );
 
   const LeaderBoardDialog({super.key});
 
@@ -37,13 +35,11 @@ class _LeaderBoardDialogState extends State<LeaderBoardDialog> {
             name: name,
             isMe: record.ownerId == state.currentAccount?.user.id,
             dashType: DashType.fromUserId(record.ownerId ?? ''),
-            score: int.parse(record.score ?? '0'),
-            rank: int.parse(record.rank ?? '9999'),
+            score: record.score,
+            rank: record.rank == 0 ? 9999 : record.rank,
           );
         });
-        return RawScoresDialog(
-          scores: records?.toList() ?? [],
-        );
+        return RawScoresDialog(scores: records?.toList() ?? []);
       },
     );
   }

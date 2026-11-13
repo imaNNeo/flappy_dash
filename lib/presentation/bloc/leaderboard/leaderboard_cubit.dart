@@ -9,9 +9,7 @@ import 'package:nakama/nakama.dart';
 part 'leaderboard_state.dart';
 
 class LeaderboardCubit extends Cubit<LeaderboardState> {
-  LeaderboardCubit(
-    this._gameRepository,
-  ) : super(const LeaderboardState()) {
+  LeaderboardCubit(this._gameRepository) : super(const LeaderboardState()) {
     _init();
   }
 
@@ -24,22 +22,21 @@ class LeaderboardCubit extends Cubit<LeaderboardState> {
   }
 
   void _listenToUserDisplayNameUpdates() {
-    _userAccountUpdateSubscription =
-        _gameRepository.getUserAccountUpdateStream().listen((account) {
-      final currentAccount = state.currentAccount;
-      if (currentAccount != null &&
-          currentAccount.user.displayName != account.user.displayName) {
-        refreshLeaderboard();
-      }
-      emit(state.copyWith(currentAccount: account));
-    });
+    _userAccountUpdateSubscription = _gameRepository
+        .getUserAccountUpdateStream()
+        .listen((account) {
+          final currentAccount = state.currentAccount;
+          if (currentAccount != null &&
+              currentAccount.user.displayName != account.user.displayName) {
+            refreshLeaderboard();
+          }
+          emit(state.copyWith(currentAccount: account));
+        });
   }
 
   Future<void> refreshLeaderboard() async {
     final leaderboard = await _gameRepository.getLeaderboard();
-    emit(state.copyWith(
-      leaderboardEntity: leaderboard,
-    ));
+    emit(state.copyWith(leaderboardEntity: leaderboard));
   }
 
   void onLeaderboardPageOpen() async {

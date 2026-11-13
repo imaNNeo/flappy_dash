@@ -1,10 +1,7 @@
 part of '../match_result_page.dart';
 
 class _TrophiesRow extends StatelessWidget {
-  const _TrophiesRow({
-    required this.matchResult,
-    required this.screenSize,
-  });
+  const _TrophiesRow({required this.matchResult, required this.screenSize});
 
   final MatchResultEntity matchResult;
   final ScreenSize screenSize;
@@ -27,25 +24,25 @@ class _TrophiesRow extends StatelessWidget {
 
     if (scores.isNotEmpty) {
       firstData = (
-      name: scores[0].user.showingName,
-      dashType: DashType.fromUserId(scores[0].user.id),
-      score: scores[0].score,
+        name: scores[0].user.showingName,
+        dashType: DashType.fromUserId(scores[0].user.id),
+        score: scores[0].score,
       );
     }
 
     if (scores.length > 1) {
       secondData = (
-      name: scores[1].user.showingName,
-      dashType: DashType.fromUserId(scores[1].user.id),
-      score: scores[1].score,
+        name: scores[1].user.showingName,
+        dashType: DashType.fromUserId(scores[1].user.id),
+        score: scores[1].score,
       );
     }
 
     if (scores.length > 2) {
       thirdData = (
-      name: scores[2].user.showingName,
-      dashType: DashType.fromUserId(scores[2].user.id),
-      score: scores[2].score,
+        name: scores[2].user.showingName,
+        dashType: DashType.fromUserId(scores[2].user.id),
+        score: scores[2].score,
       );
     }
     return Row(

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NicknameDialog extends StatefulWidget {
-
   static Future<String?> show(BuildContext context) {
     return showDialog<String?>(
       context: context,
@@ -25,8 +24,12 @@ class _NicknameDialogState extends State<NicknameDialog> {
 
   @override
   void initState() {
-    final name =
-        context.read<AccountCubit>().state.currentAccount?.user.showingName;
+    final name = context
+        .read<AccountCubit>()
+        .state
+        .currentAccount
+        ?.user
+        .showingName;
     _textEditingController = TextEditingController(text: name);
     super.initState();
   }
@@ -39,9 +42,7 @@ class _NicknameDialogState extends State<NicknameDialog> {
       content: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.all(
-            Radius.circular(16),
-          ),
+          borderRadius: BorderRadius.all(Radius.circular(16)),
         ),
         child: Padding(
           padding: const EdgeInsets.all(18.0),
@@ -50,10 +51,7 @@ class _NicknameDialogState extends State<NicknameDialog> {
             children: [
               const Text(
                 'Your Nickname',
-                style: TextStyle(
-                  fontFamily: 'Roboto',
-                  fontSize: 28,
-                ),
+                style: TextStyle(fontFamily: 'Roboto', fontSize: 28),
               ),
               const SizedBox(height: 24),
               TextField(

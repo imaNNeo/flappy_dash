@@ -4,7 +4,7 @@ import 'package:nakama/nakama.dart';
 import 'match_phase.dart';
 import 'player_state.dart';
 
-class MatchState with EquatableMixin {
+class MatchState with Equatable {
   final DateTime matchInitializedAt;
   final DateTime matchRunsAt;
   final DateTime matchFinishesAt;
@@ -31,36 +31,41 @@ class MatchState with EquatableMixin {
     List<UserPresence>? presences,
     Map<String, PlayerState>? players,
     List<double>? pipesPositions,
-  }) =>
-      MatchState(
-        matchInitializedAt: matchInitializedAt ?? this.matchInitializedAt,
-        matchRunsAt: matchRunsAt ?? this.matchRunsAt,
-        matchFinishesAt: matchFinishesAt ?? this.matchFinishesAt,
-        currentPhase: currentPhase ?? this.currentPhase,
-        presences: presences ?? this.presences,
-        players: players ?? this.players,
-        pipesPositions: pipesPositions ?? this.pipesPositions,
-      );
+  }) => MatchState(
+    matchInitializedAt: matchInitializedAt ?? this.matchInitializedAt,
+    matchRunsAt: matchRunsAt ?? this.matchRunsAt,
+    matchFinishesAt: matchFinishesAt ?? this.matchFinishesAt,
+    currentPhase: currentPhase ?? this.currentPhase,
+    presences: presences ?? this.presences,
+    players: players ?? this.players,
+    pipesPositions: pipesPositions ?? this.pipesPositions,
+  );
 
   factory MatchState.fromJson(Map<String, dynamic> json) => MatchState(
-    matchInitializedAt:
-    DateTime.fromMillisecondsSinceEpoch(json['matchInitializedAt']),
+    matchInitializedAt: DateTime.fromMillisecondsSinceEpoch(
+      json['matchInitializedAt'],
+    ),
     matchRunsAt: DateTime.fromMillisecondsSinceEpoch(json['matchRunsAt']),
-    matchFinishesAt:
-    DateTime.fromMillisecondsSinceEpoch(json['matchFinishesAt']),
+    matchFinishesAt: DateTime.fromMillisecondsSinceEpoch(
+      json['matchFinishesAt'],
+    ),
     currentPhase: MatchPhase.values[json['currentPhase']],
     presences: (json['presences'] as List)
-        .map((e) => UserPresence(
-      userId: e['userId'],
-      sessionId: e['sessionId'],
-      username: e['username'],
-      persistence: false,
-    ))
+        .map(
+          (e) => UserPresence(
+            userId: e['userId'],
+            sessionId: e['sessionId'],
+            username: e['username'],
+            persistence: false,
+          ),
+        )
         .toList(),
     players: (json['players'] as Map<String, dynamic>).map(
-          (k, v) => MapEntry(k, PlayerState.fromJson(v)),
+      (k, v) => MapEntry(k, PlayerState.fromJson(v)),
     ),
-    pipesPositions: (json['pipesPositions'] as List).cast<double>(),
+    pipesPositions: (json['pipesPositions'] as List)
+        .map((e) => (e as num).toDouble())
+        .toList(),
   );
 
   @override

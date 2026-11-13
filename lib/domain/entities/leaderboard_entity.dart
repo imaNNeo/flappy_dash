@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flappy_dash/domain/extensions/user_extension.dart';
 import 'package:nakama/nakama.dart';
 
-class LeaderboardEntity with EquatableMixin {
+class LeaderboardEntity with Equatable {
   final LeaderboardRecordList _recordList;
   final Map<String, User> _userProfiles;
   final String _currentUserId;
@@ -27,19 +27,12 @@ class LeaderboardEntity with EquatableMixin {
     return (record, user.showingName);
   }
 
-  LeaderboardEntity(
-    this._recordList,
-    this._userProfiles,
-    this._currentUserId,
-  ) : assert(_recordList.records!.length == _userProfiles.length);
+  LeaderboardEntity(this._recordList, this._userProfiles, this._currentUserId)
+    : assert(_recordList.records!.length == _userProfiles.length);
 
   List<T> map<T>(T Function(LeaderboardRecord record, String name) f) =>
       List.generate(length, (index) => f(this[index].$1, this[index].$2));
 
   @override
-  List<Object?> get props => [
-        _recordList,
-        _userProfiles,
-        _currentUserId,
-      ];
+  List<Object?> get props => [_recordList, _userProfiles, _currentUserId];
 }

@@ -9,10 +9,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 part 'splash_state.dart';
 
 class SplashCubit extends Cubit<SplashState> {
-  SplashCubit(
-    this._gameRepository,
-    this._settingsRepository,
-  ) : super(const SplashState());
+  SplashCubit(this._gameRepository, this._settingsRepository)
+    : super(const SplashState());
 
   static const _splashDuration = Duration(seconds: 2);
   final GameRepository _gameRepository;
@@ -28,9 +26,7 @@ class SplashCubit extends Cubit<SplashState> {
       final startTime = DateTime.now();
       await _beforeVersionCheckInitialization();
       if (!(await _settingsRepository.isVersionUpToDate())) {
-        emit(state.copyWith(
-          versionIsOutdated: true,
-        ));
+        emit(state.copyWith(versionIsOutdated: true));
         return;
       }
       final endTime = DateTime.now();
@@ -38,18 +34,12 @@ class SplashCubit extends Cubit<SplashState> {
       if (difference < _splashDuration) {
         await Future.delayed(_splashDuration - difference);
       }
-      emit(state.copyWith(
-        isSplashInitialized: true,
-      ));
+      emit(state.copyWith(isSplashInitialized: true));
       _openHomePage();
     } catch (e) {
-      emit(state.copyWith(
-        initializationError: e.toString(),
-      ));
+      emit(state.copyWith(initializationError: e.toString()));
       if (!kDebugMode) {
-        emit(state.copyWith(
-          initializationError: '',
-        ));
+        emit(state.copyWith(initializationError: ''));
       }
     }
   }

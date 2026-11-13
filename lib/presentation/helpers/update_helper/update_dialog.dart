@@ -9,9 +9,7 @@ class UpdateDialog {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text(
-            'Outdated Version',
-          ),
+          title: const Text('Outdated Version'),
           content: const Text(
             'Please update the app to the latest version to continue using it.',
           ),

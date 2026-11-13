@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-sealed class GameConfigEntity with EquatableMixin {
+sealed class GameConfigEntity with Equatable {
   const GameConfigEntity();
 
   final double dashMoveSpeed = 160.0;
@@ -32,11 +32,11 @@ class SinglePlayerGameConfigEntity extends GameConfigEntity {
 
   @override
   List<Object?> get props => [
-        pipesPositionArea,
-        pipesDistance,
-        pipeWidth,
-        pipeHoleGap,
-      ];
+    pipesPositionArea,
+    pipesDistance,
+    pipeWidth,
+    pipeHoleGap,
+  ];
 }
 
 class MultiplayerGameConfigEntity extends GameConfigEntity {
@@ -64,10 +64,10 @@ class MultiplayerGameConfigEntity extends GameConfigEntity {
 
   @override
   List<Object?> get props => [
-        pipesPositionArea,
-        pipesDistance,
-        pipeWidth,
-        pipeHoleGap,
-        correctPositionEvery,
-      ];
+    pipesPositionArea,
+    pipesDistance,
+    pipeWidth,
+    pipeHoleGap,
+    correctPositionEvery,
+  ];
 }

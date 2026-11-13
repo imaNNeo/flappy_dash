@@ -19,10 +19,8 @@ import 'dash/dash_spawn_effect.dart';
 import 'dash/dash_spawn_portal.dart';
 
 class MultiplayerController extends Component
-    with ParentIsA<FlappyDashRootComponent>, HasGameRef<FlappyDashGame> {
-  MultiplayerController({
-    super.priority,
-  });
+    with ParentIsA<FlappyDashRootComponent>, HasGameReference<FlappyDashGame> {
+  MultiplayerController({super.priority});
 
   late StreamSubscription<MultiplayerState> _stateStreamSubscription;
   late StreamSubscription<MatchEvent> _eventStreamSubscription;
@@ -42,7 +40,9 @@ class MultiplayerController extends Component
 
   void _onNewState(MultiplayerState state) {
     if (mapEquals(
-        _previousState?.matchState?.players, state.matchState?.players)) {
+      _previousState?.matchState?.players,
+      state.matchState?.players,
+    )) {
       _onPlayersUpdated(state.matchState?.players);
     }
 
@@ -51,8 +51,9 @@ class MultiplayerController extends Component
 
   void _onPlayersUpdated(Map<String, PlayerState>? players) {
     if (players == null) {
-      _otherDashes
-          .forEach((_, dashBundle) => dashBundle.dash.removeFromParent());
+      _otherDashes.forEach(
+        (_, dashBundle) => dashBundle.dash.removeFromParent(),
+      );
       _otherDashes.clear();
       return;
     }
@@ -153,15 +154,15 @@ class MultiplayerController extends Component
       case PlayerCorrectPositionEvent():
         // We just mutate the position of the dash
         final dash = _otherDashes[event.sender!.userId]!.dash;
-        if (_cubit.state.matchState!.players[event.sender!.userId]!.playingState
+        if (_cubit
+            .state
+            .matchState!
+            .players[event.sender!.userId]!
+            .playingState
             .isNotPlaying) {
           return;
         }
-        dash.updateState(
-          event.dashX,
-          event.dashY,
-          event.dashVelocityY,
-        );
+        dash.updateState(event.dashX, event.dashY, event.dashVelocityY);
         break;
       // We don't care about these events at the moment
       case PlayerIsIdleEvent():
@@ -184,12 +185,7 @@ class MultiplayerController extends Component
     required double spawnsAfter,
   }) async {
     final dash = _otherDashes[playerId]!.dash;
-    dash.updateState(
-      position.x,
-      position.y,
-      0.0,
-      duration: 0.0,
-    );
+    dash.updateState(position.x, position.y, 0.0, duration: 0.0);
     dash.scale = Vector2.all(0.0);
 
     // It's okay to show the other dash while it's idle after spawning,
@@ -208,32 +204,33 @@ class MultiplayerController extends Component
         },
       ),
     );
-    add(SpawningPortal(
-      position: position,
-      size: Vector2.all(dash.size.x),
-      color: AppColors.getDashColor(
-        DashType.fromUserId(playerId),
-      ).darken(0.2),
-      priority: -1,
-      hideAfter: spawnsAfter - 0.5,
-      onHide: () {
-        _cubit.addDebugMessage(
-          DebugFunctionCallEvent(
-            'MultiplayerController',
-            '_spawnPortalAndPlayer - portal hidden',
-            {
-              'playerId': playerId.split('-')[0],
-              'dash.position': dash.position.toStringWithMaxPrecision(2),
-              'dash.visibleOnIdle': dash.visibleOnIdle.toString(),
-            },
-          ),
-        );
-        dash.isNameVisible = false;
-        dash.add(DashSpawnEffect(
-          onComplete: () => dash.isNameVisible = true,
-        ));
-      },
-    ));
+    add(
+      SpawningPortal(
+        position: position,
+        size: Vector2.all(dash.size.x),
+        color: AppColors.getDashColor(DashType.fromUserId(playerId))
+            .darken(0.2),
+        priority: -1,
+        hideAfter: spawnsAfter - 0.5,
+        onHide: () {
+          _cubit.addDebugMessage(
+            DebugFunctionCallEvent(
+              'MultiplayerController',
+              '_spawnPortalAndPlayer - portal hidden',
+              {
+                'playerId': playerId.split('-')[0],
+                'dash.position': dash.position.toStringWithMaxPrecision(2),
+                'dash.visibleOnIdle': dash.visibleOnIdle.toString(),
+              },
+            ),
+          );
+          dash.isNameVisible = false;
+          dash.add(
+            DashSpawnEffect(onComplete: () => dash.isNameVisible = true),
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -244,7 +241,7 @@ class MultiplayerController extends Component
   }
 }
 
-class _OtherDashBundle with EquatableMixin {
+class _OtherDashBundle with Equatable {
   final Dash dash;
   final PlayerState playerState;
 

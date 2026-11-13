@@ -17,6 +17,7 @@ import 'package:flappy_dash/domain/entities/value_wrapper.dart';
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
 import 'package:flappy_dash/domain/repositories/game_repository.dart';
 import 'package:flappy_dash/domain/repositories/multiplayer_repository.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nakama/nakama.dart';
 
@@ -38,9 +39,7 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
 
   void _initialize() async {
     final userId = await _gameRepository.getCurrentUserId();
-    emit(state.copyWith(
-      currentUserId: userId,
-    ));
+    emit(state.copyWith(currentUserId: userId));
     _timer = Timer.periodic(const Duration(milliseconds: 100), (_) {
       _refreshRemainingTime();
       _refreshRespawnTimer();
@@ -48,6 +47,40 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     });
     _listenToUserDisplayNameUpdates();
     _listenToDispatchingEvents();
+    _reconnectedSubscription = _multiplayerRepository.onReconnected.listen(
+      (_) => _rejoinAfterReconnect(),
+    );
+  }
+
+  /// The server drops us from the match when the socket closes. Join again
+  /// (the server keeps our score) and get back into the lobby if we were in it.
+  void _rejoinAfterReconnect() async {
+    final matchId = state.matchId;
+    if (matchId.isBlank || state.currentMatch == null) {
+      return;
+    }
+    if (state.matchState?.currentPhase == MatchPhase.finished) {
+      return;
+    }
+    final wasInLobby = state.joinedInLobby;
+    try {
+      final match = await _multiplayerRepository.joinMatch(matchId);
+      if (isClosed || state.matchId != matchId) {
+        return;
+      }
+      emit(state.copyWith(currentMatch: match));
+      if (wasInLobby && state.matchState?.currentPhase != MatchPhase.running) {
+        _multiplayerRepository.joinLobby(matchId);
+      }
+    } catch (e) {
+      _addDebugMessage(
+        DebugFunctionCallEvent(
+          'MultiplayerCubit',
+          'rejoinAfterReconnect failed',
+          {'error': e.toString()},
+        ),
+      );
+    }
   }
 
   void _listenToUserDisplayNameUpdates() {
@@ -66,85 +99,115 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
   final GameRepository _gameRepository;
 
   Timer? _timer;
-  late StreamSubscription _matchEventsSubscription;
+  StreamSubscription? _matchEventsSubscription;
   late StreamSubscription _dispatchingEventsSubscription;
+  late StreamSubscription _reconnectedSubscription;
 
   void _refreshRemainingTime() {
-    final waitingRemaining =
-        state.matchState?.matchRunsAt.difference(DateTime.now()).inSeconds;
-    final playingRemaining =
-        state.matchState?.matchFinishesAt.difference(DateTime.now()).inSeconds;
+    final waitingRemaining = state.matchState?.matchRunsAt
+        .difference(DateTime.now())
+        .inSeconds;
+    final playingRemaining = state.matchState?.matchFinishesAt
+        .difference(DateTime.now())
+        .inSeconds;
 
-    emit(state.copyWith(
-      matchWaitingRemainingSeconds: waitingRemaining != null
-          ? max(waitingRemaining, 0)
-          : waitingRemaining,
-      matchPlayingRemainingSeconds: playingRemaining != null
-          ? max(playingRemaining, 0)
-          : playingRemaining,
-    ));
+    emit(
+      state.copyWith(
+        matchWaitingRemainingSeconds: waitingRemaining != null
+            ? max(waitingRemaining, 0)
+            : waitingRemaining,
+        matchPlayingRemainingSeconds: playingRemaining != null
+            ? max(playingRemaining, 0)
+            : playingRemaining,
+      ),
+    );
   }
 
   void joinMatch(String matchId) async {
     if (matchId != state.matchId) {
       // Reset the state
-      emit(MultiplayerState(
-        matchId: matchId,
-        currentUserId: state.currentUserId,
-        currentAccount: state.currentAccount,
-      ));
+      emit(
+        MultiplayerState(
+          matchId: matchId,
+          currentUserId: state.currentUserId,
+          currentAccount: state.currentAccount,
+        ),
+      );
     }
 
     if (state.joinMatchLoading) {
       return;
     }
-    emit(state.copyWith(
-      matchId: matchId,
-      joinMatchLoading: true,
-      joinMatchError: '',
-    ));
+    emit(
+      state.copyWith(
+        matchId: matchId,
+        joinMatchLoading: true,
+        joinMatchError: '',
+      ),
+    );
     try {
-      _matchEventsSubscription = _multiplayerRepository
-          .onMatchEvent(state.matchId)
-          .listen(_onMatchEvent);
-      final match = await _multiplayerRepository.joinMatch(state.matchId);
-      emit(state.copyWith(
-        joinMatchLoading: false,
-        currentMatch: match,
-      ));
+      await _listenAndJoin(state.matchId);
     } catch (e) {
-      emit(state.copyWith(
-        joinMatchLoading: false,
-        joinMatchError: e.toString(),
-      ));
+      // The match may have started or ended in the meantime (e.g. an old
+      // lobby link). Fall back to the match that is waiting for players now.
+      try {
+        final waitingMatchId = await _multiplayerRepository.getWaitingMatchId();
+        if (waitingMatchId == state.matchId) {
+          rethrow;
+        }
+        emit(
+          MultiplayerState(
+            matchId: waitingMatchId,
+            currentUserId: state.currentUserId,
+            currentAccount: state.currentAccount,
+            joinMatchLoading: true,
+          ),
+        );
+        await _listenAndJoin(waitingMatchId);
+      } catch (_) {
+        emit(
+          state.copyWith(joinMatchLoading: false, joinMatchError: e.toString()),
+        );
+      }
     }
+  }
+
+  Future<void> _listenAndJoin(String matchId) async {
+    await _matchEventsSubscription?.cancel();
+    _matchEventsSubscription = _multiplayerRepository
+        .onMatchEvent(matchId)
+        .listen(_onMatchEvent);
+    final match = await _multiplayerRepository.joinMatch(matchId);
+    emit(state.copyWith(joinMatchLoading: false, currentMatch: match));
   }
 
   void _updateLobby(MatchState newState) {
     final me = newState.players[state.currentUserId]!;
     final othersInLobby = newState.players.values
-        .where((player) =>
-            player.isInLobby && player.userId != state.currentUserId)
+        .where(
+          (player) => player.isInLobby && player.userId != state.currentUserId,
+        )
         .toList();
 
-    emit(state.copyWith(
-      matchState: newState,
-      inLobbyPlayers: [
-        if (me.isInLobby) me,
-        ...othersInLobby,
-      ],
-      joinedInLobby: me.isInLobby,
-    ));
+    emit(
+      state.copyWith(
+        matchState: newState,
+        inLobbyPlayers: [if (me.isInLobby) me, ...othersInLobby],
+        joinedInLobby: me.isInLobby,
+      ),
+    );
   }
 
   void _onMatchStarted(MatchState newState) {
     assert(newState.currentPhase == MatchPhase.running);
-    emit(state.copyWith(
-      matchState: newState,
-      inLobbyPlayers: [],
-      joinedInLobby: false,
-      diedCount: 0,
-    ));
+    emit(
+      state.copyWith(
+        matchState: newState,
+        inLobbyPlayers: [],
+        joinedInLobby: false,
+        diedCount: 0,
+      ),
+    );
   }
 
   void _onMatchEvent(MatchEvent event) {
@@ -181,13 +244,17 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
           case PlayerWillSpawnAtEvent():
             if (state.currentUserId == event.sender!.userId) {
               final spawnsAt = state
-                  .matchState!.players[event.sender!.userId]!.spawnsAgainAt;
+                  .matchState!
+                  .players[event.sender!.userId]!
+                  .spawnsAgainAt;
               final spawnsAfter = spawnsAt.difference(DateTime.now()).inSeconds;
 
-              emit(state.copyWith(
-                spawnsAgainAt: ValueWrapper(spawnsAt),
-                spawnRemainingSeconds: spawnsAfter,
-              ));
+              emit(
+                state.copyWith(
+                  spawnsAgainAt: ValueWrapper(spawnsAt),
+                  spawnRemainingSeconds: spawnsAfter,
+                ),
+              );
             }
             break;
           case _:
@@ -216,7 +283,8 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
       return;
     }
 
-    _matchEventsSubscription.cancel();
+    _matchEventsSubscription?.cancel();
+    _matchEventsSubscription = null;
     await _multiplayerRepository.leaveMatch(state.matchId);
   }
 
@@ -240,9 +308,7 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
       return;
     }
     _audioHelper.playScoreCollectSound();
-    emit(state.copyWith(
-      currentScore: state.currentScore + 1,
-    ));
+    emit(state.copyWith(currentScore: state.currentScore + 1));
     _multiplayerRepository.sendDispatchingEvent(
       state.matchId,
       DispatchingPlayerScoredEvent(
@@ -259,22 +325,22 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
       return;
     }
     final pipesDistance = state.gameMode.gameConfig.pipesDistance;
-    final spawnOnPipeIndex =
-        Random().nextInt(state.matchState!.pipesPositions.length - 1);
+    final spawnOnPipeIndex = Random().nextInt(
+      state.matchState!.pipesPositions.length - 1,
+    );
     final newX = ((spawnOnPipeIndex + 1) * pipesDistance).toDouble();
-    final newY = state.matchState!.pipesPositions[spawnOnPipeIndex] *
+    final newY =
+        state.matchState!.pipesPositions[spawnOnPipeIndex] *
         state.gameMode.gameConfig.pipesPositionArea;
-    _addDebugMessage(DebugFunctionCallEvent(
-      'MultiplayerCubit',
-      'playerDied',
-      {
+    _addDebugMessage(
+      DebugFunctionCallEvent('MultiplayerCubit', 'playerDied', {
         'x': x.toStringAsFixed(2),
         'y': y.toStringAsFixed(2),
         'newPosPipeIndex': spawnOnPipeIndex.toString(),
         'newX': newX.toStringAsFixed(2),
         'newY': newY.toStringAsFixed(2),
-      },
-    ));
+      }),
+    );
     _multiplayerRepository.sendDispatchingEvent(
       state.matchId,
       DispatchingPlayerDiedEvent(
@@ -286,11 +352,13 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
         newY,
       ),
     );
-    emit(state.copyWith(
-      currentPlayingState: PlayingState.gameOver,
-      diedCount: state.diedCount + 1,
-      multiplayerDiedMessage: _getRandomMultiplayerDiedMessage(),
-    ));
+    emit(
+      state.copyWith(
+        currentPlayingState: PlayingState.gameOver,
+        diedCount: state.diedCount + 1,
+        multiplayerDiedMessage: _getRandomMultiplayerDiedMessage(),
+      ),
+    );
   }
 
   MultiplayerDiedMessage _getRandomMultiplayerDiedMessage() {
@@ -312,9 +380,7 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
       return;
     }
     final diff = state.spawnsAgainAt!.difference(DateTime.now()).inSeconds;
-    emit(state.copyWith(
-      spawnRemainingSeconds: max(diff, 0),
-    ));
+    emit(state.copyWith(spawnRemainingSeconds: max(diff, 0)));
   }
 
   void startPlaying() {
@@ -329,9 +395,7 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
       state.matchId,
       DispatchingPlayerStartedEvent(),
     );
-    emit(state.copyWith(
-      currentPlayingState: PlayingState.playing,
-    ));
+    emit(state.copyWith(currentPlayingState: PlayingState.playing));
   }
 
   void stopPlaying(String matchId) {
@@ -356,20 +420,21 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     }
 
     if (state.matchId.isBlank) {
-      emit(state.copyWith(
-        spawnsAgainAt: ValueWrapper.nullValue(),
-      ));
+      emit(state.copyWith(spawnsAgainAt: ValueWrapper.nullValue()));
       return;
     }
 
-    final secondsLeft =
-        state.spawnsAgainAt!.difference(DateTime.now()).inSeconds;
+    final secondsLeft = state.spawnsAgainAt!
+        .difference(DateTime.now())
+        .inSeconds;
 
     if (secondsLeft <= 0 && state.currentPlayingState.isGameOver) {
-      emit(state.copyWith(
-        spawnsAgainAt: ValueWrapper.nullValue(),
-        currentPlayingState: PlayingState.idle,
-      ));
+      emit(
+        state.copyWith(
+          spawnsAgainAt: ValueWrapper.nullValue(),
+          currentPlayingState: PlayingState.idle,
+        ),
+      );
     }
   }
 
@@ -388,19 +453,14 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
   void dispatchIdleEvent(double x, double y) {
     _multiplayerRepository.sendDispatchingEvent(
       state.matchId,
-      DispatchingPlayerIsIdleEvent(
-        x,
-        y,
-        DateTime.now().millisecondsSinceEpoch,
-      ),
+      DispatchingPlayerIsIdleEvent(x, y, DateTime.now().millisecondsSinceEpoch),
     );
   }
 
   void _listenToDispatchingEvents() {
-    _dispatchingEventsSubscription =
-        _multiplayerRepository.onEventDispatched().listen(
-              (event) => _addDebugMessage(DebugDispatchingEvent(event)),
-            );
+    _dispatchingEventsSubscription = _multiplayerRepository
+        .onEventDispatched()
+        .listen((event) => _addDebugMessage(DebugDispatchingEvent(event)));
   }
 
   void addDebugMessage(DebugMessage message) => _addDebugMessage(message);
@@ -414,19 +474,18 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     if (isHidden) {
       return;
     }
-    emit(state.copyWith(
-      debugMessages: [
-        ...state.debugMessages,
-        message,
-      ],
-    ));
+    emit(state.copyWith(debugMessages: [...state.debugMessages, message]));
   }
 
   void refreshLastMatchOverview() async {
-    final overview = await _multiplayerRepository.getLastMatchOverview();
-    emit(state.copyWith(
-      lastMatchOverview: ValueWrapper(overview),
-    ));
+    try {
+      final overview = await _multiplayerRepository.getLastMatchOverview();
+      emit(state.copyWith(lastMatchOverview: ValueWrapper(overview)));
+    } catch (e) {
+      // No finished match yet (or the server is unreachable); the lobby
+      // simply doesn't show the last winner then.
+      debugPrint('Failed to load the last match overview: $e');
+    }
   }
 
   void tappedOnAutoJumpArea() {
@@ -434,25 +493,22 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
       return;
     }
     final countToTap = state.countToTapForAutoJump - 1;
-    emit(state.copyWith(
-      countToTapForAutoJump: countToTap,
-    ));
+    emit(state.copyWith(countToTapForAutoJump: countToTap));
     if (countToTap <= 0) {
       setAutoJumpEnabled(true);
     }
   }
 
   void setAutoJumpEnabled(bool enabled) {
-    emit(state.copyWith(
-      isCurrentPlayerAutoJump: enabled,
-    ));
+    emit(state.copyWith(isCurrentPlayerAutoJump: enabled));
   }
 
   @override
   Future<void> close() {
     _timer?.cancel();
-    _matchEventsSubscription.cancel();
+    _matchEventsSubscription?.cancel();
     _dispatchingEventsSubscription.cancel();
+    _reconnectedSubscription.cancel();
 
     return super.close();
   }

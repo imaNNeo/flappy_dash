@@ -35,18 +35,12 @@ class DebugIncomingEvent extends DebugMessage {
     final isMe = event.sender?.userId == currentUserId;
     final senderColor = currentUserId.isNullOrBlank
         ? incomingEventColor
-        : AppColors.getDashColor(
-            DashType.fromUserId(currentUserId),
-          );
+        : AppColors.getDashColor(DashType.fromUserId(currentUserId));
     return [
       StyledText(time, normalColor),
       StyledText(' ↓ ', incomingEventColor, isBold: true),
       StyledText('${event.debugName} ', incomingEventColor, isBold: true),
-      StyledText(
-        'from: ',
-        normalColor,
-        isBold: true,
-      ),
+      StyledText('from: ', normalColor, isBold: true),
       StyledText(
         '${event.sender?.userId.split('-')[0]} ${isMe ? 'me' : ''}',
         senderColor,
@@ -83,21 +77,17 @@ class DebugFunctionCallEvent extends DebugMessage {
   final String functionName;
   final Map<String, String> info;
 
-  DebugFunctionCallEvent(
-    this.className,
-    this.functionName,
-    this.info,
-  );
+  DebugFunctionCallEvent(this.className, this.functionName, this.info);
 
   @override
   List<StyledText> toDebugMessage(String currentUserId) => [
-        StyledText(time, normalColor),
-        StyledText(' - ', functionCallColor, isBold: true),
-        StyledText('$className.$functionName', functionCallColor, isBold: true),
-        StyledText(
-          ' - (${info.entries.map((e) => '${e.key}: ${e.value}').join(', ')})',
-          functionCallColor,
-          isBold: false,
-        ),
-      ];
+    StyledText(time, normalColor),
+    StyledText(' - ', functionCallColor, isBold: true),
+    StyledText('$className.$functionName', functionCallColor, isBold: true),
+    StyledText(
+      ' - (${info.entries.map((e) => '${e.key}: ${e.value}').join(', ')})',
+      functionCallColor,
+      isBold: false,
+    ),
+  ];
 }

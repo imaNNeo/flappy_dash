@@ -35,10 +35,7 @@ part 'parts/large_rank_trophy.dart';
 part 'parts/trophies_row.dart';
 
 class MatchResultPage extends StatelessWidget {
-  const MatchResultPage({
-    super.key,
-    required this.matchId,
-  });
+  const MatchResultPage({super.key, required this.matchId});
 
   final String matchId;
 
@@ -99,12 +96,8 @@ class _MatchResultPageContentState extends State<_MatchResultPageContent> {
           ScreenSize.medium => 24.0,
           ScreenSize.large || ScreenSize.extraLarge => 36.0,
         };
-        ({
-          int rank,
-          String name,
-          DashType dashType,
-          int score,
-        })? currentUserData;
+        ({int rank, String name, DashType dashType, int score})?
+        currentUserData;
 
         final myId = context.read<AccountCubit>().state.currentAccount?.user.id;
 
@@ -140,10 +133,7 @@ class _MatchResultPageContentState extends State<_MatchResultPageContent> {
                               svgIcon: 'ic_home.svg',
                               overrideOnPressed: () => context.go('/'),
                             ),
-                            Expanded(
-                                child: Container(
-                              height: 1,
-                            )),
+                            Expanded(child: Container(height: 1)),
                             Padding(
                               padding: const EdgeInsets.only(right: 24.0),
                               child: currentUserData != null
@@ -151,15 +141,15 @@ class _MatchResultPageContentState extends State<_MatchResultPageContent> {
                                       data: currentUserData,
                                     )
                                   : const SizedBox(),
-                            )
+                            ),
                           ],
                         ),
                       ),
                     ).animate().fadeIn(
-                          duration: const Duration(milliseconds: 500),
-                          delay: const Duration(milliseconds: 1600),
-                          curve: Curves.decelerate,
-                        ),
+                      duration: const Duration(milliseconds: 500),
+                      delay: const Duration(milliseconds: 1600),
+                      curve: Curves.decelerate,
+                    ),
                     Align(
                       alignment: const Alignment(0, -0.2),
                       child: Column(
@@ -172,12 +162,12 @@ class _MatchResultPageContentState extends State<_MatchResultPageContent> {
                               fontSize: titleFontSize,
                             ),
                           ).animate().slideY(
-                                duration: const Duration(milliseconds: 500),
-                                begin: -10.0,
-                                end: 0.0,
-                                delay: const Duration(milliseconds: 1600),
-                                curve: Curves.decelerate,
-                              ),
+                            duration: const Duration(milliseconds: 500),
+                            begin: -10.0,
+                            end: 0.0,
+                            delay: const Duration(milliseconds: 1600),
+                            curve: Curves.decelerate,
+                          ),
                           const SizedBox(height: 48),
                           _TrophiesRow(
                             screenSize: screenSize,
@@ -200,12 +190,10 @@ class _MatchResultPageContentState extends State<_MatchResultPageContent> {
                                   horizontal: 16,
                                   vertical: switch (screenSize) {
                                     ScreenSize.extraSmall ||
-                                    ScreenSize.small =>
-                                      8.0,
+                                    ScreenSize.small => 8.0,
                                     ScreenSize.medium => 10.0,
                                     ScreenSize.large ||
-                                    ScreenSize.extraLarge =>
-                                      14.0,
+                                    ScreenSize.extraLarge => 14.0,
                                   },
                                 ),
                                 child: Row(
@@ -231,18 +219,20 @@ class _MatchResultPageContentState extends State<_MatchResultPageContent> {
                                       .asMap()
                                       .entries
                                       .map((entry) {
-                                    final record = entry.value;
-                                    final index = entry.key;
-                                    final rank = index + 1;
-                                    return (
-                                      name: record.user.showingName,
-                                      isMe: record.user.id == myId,
-                                      dashType:
-                                          DashType.fromUserId(record.user.id),
-                                      score: record.score,
-                                      rank: rank,
-                                    );
-                                  }).toList();
+                                        final record = entry.value;
+                                        final index = entry.key;
+                                        final rank = index + 1;
+                                        return (
+                                          name: record.user.showingName,
+                                          isMe: record.user.id == myId,
+                                          dashType: DashType.fromUserId(
+                                            record.user.id,
+                                          ),
+                                          score: record.score,
+                                          rank: rank,
+                                        );
+                                      })
+                                      .toList();
                                   RawScoresDialog.show(
                                     context,
                                     scores: rawScores,
@@ -252,9 +242,9 @@ class _MatchResultPageContentState extends State<_MatchResultPageContent> {
                               ),
                             ],
                           ).animate().fadeIn(
-                                duration: const Duration(milliseconds: 500),
-                                delay: const Duration(milliseconds: 1500),
-                              ),
+                            duration: const Duration(milliseconds: 500),
+                            delay: const Duration(milliseconds: 1500),
+                          ),
                         ],
                       ),
                     ),
@@ -304,12 +294,12 @@ class _MatchResultPageContentState extends State<_MatchResultPageContent> {
                         ],
                       ),
                     ).animate().slideY(
-                          duration: const Duration(milliseconds: 500),
-                          begin: 1.0,
-                          end: 0.0,
-                          delay: const Duration(milliseconds: 1600),
-                          curve: Curves.decelerate,
-                        ),
+                      duration: const Duration(milliseconds: 500),
+                      begin: 1.0,
+                      end: 0.0,
+                      delay: const Duration(milliseconds: 1600),
+                      curve: Curves.decelerate,
+                    ),
                   ],
                 ),
               ],
@@ -348,7 +338,8 @@ class _MatchResultPageContentState extends State<_MatchResultPageContent> {
       _ => '${myRank}th',
     };
     const subject = '🏆 Flappy Dash Round Finished! 🏆';
-    final message = '''
+    final message =
+        '''
 🎉 I finished $rankText place, passing $myScore pipes!
 
 How far can you go? Try Flappy Dash now! 🚀
@@ -364,6 +355,3 @@ How far can you go? Try Flappy Dash now! 🚀
     );
   }
 }
-
-
-

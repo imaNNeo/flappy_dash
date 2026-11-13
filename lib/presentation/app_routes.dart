@@ -21,39 +21,41 @@ class AppRoutes {
         },
       ),
       GoRoute(
-          path: '/',
-          builder: (context, state) => const HomePage(),
-          routes: [
-            GoRoute(
-              path: 'single_player',
-              builder: (context, state) => const SinglePlayerGamePage(),
-            ),
-            GoRoute(
-              path: 'lobby/:matchId',
-              builder: (context, state) {
-                return MultiPlayerLobbyPage(
-                  matchId: state.pathParameters['matchId']!,
-                );
-              },
-            ),
-            GoRoute(
-                path: 'multi_player/:matchId',
+        path: '/',
+        builder: (context, state) => const HomePage(),
+        routes: [
+          GoRoute(
+            path: 'single_player',
+            builder: (context, state) => const SinglePlayerGamePage(),
+          ),
+          GoRoute(
+            path: 'lobby/:matchId',
+            builder: (context, state) {
+              return MultiPlayerLobbyPage(
+                matchId: state.pathParameters['matchId']!,
+              );
+            },
+          ),
+          GoRoute(
+            path: 'multi_player/:matchId',
+            builder: (context, state) {
+              return MultiPlayerGamePage(
+                matchId: state.pathParameters['matchId']!,
+              );
+            },
+            routes: [
+              GoRoute(
+                path: 'result',
                 builder: (context, state) {
-                  return MultiPlayerGamePage(
+                  return MatchResultPage(
                     matchId: state.pathParameters['matchId']!,
                   );
                 },
-                routes: [
-                  GoRoute(
-                    path: 'result',
-                    builder: (context, state) {
-                      return MatchResultPage(
-                        matchId: state.pathParameters['matchId']!,
-                      );
-                    },
-                  ),
-                ]),
-          ]),
+              ),
+            ],
+          ),
+        ],
+      ),
     ],
     redirect: (context, state) {
       final splashCubit = context.read<SplashCubit>();

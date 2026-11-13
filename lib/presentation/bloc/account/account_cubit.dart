@@ -9,9 +9,7 @@ import 'package:nakama/nakama.dart';
 part 'account_state.dart';
 
 class AccountCubit extends Cubit<AccountState> {
-  AccountCubit(
-    this._gameRepository,
-  ) : super(const AccountState()) {
+  AccountCubit(this._gameRepository) : super(const AccountState()) {
     _init();
   }
 
@@ -20,12 +18,11 @@ class AccountCubit extends Cubit<AccountState> {
   late StreamSubscription<Account> _accountUpdateStreamSubscription;
 
   void _init() async {
-    _accountUpdateStreamSubscription =
-        _gameRepository.getUserAccountUpdateStream().listen((account) {
-      emit(state.copyWith(
-        currentAccount: account,
-      ));
-    });
+    _accountUpdateStreamSubscription = _gameRepository
+        .getUserAccountUpdateStream()
+        .listen((account) {
+          emit(state.copyWith(currentAccount: account));
+        });
   }
 
   void updateUserDisplayName(String newUserDisplayName) async {

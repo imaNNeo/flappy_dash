@@ -17,18 +17,17 @@ class RawScoresDialog extends StatelessWidget {
     BuildContext context, {
     required List<RawScoreRecord> scores,
     bool allowEditDisplayName = true,
-        String title = 'Scores',
-  }) =>
-      showDialog<T?>(
-        context: context,
-        builder: (context) {
-          return RawScoresDialog(
-            scores: scores,
-            allowEditDisplayName: allowEditDisplayName,
-            title: title,
-          );
-        },
+    String title = 'Scores',
+  }) => showDialog<T?>(
+    context: context,
+    builder: (context) {
+      return RawScoresDialog(
+        scores: scores,
+        allowEditDisplayName: allowEditDisplayName,
+        title: title,
       );
+    },
+  );
 
   const RawScoresDialog({
     super.key,
@@ -57,20 +56,15 @@ class RawScoresDialog extends StatelessWidget {
         width: width,
         decoration: BoxDecoration(
           color: AppColors.dialogBgColor,
-          borderRadius: const BorderRadius.all(
-            Radius.circular(16),
-          ),
-          border: Border.all(
-            color: Colors.black,
-            width: 6,
-          ),
+          borderRadius: const BorderRadius.all(Radius.circular(16)),
+          border: Border.all(color: Colors.black, width: 6),
           boxShadow: const [
             BoxShadow(
               color: Colors.black,
               spreadRadius: 0.1,
               blurRadius: 0,
               offset: Offset(0, 6),
-            )
+            ),
           ],
         ),
         child: Column(
@@ -116,10 +110,8 @@ class RawScoresDialog extends StatelessWidget {
                         : null,
                   );
                 },
-                separatorBuilder: (context, index) => Container(
-                  height: 1,
-                  color: Colors.white10,
-                ),
+                separatorBuilder: (context, index) =>
+                    Container(height: 1, color: Colors.white10),
                 itemCount: scores.length,
               ),
             ),
@@ -161,14 +153,8 @@ class LeaderboardRow extends StatelessWidget {
           child: Row(
             children: [
               rank <= 3
-                  ? ScoreTrophy(
-                      size: 38,
-                      rank: rank,
-                    )
-                  : NormalScore(
-                      size: 38,
-                      rank: rank,
-                    ),
+                  ? ScoreTrophy(size: 38, rank: rank)
+                  : NormalScore(size: 38, rank: rank),
               const SizedBox(width: 16),
               Text(
                 name,
@@ -183,9 +169,7 @@ class LeaderboardRow extends StatelessWidget {
                   alignment: Alignment(0, 0.3),
                   child: Text(
                     '(edit)',
-                    style: TextStyle(
-                      color: AppColors.blueColor,
-                    ),
+                    style: TextStyle(color: AppColors.blueColor),
                   ),
                 ),
               ],
@@ -206,11 +190,7 @@ class LeaderboardRow extends StatelessWidget {
 }
 
 class ScoreTrophy extends StatelessWidget {
-  const ScoreTrophy({
-    super.key,
-    required this.size,
-    required this.rank,
-  });
+  const ScoreTrophy({super.key, required this.size, required this.rank});
 
   final double size;
   final int? rank;
@@ -225,15 +205,12 @@ class ScoreTrophy extends StatelessWidget {
           SvgPicture.asset(
             'assets/icons/ic_trophy.svg',
             height: size,
-            colorFilter: ColorFilter.mode(
-              switch (rank) {
-                null || 1 => AppColors.leaderboardGoldenColor,
-                2 => AppColors.leaderboardSilverColor,
-                3 => AppColors.leaderboardBronzeColor,
-                _ => throw StateError('Invalid rank: $rank'),
-              },
-              BlendMode.srcIn,
-            ),
+            colorFilter: ColorFilter.mode(switch (rank) {
+              null || 1 => AppColors.leaderboardGoldenColor,
+              2 => AppColors.leaderboardSilverColor,
+              3 => AppColors.leaderboardBronzeColor,
+              _ => throw StateError('Invalid rank: $rank'),
+            }, BlendMode.srcIn),
           ),
           Align(
             alignment: const Alignment(0.0, -0.8),
@@ -257,11 +234,7 @@ class ScoreTrophy extends StatelessWidget {
 }
 
 class NormalScore extends StatelessWidget {
-  const NormalScore({
-    super.key,
-    required this.size,
-    required this.rank,
-  });
+  const NormalScore({super.key, required this.size, required this.rank});
 
   final double size;
   final int rank;
@@ -273,17 +246,12 @@ class NormalScore extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(
-          color: AppColors.mainColor,
-        ),
+        border: Border.all(color: AppColors.mainColor),
       ),
       child: Center(
         child: Text(
           rank.toString(),
-          style: const TextStyle(
-            color: AppColors.mainColor,
-            fontSize: 24,
-          ),
+          style: const TextStyle(color: AppColors.mainColor, fontSize: 24),
         ),
       ),
     );

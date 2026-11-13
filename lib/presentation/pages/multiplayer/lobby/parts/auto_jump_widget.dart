@@ -4,10 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AutoJumpWidget extends StatelessWidget {
-  const AutoJumpWidget({
-    super.key,
-    required this.state,
-  });
+  const AutoJumpWidget({super.key, required this.state});
 
   final MultiplayerState state;
 
@@ -26,9 +23,9 @@ class AutoJumpWidget extends StatelessWidget {
                     'Auto Jump is ${state.isCurrentPlayerAutoJump ? 'ON' : 'OFF'}',
                 child: IconButton(
                   onPressed: () {
-                    context
-                        .read<MultiplayerCubit>()
-                        .setAutoJumpEnabled(!state.isCurrentPlayerAutoJump);
+                    context.read<MultiplayerCubit>().setAutoJumpEnabled(
+                      !state.isCurrentPlayerAutoJump,
+                    );
                   },
                   icon: Icon(
                     size: 32,

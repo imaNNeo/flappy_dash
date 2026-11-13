@@ -7,12 +7,12 @@ class OutlineText extends StatelessWidget {
   final TextOverflow? overflow;
 
   const OutlineText(
-      this.child, {
-        super.key,
-        this.strokeWidth = 2,
-        this.strokeColor,
-        this.overflow,
-      });
+    this.child, {
+    super.key,
+    this.strokeWidth = 2,
+    this.strokeColor,
+    this.overflow,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class OutlineText extends StatelessWidget {
           overflow: overflow,
         ),
         // original text
-        child
+        child,
       ],
     );
   }

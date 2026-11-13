@@ -30,9 +30,8 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (BuildContext context) => HomeCubit(
-        getIt.get<MultiplayerRepository>(),
-      ),
+      create: (BuildContext context) =>
+          HomeCubit(getIt.get<MultiplayerRepository>()),
       child: const HomePageContent(),
     );
   }
@@ -84,10 +83,7 @@ class _HomePageContentState extends State<HomePageContent> {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Expanded(
-                        flex: 2,
-                        child: Container(),
-                      ),
+                      Expanded(flex: 2, child: Container()),
                       GameTitle(screenSize: screenSize),
                       SizedBox(height: titleBottomSpace),
                       SinglePlayerButton(
@@ -101,10 +97,7 @@ class _HomePageContentState extends State<HomePageContent> {
                         showLoading: state.multiPlayerMatchIdLoading,
                       ),
                       const SizedBox(height: 8),
-                      Expanded(
-                        flex: 3,
-                        child: Container(),
-                      ),
+                      Expanded(flex: 3, child: Container()),
                       WatchOnYoutubeWidget(screenSize: screenSize),
                       const SizedBox(height: 16),
                     ],
@@ -121,13 +114,8 @@ class _HomePageContentState extends State<HomePageContent> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        GithubButton(
-                          screenSize: screenSize,
-                        ),
-                        Expanded(
-                            child: Container(
-                          height: 0,
-                        )),
+                        GithubButton(screenSize: screenSize),
+                        Expanded(child: Container(height: 0)),
                         const ProfileOverlay(),
                         const SizedBox(
                           width: PresentationConstants.defaultPadding,
@@ -140,7 +128,7 @@ class _HomePageContentState extends State<HomePageContent> {
               const Align(
                 alignment: Alignment.bottomRight,
                 child: AppVersionWidget(),
-              )
+              ),
             ],
           ),
         );

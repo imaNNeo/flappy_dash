@@ -6,10 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class WatchOnYoutubeWidget extends StatelessWidget {
-  const WatchOnYoutubeWidget({
-    super.key,
-    required this.screenSize,
-  });
+  const WatchOnYoutubeWidget({super.key, required this.screenSize});
 
   final ScreenSize screenSize;
 
@@ -23,10 +20,7 @@ class WatchOnYoutubeWidget extends StatelessWidget {
           PresentationConstants.defaultBorderRadius,
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 18.0,
-            vertical: 6.0,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 6.0),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -37,8 +31,7 @@ class WatchOnYoutubeWidget extends StatelessWidget {
                   ScreenSize.small ||
                   ScreenSize.medium ||
                   ScreenSize.large ||
-                  ScreenSize.extraLarge =>
-                    58,
+                  ScreenSize.extraLarge => 58,
                 },
               ),
               SizedBox(
@@ -47,8 +40,7 @@ class WatchOnYoutubeWidget extends StatelessWidget {
                   ScreenSize.small ||
                   ScreenSize.medium ||
                   ScreenSize.large ||
-                  ScreenSize.extraLarge =>
-                    6,
+                  ScreenSize.extraLarge => 6,
                 },
               ),
               Text(
@@ -59,13 +51,12 @@ class WatchOnYoutubeWidget extends StatelessWidget {
                     ScreenSize.small ||
                     ScreenSize.medium ||
                     ScreenSize.large ||
-                    ScreenSize.extraLarge =>
-                      24,
+                    ScreenSize.extraLarge => 24,
                   },
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
-              )
+              ),
             ],
           ),
         ),

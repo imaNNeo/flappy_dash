@@ -1,9 +1,7 @@
 part of 'account_cubit.dart';
 
-class AccountState with EquatableMixin {
-  const AccountState({
-    this.currentAccount,
-  });
+class AccountState with Equatable {
+  const AccountState({this.currentAccount});
 
   final Account? currentAccount;
 
@@ -11,15 +9,9 @@ class AccountState with EquatableMixin {
       currentAccount != null &&
       AppConstants.debugUsernames.contains(currentAccount!.user.username);
 
-  AccountState copyWith({
-    Account? currentAccount,
-  }) =>
-      AccountState(
-        currentAccount: currentAccount ?? this.currentAccount,
-      );
+  AccountState copyWith({Account? currentAccount}) =>
+      AccountState(currentAccount: currentAccount ?? this.currentAccount);
 
   @override
-  List<Object?> get props => [
-        currentAccount,
-      ];
+  List<Object?> get props => [currentAccount];
 }

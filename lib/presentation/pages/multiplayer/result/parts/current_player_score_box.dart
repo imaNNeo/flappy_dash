@@ -1,9 +1,7 @@
 part of '../match_result_page.dart';
 
 class _CurrentPlayerScoreBox extends StatelessWidget {
-  const _CurrentPlayerScoreBox({
-    required this.data,
-  });
+  const _CurrentPlayerScoreBox({required this.data});
 
   final ({int rank, String name, DashType dashType, int score}) data;
 
@@ -19,15 +17,9 @@ class _CurrentPlayerScoreBox extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(width: 8),
-            ScoreTrophy(
-              size: 24,
-              rank: data.rank,
-            ),
+            ScoreTrophy(size: 24, rank: data.rank),
             const SizedBox(width: 8),
-            DashImage(
-              size: 28,
-              type: dashType,
-            ),
+            DashImage(size: 28, type: dashType),
             const SizedBox(width: 4),
             OutlineText(
               Text(

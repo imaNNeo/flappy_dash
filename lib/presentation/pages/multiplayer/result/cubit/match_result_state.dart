@@ -1,6 +1,6 @@
 part of 'match_result_cubit.dart';
 
-class MatchResultState with EquatableMixin {
+class MatchResultState with Equatable {
   const MatchResultState({
     required this.matchId,
     this.matchResult,
@@ -28,25 +28,24 @@ class MatchResultState with EquatableMixin {
     bool? playAgainLoading,
     String? playAgainError,
     String? playAgainMatchId,
-  }) =>
-      MatchResultState(
-        matchId: matchId ?? this.matchId,
-        matchResult: matchResult ?? this.matchResult,
-        isLoading: isLoading ?? this.isLoading,
-        error: error ?? this.error,
-        playAgainLoading: playAgainLoading ?? this.playAgainLoading,
-        playAgainError: playAgainError ?? this.playAgainError,
-        playAgainMatchId: playAgainMatchId ?? this.playAgainMatchId,
-      );
+  }) => MatchResultState(
+    matchId: matchId ?? this.matchId,
+    matchResult: matchResult ?? this.matchResult,
+    isLoading: isLoading ?? this.isLoading,
+    error: error ?? this.error,
+    playAgainLoading: playAgainLoading ?? this.playAgainLoading,
+    playAgainError: playAgainError ?? this.playAgainError,
+    playAgainMatchId: playAgainMatchId ?? this.playAgainMatchId,
+  );
 
   @override
   List<Object?> get props => [
-        matchId,
-        matchResult,
-        isLoading,
-        error,
-        playAgainLoading,
-        playAgainError,
-        playAgainMatchId,
-      ];
+    matchId,
+    matchResult,
+    isLoading,
+    error,
+    playAgainLoading,
+    playAgainError,
+    playAgainMatchId,
+  ];
 }

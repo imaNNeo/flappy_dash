@@ -73,23 +73,14 @@ class _SinglePlayerGamePageState extends State<SinglePlayerGamePage> {
               GameWidget(
                 game: _flappyDashGame,
                 backgroundBuilder: (_) {
-                  return Container(
-                    color: AppColors.backgroundColor,
-                  );
+                  return Container(color: AppColors.backgroundColor);
                 },
               ),
               if (state.currentPlayingState.isGameOver) const GameOverWidget(),
               if (state.currentPlayingState.isIdle)
-                const Align(
-                  alignment: Alignment(0, 0.2),
-                  child: TapToPlay(),
-                ),
+                const Align(alignment: Alignment(0, 0.2), child: TapToPlay()),
               if (state.currentPlayingState.isNotGameOver)
-                SafeArea(
-                  child: TopScore(
-                    currentScore: state.currentScore,
-                  ),
-                ),
+                SafeArea(child: TopScore(currentScore: state.currentScore)),
               Align(
                 alignment: Alignment.topCenter,
                 child: SafeArea(
@@ -102,11 +93,7 @@ class _SinglePlayerGamePageState extends State<SinglePlayerGamePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const GameBackButton(),
-                        Expanded(
-                          child: Container(
-                            height: 0,
-                          ),
-                        ),
+                        Expanded(child: Container(height: 0)),
                         Padding(
                           padding: const EdgeInsets.all(0),
                           child: Column(

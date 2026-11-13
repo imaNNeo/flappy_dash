@@ -1,6 +1,6 @@
 part of 'multiplayer_cubit.dart';
 
-class MultiplayerState with EquatableMixin {
+class MultiplayerState with Equatable {
   const MultiplayerState({
     this.gameMode = const MultiplayerGameMode(),
     this.currentScore = 0,
@@ -71,63 +71,61 @@ class MultiplayerState with EquatableMixin {
     ValueWrapper<MatchOverviewEntity>? lastMatchOverview,
     bool? isCurrentPlayerAutoJump,
     int? countToTapForAutoJump,
-  }) =>
-      MultiplayerState(
-        currentScore: currentScore ?? this.currentScore,
-        currentPlayingState: currentPlayingState ?? this.currentPlayingState,
-        currentUserId: currentUserId ?? this.currentUserId,
-        matchId: matchId ?? this.matchId,
-        joinMatchLoading: joinMatchLoading ?? this.joinMatchLoading,
-        joinMatchError: joinMatchError ?? this.joinMatchError,
-        currentMatch: currentMatch ?? this.currentMatch,
-        matchState: matchState ?? this.matchState,
-        matchWaitingRemainingSeconds:
-            matchWaitingRemainingSeconds ?? this.matchWaitingRemainingSeconds,
-        matchPlayingRemainingSeconds:
-            matchPlayingRemainingSeconds ?? this.matchPlayingRemainingSeconds,
-        inLobbyPlayers: inLobbyPlayers ?? this.inLobbyPlayers,
-        joinedInLobby: joinedInLobby ?? this.joinedInLobby,
-        currentAccount: currentAccount ?? this.currentAccount,
-        spawnsAgainAt:
-            spawnsAgainAt != null ? spawnsAgainAt.value : this.spawnsAgainAt,
-        spawnRemainingSeconds:
-            spawnRemainingSeconds ?? this.spawnRemainingSeconds,
-        multiplayerDiedMessage:
-            multiplayerDiedMessage ?? this.multiplayerDiedMessage,
-        diedCount: diedCount ?? this.diedCount,
-        debugMessages: debugMessages ?? this.debugMessages,
-        lastMatchOverview: lastMatchOverview != null
-            ? lastMatchOverview.value
-            : this.lastMatchOverview,
-        isCurrentPlayerAutoJump:
-            isCurrentPlayerAutoJump ?? this.isCurrentPlayerAutoJump,
-        countToTapForAutoJump:
-            countToTapForAutoJump ?? this.countToTapForAutoJump,
-      );
+  }) => MultiplayerState(
+    currentScore: currentScore ?? this.currentScore,
+    currentPlayingState: currentPlayingState ?? this.currentPlayingState,
+    currentUserId: currentUserId ?? this.currentUserId,
+    matchId: matchId ?? this.matchId,
+    joinMatchLoading: joinMatchLoading ?? this.joinMatchLoading,
+    joinMatchError: joinMatchError ?? this.joinMatchError,
+    currentMatch: currentMatch ?? this.currentMatch,
+    matchState: matchState ?? this.matchState,
+    matchWaitingRemainingSeconds:
+        matchWaitingRemainingSeconds ?? this.matchWaitingRemainingSeconds,
+    matchPlayingRemainingSeconds:
+        matchPlayingRemainingSeconds ?? this.matchPlayingRemainingSeconds,
+    inLobbyPlayers: inLobbyPlayers ?? this.inLobbyPlayers,
+    joinedInLobby: joinedInLobby ?? this.joinedInLobby,
+    currentAccount: currentAccount ?? this.currentAccount,
+    spawnsAgainAt: spawnsAgainAt != null
+        ? spawnsAgainAt.value
+        : this.spawnsAgainAt,
+    spawnRemainingSeconds: spawnRemainingSeconds ?? this.spawnRemainingSeconds,
+    multiplayerDiedMessage:
+        multiplayerDiedMessage ?? this.multiplayerDiedMessage,
+    diedCount: diedCount ?? this.diedCount,
+    debugMessages: debugMessages ?? this.debugMessages,
+    lastMatchOverview: lastMatchOverview != null
+        ? lastMatchOverview.value
+        : this.lastMatchOverview,
+    isCurrentPlayerAutoJump:
+        isCurrentPlayerAutoJump ?? this.isCurrentPlayerAutoJump,
+    countToTapForAutoJump: countToTapForAutoJump ?? this.countToTapForAutoJump,
+  );
 
   @override
   List<Object?> get props => [
-        gameMode,
-        currentScore,
-        currentPlayingState,
-        currentUserId,
-        matchId,
-        joinMatchLoading,
-        joinMatchError,
-        currentMatch,
-        matchState,
-        matchWaitingRemainingSeconds,
-        matchPlayingRemainingSeconds,
-        inLobbyPlayers,
-        joinedInLobby,
-        currentAccount,
-        spawnsAgainAt,
-        spawnRemainingSeconds,
-        multiplayerDiedMessage,
-        diedCount,
-        debugMessages,
-        lastMatchOverview,
-        isCurrentPlayerAutoJump,
-        countToTapForAutoJump,
-      ];
+    gameMode,
+    currentScore,
+    currentPlayingState,
+    currentUserId,
+    matchId,
+    joinMatchLoading,
+    joinMatchError,
+    currentMatch,
+    matchState,
+    matchWaitingRemainingSeconds,
+    matchPlayingRemainingSeconds,
+    inLobbyPlayers,
+    joinedInLobby,
+    currentAccount,
+    spawnsAgainAt,
+    spawnRemainingSeconds,
+    multiplayerDiedMessage,
+    diedCount,
+    debugMessages,
+    lastMatchOverview,
+    isCurrentPlayerAutoJump,
+    countToTapForAutoJump,
+  ];
 }

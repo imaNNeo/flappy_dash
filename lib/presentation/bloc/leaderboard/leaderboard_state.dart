@@ -1,10 +1,7 @@
 part of 'leaderboard_cubit.dart';
 
-class LeaderboardState with EquatableMixin {
-  const LeaderboardState({
-    this.leaderboardEntity,
-    this.currentAccount,
-  });
+class LeaderboardState with Equatable {
+  const LeaderboardState({this.leaderboardEntity, this.currentAccount});
 
   final LeaderboardEntity? leaderboardEntity;
   final Account? currentAccount;
@@ -12,15 +9,11 @@ class LeaderboardState with EquatableMixin {
   LeaderboardState copyWith({
     LeaderboardEntity? leaderboardEntity,
     Account? currentAccount,
-  }) =>
-      LeaderboardState(
-        leaderboardEntity: leaderboardEntity ?? this.leaderboardEntity,
-        currentAccount: currentAccount ?? this.currentAccount,
-      );
+  }) => LeaderboardState(
+    leaderboardEntity: leaderboardEntity ?? this.leaderboardEntity,
+    currentAccount: currentAccount ?? this.currentAccount,
+  );
 
   @override
-  List<Object?> get props => [
-        leaderboardEntity,
-        currentAccount,
-      ];
+  List<Object?> get props => [leaderboardEntity, currentAccount];
 }

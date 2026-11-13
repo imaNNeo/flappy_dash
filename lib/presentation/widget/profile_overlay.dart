@@ -29,8 +29,9 @@ class ProfileOverlay extends StatelessWidget {
       builder: (context, state) {
         final displayName = state.currentAccount?.user.displayName;
         final userId = state.currentAccount?.user.id;
-        final dashType =
-            userId == null ? DashType.flutterDash : DashType.fromUserId(userId);
+        final dashType = userId == null
+            ? DashType.flutterDash
+            : DashType.fromUserId(userId);
         return BoxOverlay(
           padding: EdgeInsets.symmetric(
             horizontal: relative(12.0),

@@ -15,10 +15,7 @@ class QrCodeWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomPaint(
       size: Size.infinite,
-      painter: _MyQrPainter(
-        qrImage: QrImage(qrCode),
-        color: color,
-      ),
+      painter: _MyQrPainter(qrImage: QrImage(qrCode), color: color),
     );
   }
 }
@@ -28,12 +25,10 @@ class _MyQrPainter extends CustomPainter {
   final Color color;
   final Paint _paint;
 
-  _MyQrPainter({
-    required this.qrImage,
-    required this.color,
-  }) : _paint = Paint()
-          ..color = color
-          ..style = PaintingStyle.fill;
+  _MyQrPainter({required this.qrImage, required this.color})
+    : _paint = Paint()
+        ..color = color
+        ..style = PaintingStyle.fill;
 
   @override
   void paint(Canvas canvas, Size size) {
