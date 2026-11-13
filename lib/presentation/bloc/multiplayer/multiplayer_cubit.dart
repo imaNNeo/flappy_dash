@@ -104,21 +104,29 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
   late StreamSubscription _reconnectedSubscription;
 
   void _refreshRemainingTime() {
-    final waitingRemaining = state.matchState?.matchRunsAt
-        .difference(DateTime.now())
+    final matchState = state.matchState;
+    final now = DateTime.now();
+    final waitingRemaining = matchState?.matchRunsAt.difference(now).inSeconds;
+    final playingRemaining = matchState?.matchFinishesAt
+        .difference(now)
         .inSeconds;
-    final playingRemaining = state.matchState?.matchFinishesAt
-        .difference(DateTime.now())
-        .inSeconds;
+    final newWaiting = waitingRemaining != null
+        ? max(waitingRemaining, 0)
+        : waitingRemaining;
+    final newPlaying = playingRemaining != null
+        ? max(playingRemaining, 0)
+        : playingRemaining;
 
+    // This runs 10 times a second; only emit when a value really changed, so
+    // we skip building and comparing a whole new state for nothing.
+    if (newWaiting == state.matchWaitingRemainingSeconds &&
+        newPlaying == state.matchPlayingRemainingSeconds) {
+      return;
+    }
     emit(
       state.copyWith(
-        matchWaitingRemainingSeconds: waitingRemaining != null
-            ? max(waitingRemaining, 0)
-            : waitingRemaining,
-        matchPlayingRemainingSeconds: playingRemaining != null
-            ? max(playingRemaining, 0)
-            : playingRemaining,
+        matchWaitingRemainingSeconds: newWaiting,
+        matchPlayingRemainingSeconds: newPlaying,
       ),
     );
   }
@@ -212,7 +220,15 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
 
   void _onMatchEvent(MatchEvent event) {
     final phase = state.matchState?.currentPhase;
-    _addDebugMessage(DebugIncomingEvent(event));
+    final debugMessage = DebugIncomingEvent(event);
+    // While the match runs, nearly every event carries a new match state.
+    // Emit it together with the debug log entry: one state change per event
+    // instead of two for every listener and widget to react to.
+    final mergeWithMatchState =
+        phase == MatchPhase.running && event is HasMatchState;
+    if (!mergeWithMatchState) {
+      _addDebugMessage(debugMessage);
+    }
     switch (phase) {
       case null || MatchPhase.waitingForPlayers:
         switch (event) {
@@ -234,8 +250,13 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
         }
         break;
       case MatchPhase.running:
-        if (event is HasMatchState) {
-          emit(state.copyWith(matchState: (event as HasMatchState).state));
+        if (mergeWithMatchState) {
+          emit(
+            state.copyWith(
+              matchState: (event as HasMatchState).state,
+              debugMessages: _debugMessagesWith(debugMessage),
+            ),
+          );
         }
         switch (event) {
           case MatchFinishedEvent():
@@ -380,7 +401,11 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
       return;
     }
     final diff = state.spawnsAgainAt!.difference(DateTime.now()).inSeconds;
-    emit(state.copyWith(spawnRemainingSeconds: max(diff, 0)));
+    final remaining = max(diff, 0);
+    if (remaining == state.spawnRemainingSeconds) {
+      return;
+    }
+    emit(state.copyWith(spawnRemainingSeconds: remaining));
   }
 
   void startPlaying() {
@@ -466,15 +491,23 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
   void addDebugMessage(DebugMessage message) => _addDebugMessage(message);
 
   void _addDebugMessage(DebugMessage message) {
+    final debugMessages = _debugMessagesWith(message);
+    if (identical(debugMessages, state.debugMessages)) {
+      return;
+    }
+    emit(state.copyWith(debugMessages: debugMessages));
+  }
+
+  DebugMessageLog _debugMessagesWith(DebugMessage message) {
     final isHidden = switch (message) {
       DebugIncomingEvent() => message.event.hideInDebugPanel,
       DebugDispatchingEvent() => message.event.hideInDebugPanel,
       DebugFunctionCallEvent() => false,
     };
     if (isHidden) {
-      return;
+      return state.debugMessages;
     }
-    emit(state.copyWith(debugMessages: [...state.debugMessages, message]));
+    return state.debugMessages.add(message);
   }
 
   void refreshLastMatchOverview() async {

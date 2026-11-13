@@ -25,12 +25,14 @@ class Pipe extends PositionComponent {
       flipVertically();
     }
 
-    add(RectangleHitbox());
+    // Passive: pipes only need to be checked against the dash, never against
+    // each other, which an active hitbox would make the broadphase do.
+    add(RectangleHitbox(collisionType: CollisionType.passive));
   }
 
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    _pipeSprite.render(canvas, position: Vector2.zero(), size: size);
+    _pipeSprite.render(canvas, size: size);
   }
 }

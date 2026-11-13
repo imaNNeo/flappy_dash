@@ -10,6 +10,9 @@ class MultiplayerDiedOverlayWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<MultiplayerCubit, MultiplayerState>(
+      buildWhen: (previous, current) =>
+          previous.multiplayerDiedMessage != current.multiplayerDiedMessage ||
+          previous.spawnRemainingSeconds != current.spawnRemainingSeconds,
       builder: (context, state) {
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
