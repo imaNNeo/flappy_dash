@@ -17,8 +17,9 @@ class _LargeRankTrophy extends StatelessWidget {
   Widget build(BuildContext context) {
     final firstTrophyWidth = bigTrophyWidth;
     const otherTrophiesRatio = 0.7;
-    final trophyWidth =
-    rank == 1 ? firstTrophyWidth : firstTrophyWidth * otherTrophiesRatio;
+    final trophyWidth = rank == 1
+        ? firstTrophyWidth
+        : firstTrophyWidth * otherTrophiesRatio;
     final trophyHeight = trophyWidth / _trophyImageRatio;
 
     const animationDuration = 500;
@@ -48,7 +49,7 @@ class _LargeRankTrophy extends StatelessWidget {
                       fontSize: trophyWidth * 0.12,
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -59,13 +60,10 @@ class _LargeRankTrophy extends StatelessWidget {
             children: [
               data == null
                   ? SizedBox(
-                width: trophyWidth * 0.17,
-                height: trophyWidth * 0.17,
-              )
-                  : DashImage(
-                size: trophyWidth * 0.17,
-                type: data!.dashType,
-              ),
+                      width: trophyWidth * 0.17,
+                      height: trophyWidth * 0.17,
+                    )
+                  : DashImage(size: trophyWidth * 0.17, type: data!.dashType),
               SizedBox(width: trophyWidth * 0.02),
               OutlineText(
                 Text(

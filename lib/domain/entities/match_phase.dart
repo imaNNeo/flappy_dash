@@ -1,5 +1,1 @@
-enum MatchPhase {
-  waitingForPlayers,
-  running,
-  finished,
-}
+enum MatchPhase { waitingForPlayers, running, finished }

@@ -1,5 +1,4 @@
 class DateTimeUtils {
-
   static String timeAgo(DateTime dateTime) {
     final Duration difference = DateTime.now().difference(dateTime);
     if (difference.inSeconds < 60) {

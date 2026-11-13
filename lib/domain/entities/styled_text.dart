@@ -7,16 +7,8 @@ class StyledText with EquatableMixin {
   final Color color;
   final bool isBold;
 
-  StyledText(
-    this.text,
-    this.color, {
-    this.isBold = false,
-  });
+  StyledText(this.text, this.color, {this.isBold = false});
 
   @override
-  List<Object?> get props => [
-        text,
-        color,
-        isBold,
-      ];
+  List<Object?> get props => [text, color, isBold];
 }

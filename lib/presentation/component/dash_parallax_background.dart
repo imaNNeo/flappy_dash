@@ -3,8 +3,7 @@ import 'package:flame/parallax.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 
-class DashParallaxBackground extends ParallaxComponent<FlappyDashGame>  {
-
+class DashParallaxBackground extends ParallaxComponent<FlappyDashGame> {
   @override
   Future<void> onLoad() async {
     await super.onLoad();

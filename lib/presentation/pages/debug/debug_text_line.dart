@@ -4,10 +4,7 @@ import 'package:flutter/material.dart';
 class DebugTextLine extends StatelessWidget {
   final List<StyledText> words;
 
-  const DebugTextLine({
-    super.key,
-    required this.words,
-  });
+  const DebugTextLine({super.key, required this.words});
 
   @override
   Widget build(BuildContext context) {
@@ -16,15 +13,15 @@ class DebugTextLine extends StatelessWidget {
         children: words
             .map(
               (word) => TextSpan(
-            text: word.text,
-            style: TextStyle(
-              color: word.color,
-              fontSize: 12,
-              fontWeight: word.isBold ? FontWeight.bold : FontWeight.normal,
-              fontFamily: 'RobotoMono',
-            ),
-          ),
-        )
+                text: word.text,
+                style: TextStyle(
+                  color: word.color,
+                  fontSize: 12,
+                  fontWeight: word.isBold ? FontWeight.bold : FontWeight.normal,
+                  fontFamily: 'RobotoMono',
+                ),
+              ),
+            )
             .toList(),
       ),
     );

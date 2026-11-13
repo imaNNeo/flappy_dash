@@ -29,10 +29,7 @@ import 'package:go_router/go_router.dart';
 part 'parts/pending_match_box.dart';
 
 class MultiPlayerLobbyPage extends StatefulWidget {
-  const MultiPlayerLobbyPage({
-    super.key,
-    required this.matchId,
-  });
+  const MultiPlayerLobbyPage({super.key, required this.matchId});
 
   final String matchId;
 
@@ -121,12 +118,10 @@ class _MultiPlayerLobbyPageContentState extends State<MultiPlayerLobbyPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(height: appTitleTopPadding),
-                  GameTitle(
-                    screenSize: screenSize,
-                    showMultiplayerText: true,
-                  ),
+                  GameTitle(screenSize: screenSize, showMultiplayerText: true),
                   SizedBox(
-                    height: (boxVerticalSpacing * 1.5) +
+                    height:
+                        (boxVerticalSpacing * 1.5) +
                         boxExtraTopMarginForWinnerBadge,
                   ),
                   Expanded(
@@ -156,14 +151,9 @@ class _MultiPlayerLobbyPageContentState extends State<MultiPlayerLobbyPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const GameBackButton(),
-                    Expanded(
-                        child: Container(
-                      height: 0,
-                    )),
+                    Expanded(child: Container(height: 0)),
                     const ProfileOverlay(),
-                    const SizedBox(
-                      width: PresentationConstants.defaultPadding,
-                    ),
+                    const SizedBox(width: PresentationConstants.defaultPadding),
                   ],
                 ),
               ),

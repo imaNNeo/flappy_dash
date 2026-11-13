@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:toastification/toastification.dart';
+
 extension BuildContextExtension on BuildContext {
   void showToastError(String error) {
     toastification.show(

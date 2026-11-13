@@ -2,10 +2,7 @@ import 'package:flappy_dash/data/local/settings_data_source.dart';
 import 'package:flappy_dash/data/remote/nakama_data_source.dart';
 
 class SettingsRepository {
-  SettingsRepository(
-    this._settingsDataSource,
-    this._nakamaDataSource,
-  );
+  SettingsRepository(this._settingsDataSource, this._nakamaDataSource);
 
   final SettingsDataSource _settingsDataSource;
   final NakamaDataSource _nakamaDataSource;

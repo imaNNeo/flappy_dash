@@ -10,10 +10,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LastMatchWinnerWidget extends StatelessWidget {
-  const LastMatchWinnerWidget({
-    super.key,
-    required this.height,
-  });
+  const LastMatchWinnerWidget({super.key, required this.height});
 
   final double height;
 
@@ -31,9 +28,10 @@ class LastMatchWinnerWidget extends StatelessWidget {
 }
 
 class _AnimatedLastMatchWidget extends StatefulWidget {
-  const _AnimatedLastMatchWidget(
-      {required this.lastMatch, required this.height})
-      : width = height * ratio;
+  const _AnimatedLastMatchWidget({
+    required this.lastMatch,
+    required this.height,
+  }) : width = height * ratio;
 
   final double height;
   final double width;
@@ -62,54 +60,54 @@ class _AnimatedLastMatchWidgetState extends State<_AnimatedLastMatchWidget> {
     final timeAgo = DateTimeUtils.timeAgo(widget.lastMatch!.finishedAt);
 
     return GestureDetector(
-      onTap: () {},
-      child: Container(
-        decoration: const BoxDecoration(
-          color: Colors.black,
-          borderRadius: BorderRadius.only(
-            topLeft: radius,
-            topRight: radius,
-          ),
-        ),
-        width: width,
-        height: height,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'Last winner',
-              style: TextStyle(
-                color: AppColors.leaderboardGoldenColor,
-                fontSize: width * 0.1,
+          onTap: () {},
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.only(
+                topLeft: radius,
+                topRight: radius,
               ),
             ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
+            width: width,
+            height: height,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                DashImage(size: width * 0.2, type: dashType),
-                SizedBox(width: width * 0.03),
                 Text(
-                  playerName.isNotBlank ? playerName : dashType.name,
-                  overflow: TextOverflow.ellipsis,
+                  'Last winner',
                   style: TextStyle(
-                    color: AppColors.getDashColor(dashType),
-                    fontSize: width * 0.13,
+                    color: AppColors.leaderboardGoldenColor,
+                    fontSize: width * 0.1,
+                  ),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DashImage(size: width * 0.2, type: dashType),
+                    SizedBox(width: width * 0.03),
+                    Text(
+                      playerName.isNotBlank ? playerName : dashType.name,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: AppColors.getDashColor(dashType),
+                        fontSize: width * 0.13,
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  '$timeAgo ago',
+                  style: TextStyle(
+                    color: Colors.white60,
+                    fontSize: width * 0.1,
                   ),
                 ),
               ],
             ),
-            Text(
-              '$timeAgo ago',
-              style: TextStyle(
-                color: Colors.white60,
-                fontSize: width * 0.1,
-              ),
-            ),
-          ],
-        ),
-      ),
-    )
+          ),
+        )
         .animate()
         .slideY(
           begin: 1,
@@ -119,19 +117,13 @@ class _AnimatedLastMatchWidgetState extends State<_AnimatedLastMatchWidget> {
           delay: const Duration(milliseconds: 300),
         )
         .custom(
-      builder: (
-        BuildContext context,
-        double value,
-        Widget child,
-      ) {
-        return ClipRect(
-          clipper: MyCustomClipper(
-            showHeightPortion: 1.0,
-          ),
-          child: child,
+          builder: (BuildContext context, double value, Widget child) {
+            return ClipRect(
+              clipper: MyCustomClipper(showHeightPortion: 1.0),
+              child: child,
+            );
+          },
         );
-      },
-    );
   }
 }
 

@@ -26,22 +26,20 @@ class SpawningPortal extends PositionComponent with HasGameRef<FlappyDashGame> {
   Future<void> onLoad() async {
     await super.onLoad();
     _portalSprite = await game.loadSprite('portal.png');
-    _paint = Paint()
-      ..colorFilter = ColorFilter.mode(
-        color,
-        BlendMode.srcIn,
-      );
+    _paint = Paint()..colorFilter = ColorFilter.mode(color, BlendMode.srcIn);
     scale = Vector2.zero();
     _show();
 
-    add(TimerComponent(
-      period: hideAfter,
-      onTick: () {
-        onHide();
-        _hide();
-      },
-      removeOnFinish: true,
-    ));
+    add(
+      TimerComponent(
+        period: hideAfter,
+        onTick: () {
+          onHide();
+          _hide();
+        },
+        removeOnFinish: true,
+      ),
+    );
   }
 
   @override
@@ -53,31 +51,28 @@ class SpawningPortal extends PositionComponent with HasGameRef<FlappyDashGame> {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    _portalSprite.render(
-      canvas,
-      size: size,
-      overridePaint: _paint,
-    );
+    _portalSprite.render(canvas, size: size, overridePaint: _paint);
   }
 
   void _show() {
-    add(ScaleEffect.to(
-      Vector2.all(1.0),
-      EffectController(
-        duration: 0.5,
-        curve: Curves.easeOutCubic,
+    add(
+      ScaleEffect.to(
+        Vector2.all(1.0),
+        EffectController(duration: 0.5, curve: Curves.easeOutCubic),
       ),
-    ));
+    );
   }
 
   void _hide() {
-    add(ScaleEffect.to(
-      Vector2.zero(),
-      EffectController(
-        duration: 0.5,
-        curve: Curves.easeOutCubic,
-        onMax: removeFromParent,
+    add(
+      ScaleEffect.to(
+        Vector2.zero(),
+        EffectController(
+          duration: 0.5,
+          curve: Curves.easeOutCubic,
+          onMax: removeFromParent,
+        ),
       ),
-    ));
+    );
   }
 }

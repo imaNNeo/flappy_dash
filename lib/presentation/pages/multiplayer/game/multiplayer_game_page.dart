@@ -19,10 +19,7 @@ import 'package:go_router/go_router.dart';
 import 'parts/multiplayer_died_overlay.dart';
 
 class MultiPlayerGamePage extends StatefulWidget {
-  const MultiPlayerGamePage({
-    super.key,
-    required this.matchId,
-  });
+  const MultiPlayerGamePage({super.key, required this.matchId});
 
   final String matchId;
 
@@ -79,26 +76,19 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
                   GameWidget(
                     game: _flappyDashGame!,
                     backgroundBuilder: (_) {
-                      return Container(
-                        color: AppColors.backgroundColor,
-                      );
+                      return Container(color: AppColors.backgroundColor);
                     },
                   ),
                 if (state.currentPlayingState.isGameOver)
                   const MultiplayerDiedOverlayWidget(),
                 if (state.currentPlayingState.isIdle)
-                  const Align(
-                    alignment: Alignment(0, 0.2),
-                    child: TapToPlay(),
-                  ),
+                  const Align(alignment: Alignment(0, 0.2), child: TapToPlay()),
                 SafeArea(
                   child: Column(
                     children: [
                       TopScore(
                         currentScore: state.currentScore,
-                        customColor: AppColors.getDashColor(
-                          dashType,
-                        ),
+                        customColor: AppColors.getDashColor(dashType),
                       ),
                       _RemainingPlayingTimer(),
                     ],
@@ -118,11 +108,7 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const GameBackButton(),
-                              Expanded(
-                                child: Container(
-                                  height: 0,
-                                ),
-                              ),
+                              Expanded(child: Container(height: 0)),
                               const _ScoreboardSection(),
                             ],
                           ),
@@ -159,14 +145,8 @@ class _RemainingPlayingTimer extends StatelessWidget {
     return BlocBuilder<MultiplayerCubit, MultiplayerState>(
       builder: (context, state) {
         return Text(
-          PresentationUtils.formatSeconds(
-            state.matchPlayingRemainingSeconds,
-          ),
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            height: 1,
-          ),
+          PresentationUtils.formatSeconds(state.matchPlayingRemainingSeconds),
+          style: const TextStyle(color: Colors.black, fontSize: 18, height: 1),
         );
       },
     );
@@ -177,18 +157,15 @@ class _ScoreboardSection extends StatelessWidget {
   const _ScoreboardSection();
 
   List<MultiplayerScore> getSortedScores(MultiplayerState state) {
-    final sortedPlayers =
-        state.matchState!.players.entries.map((e) => e.value).toList();
-    sortedPlayers.sort(
-      (a, b) => b.score.compareTo(a.score),
-    );
+    final sortedPlayers = state.matchState!.players.entries
+        .map((e) => e.value)
+        .toList();
+    sortedPlayers.sort((a, b) => b.score.compareTo(a.score));
 
     return sortedPlayers.asMap().entries.map((e) {
       final rank = e.key + 1;
       final player = e.value;
-      final dashType = DashType.fromUserId(
-        player.userId,
-      );
+      final dashType = DashType.fromUserId(player.userId);
       return MultiplayerScore(
         playerId: player.userId,
         score: player.score,
@@ -208,9 +185,7 @@ class _ScoreboardSection extends StatelessWidget {
           return const SizedBox();
         }
 
-        return MultiplayerScoreBoard(
-          scores: getSortedScores(state),
-        );
+        return MultiplayerScoreBoard(scores: getSortedScores(state));
       },
     );
   }

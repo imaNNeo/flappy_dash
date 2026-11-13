@@ -21,21 +21,20 @@ class SplashState with EquatableMixin {
     bool? isSplashInitialized,
     String? initializationError,
     bool? versionIsOutdated,
-  }) =>
-      SplashState(
-        isLoading: isLoading ?? this.isLoading,
-        openTheNextPage: openTheNextPage ?? this.openTheNextPage,
-        isSplashInitialized: isSplashInitialized ?? this.isSplashInitialized,
-        initializationError: initializationError ?? this.initializationError,
-        versionIsOutdated: versionIsOutdated ?? this.versionIsOutdated,
-      );
+  }) => SplashState(
+    isLoading: isLoading ?? this.isLoading,
+    openTheNextPage: openTheNextPage ?? this.openTheNextPage,
+    isSplashInitialized: isSplashInitialized ?? this.isSplashInitialized,
+    initializationError: initializationError ?? this.initializationError,
+    versionIsOutdated: versionIsOutdated ?? this.versionIsOutdated,
+  );
 
   @override
   List<Object> get props => [
-        isLoading,
-        openTheNextPage,
-        isSplashInitialized,
-        initializationError,
-        versionIsOutdated,
-      ];
+    isLoading,
+    openTheNextPage,
+    isSplashInitialized,
+    initializationError,
+    versionIsOutdated,
+  ];
 }

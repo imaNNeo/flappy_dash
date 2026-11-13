@@ -13,12 +13,12 @@ enum ScreenSize {
   extraLarge;
 
   double get breakpoint => switch (this) {
-        ScreenSize.extraSmall => _extraSmallScreen,
-        ScreenSize.small => _smallScreen,
-        ScreenSize.medium => _mediumScreen,
-        ScreenSize.large => _largeScreen,
-        ScreenSize.extraLarge => double.infinity,
-      };
+    ScreenSize.extraSmall => _extraSmallScreen,
+    ScreenSize.small => _smallScreen,
+    ScreenSize.medium => _mediumScreen,
+    ScreenSize.large => _largeScreen,
+    ScreenSize.extraLarge => double.infinity,
+  };
 
   factory ScreenSize.fromContext(BuildContext context) =>
       ScreenSize.fromWidth(MediaQuery.of(context).size.width);

@@ -14,15 +14,9 @@ Future<void> setupServiceLocator() async {
   getIt.registerLazySingleton<AudioHelper>(() => AudioHelper());
 
   // DataSources
-  getIt.registerLazySingleton<NakamaDataSource>(
-    () => NakamaDataSource(),
-  );
-  getIt.registerLazySingleton<DeviceDataSource>(
-    () => DeviceDataSource(),
-  );
-  getIt.registerLazySingleton<SettingsDataSource>(
-    () => SettingsDataSource(),
-  );
+  getIt.registerLazySingleton<NakamaDataSource>(() => NakamaDataSource());
+  getIt.registerLazySingleton<DeviceDataSource>(() => DeviceDataSource());
+  getIt.registerLazySingleton<SettingsDataSource>(() => SettingsDataSource());
 
   // Repositories
   getIt.registerLazySingleton<GameRepository>(
@@ -32,9 +26,7 @@ Future<void> setupServiceLocator() async {
     ),
   );
   getIt.registerLazySingleton<MultiplayerRepository>(
-    () => MultiplayerRepository(
-      getIt.get<NakamaDataSource>(),
-    ),
+    () => MultiplayerRepository(getIt.get<NakamaDataSource>()),
   );
   getIt.registerLazySingleton<SettingsRepository>(
     () => SettingsRepository(

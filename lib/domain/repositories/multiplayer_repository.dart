@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flappy_dash/data/remote/nakama_data_source.dart';
 import 'package:flappy_dash/domain/entities/dispatching_match_event.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
@@ -31,27 +32,20 @@ class MultiplayerRepository {
     return match;
   }
 
-  void joinLobby(String matchId) => sendDispatchingEvent(
-        matchId,
-        DispatchingPlayerJoinedLobbyEvent(),
-      );
+  void joinLobby(String matchId) =>
+      sendDispatchingEvent(matchId, DispatchingPlayerJoinedLobbyEvent());
 
   Future<void> leaveMatch(String matchId) async {
     await _nakamaDataSource.leaveMatch(matchId);
     currentMatch.value = null;
   }
 
-  void sendUserDisplayNameUpdatedEvent(String matchId) => sendDispatchingEvent(
-        matchId,
-        DispatchingUserDisplayNameUpdatedEvent(),
-      );
+  void sendUserDisplayNameUpdatedEvent(String matchId) =>
+      sendDispatchingEvent(matchId, DispatchingUserDisplayNameUpdatedEvent());
 
   void sendDispatchingEvent(String matchId, DispatchingMatchEvent event) {
     _onEventDispatchedController.add(event);
-    _nakamaDataSource.sendDispatchingEvent(
-      matchId,
-      event,
-    );
+    _nakamaDataSource.sendDispatchingEvent(matchId, event);
   }
 
   Future<MatchResultEntity> getMatchResult(String matchId) =>

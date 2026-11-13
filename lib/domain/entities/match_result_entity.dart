@@ -26,8 +26,9 @@ class MatchResultEntity with EquatableMixin {
   // fromJson
   factory MatchResultEntity.fromJson(Map<String, dynamic> json) =>
       MatchResultEntity(
-        initializedAt:
-            DateTime.fromMillisecondsSinceEpoch(json['initializedAt']),
+        initializedAt: DateTime.fromMillisecondsSinceEpoch(
+          json['initializedAt'],
+        ),
         startedAt: DateTime.fromMillisecondsSinceEpoch(json['startedAt']),
         finishedAt: DateTime.fromMillisecondsSinceEpoch(json['finishedAt']),
         scores: json['scores']
@@ -37,29 +38,21 @@ class MatchResultEntity with EquatableMixin {
 
   // toJson
   Map<String, dynamic> toJson() => {
-        'initializedAt': initializedAt.millisecondsSinceEpoch,
-        'startedAt': startedAt.millisecondsSinceEpoch,
-        'finishedAt': finishedAt.millisecondsSinceEpoch,
-        'scores': scores.map((e) => e.toJson()).toList(),
-      };
+    'initializedAt': initializedAt.millisecondsSinceEpoch,
+    'startedAt': startedAt.millisecondsSinceEpoch,
+    'finishedAt': finishedAt.millisecondsSinceEpoch,
+    'scores': scores.map((e) => e.toJson()).toList(),
+  };
 
   @override
-  List<Object?> get props => [
-        initializedAt,
-        startedAt,
-        finishedAt,
-        scores,
-      ];
+  List<Object?> get props => [initializedAt, startedAt, finishedAt, scores];
 }
 
 class MatchScoreEntity with EquatableMixin {
   final int score;
   final User user;
 
-  MatchScoreEntity({
-    required this.score,
-    required this.user,
-  });
+  MatchScoreEntity({required this.score, required this.user});
 
   // fromJson
   factory MatchScoreEntity.fromJson(Map<String, dynamic> json) =>
@@ -70,13 +63,10 @@ class MatchScoreEntity with EquatableMixin {
 
   // toJson
   Map<String, dynamic> toJson() => {
-        'score': score,
-        'user': UserJsonParser.convertOutgoingJson(user.toJson()),
-      };
+    'score': score,
+    'user': UserJsonParser.convertOutgoingJson(user.toJson()),
+  };
 
   @override
-  List<Object?> get props => [
-        score,
-        user,
-      ];
+  List<Object?> get props => [score, user];
 }

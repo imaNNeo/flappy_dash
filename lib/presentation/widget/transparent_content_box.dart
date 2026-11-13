@@ -15,10 +15,7 @@ class TransparentContentBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const borderSize = BorderSide(
-      color: Colors.black,
-      width: 4,
-    );
+    const borderSize = BorderSide(color: Colors.black, width: 4);
     return Container(
       width: width,
       margin: margin,
@@ -30,9 +27,7 @@ class TransparentContentBox extends StatelessWidget {
         border: Border(
           top: borderSize,
           left: borderSize,
-          bottom: borderSize.copyWith(
-            width: borderSize.width * 2,
-          ),
+          bottom: borderSize.copyWith(width: borderSize.width * 2),
           right: borderSize,
         ),
       ),

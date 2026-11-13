@@ -32,11 +32,11 @@ class SinglePlayerGameConfigEntity extends GameConfigEntity {
 
   @override
   List<Object?> get props => [
-        pipesPositionArea,
-        pipesDistance,
-        pipeWidth,
-        pipeHoleGap,
-      ];
+    pipesPositionArea,
+    pipesDistance,
+    pipeWidth,
+    pipeHoleGap,
+  ];
 }
 
 class MultiplayerGameConfigEntity extends GameConfigEntity {
@@ -64,10 +64,10 @@ class MultiplayerGameConfigEntity extends GameConfigEntity {
 
   @override
   List<Object?> get props => [
-        pipesPositionArea,
-        pipesDistance,
-        pipeWidth,
-        pipeHoleGap,
-        correctPositionEvery,
-      ];
+    pipesPositionArea,
+    pipesDistance,
+    pipeWidth,
+    pipeHoleGap,
+    correctPositionEvery,
+  ];
 }

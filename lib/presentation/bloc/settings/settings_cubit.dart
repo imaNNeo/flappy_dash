@@ -6,9 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 part 'settings_state.dart';
 
 class SettingsCubit extends Cubit<SettingsState> {
-  SettingsCubit(
-    this._settingsRepository,
-  ) : super(const SettingsState()) {
+  SettingsCubit(this._settingsRepository) : super(const SettingsState()) {
     _initialize();
   }
 
@@ -16,8 +14,6 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   Future<void> _initialize() async {
     final appVersion = await _settingsRepository.getAppVersion();
-    emit(state.copyWith(
-      appVersion: ValueWrapper(appVersion),
-    ));
+    emit(state.copyWith(appVersion: ValueWrapper(appVersion)));
   }
 }

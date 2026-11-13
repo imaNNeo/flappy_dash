@@ -31,8 +31,9 @@ class MultiplayerDiedOverlayWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    state.multiplayerDiedMessage
-                            ?.getBody(state.spawnRemainingSeconds) ??
+                    state.multiplayerDiedMessage?.getBody(
+                          state.spawnRemainingSeconds,
+                        ) ??
                         '',
                     style: const TextStyle(
                       color: Colors.white,

@@ -15,19 +15,18 @@ class HomeState with EquatableMixin {
     bool? multiPlayerMatchIdLoading,
     String? multiPlayerMatchIdError,
     String? openMultiplayerLobby,
-  }) =>
-      HomeState(
-        multiPlayerMatchIdLoading:
-            multiPlayerMatchIdLoading ?? this.multiPlayerMatchIdLoading,
-        multiPlayerMatchIdError:
-            multiPlayerMatchIdError ?? this.multiPlayerMatchIdError,
-        openMultiplayerLobby: openMultiplayerLobby ?? this.openMultiplayerLobby,
-      );
+  }) => HomeState(
+    multiPlayerMatchIdLoading:
+        multiPlayerMatchIdLoading ?? this.multiPlayerMatchIdLoading,
+    multiPlayerMatchIdError:
+        multiPlayerMatchIdError ?? this.multiPlayerMatchIdError,
+    openMultiplayerLobby: openMultiplayerLobby ?? this.openMultiplayerLobby,
+  );
 
   @override
   List<Object> get props => [
-        multiPlayerMatchIdLoading,
-        multiPlayerMatchIdError,
-        openMultiplayerLobby,
-      ];
+    multiPlayerMatchIdLoading,
+    multiPlayerMatchIdError,
+    openMultiplayerLobby,
+  ];
 }

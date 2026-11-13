@@ -7,13 +7,8 @@ import 'package:flutter/material.dart';
 import 'dash.dart';
 
 class DashSpawnEffect extends ComponentEffect<Dash> {
-  DashSpawnEffect({
-    super.onComplete,
-})
-      : super(EffectController(
-          duration: 0.5,
-          curve: Curves.easeOutCubic,
-        ));
+  DashSpawnEffect({super.onComplete})
+    : super(EffectController(duration: 0.5, curve: Curves.easeOutCubic));
 
   final scaleFrom = Vector2(0.0, 0.0);
   final scaleTo = Vector2.all(1.0);

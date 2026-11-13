@@ -26,12 +26,12 @@ class Dash extends PositionComponent
     required this.isMe,
     this.autoJump = false,
     super.priority,
-  })  : type = DashType.fromUserId(playerId),
-        super(
-          position: Vector2(0, 0),
-          size: Vector2.all(80.0),
-          anchor: Anchor.center,
-        );
+  }) : type = DashType.fromUserId(playerId),
+       super(
+         position: Vector2(0, 0),
+         size: Vector2.all(80.0),
+         anchor: Anchor.center,
+       );
 
   final String playerId;
   final String displayName;
@@ -82,27 +82,31 @@ class Dash extends PositionComponent
     final radius = size.x / 2;
     final center = size / 2;
     if (isMe) {
-      add(CircleHitbox(
-        radius: radius * 0.75,
-        position: center * 1.1,
-        anchor: Anchor.center,
-        collisionType: isMe ? CollisionType.active : CollisionType.inactive,
-      ));
+      add(
+        CircleHitbox(
+          radius: radius * 0.75,
+          position: center * 1.1,
+          anchor: Anchor.center,
+          collisionType: isMe ? CollisionType.active : CollisionType.inactive,
+        ),
+      );
       if (autoJump) {
         add(_autoJumpDash = AutoJumpDash());
       }
     }
-    add(_nameComponent = OutlinedTextComponent(
-      text: _isNameVisible ? displayName : '',
-      position: Vector2(size.x / 2, 0),
-      textStyle: TextStyle(
-        fontSize: 24,
-        fontFamily: 'Chewy',
-        fontWeight: FontWeight.bold,
-        letterSpacing: 2,
-        color: AppColors.getDashColor(type),
+    add(
+      _nameComponent = OutlinedTextComponent(
+        text: _isNameVisible ? displayName : '',
+        position: Vector2(size.x / 2, 0),
+        textStyle: TextStyle(
+          fontSize: 24,
+          fontFamily: 'Chewy',
+          fontWeight: FontWeight.bold,
+          letterSpacing: 2,
+          color: AppColors.getDashColor(type),
+        ),
       ),
-    ));
+    );
     _resetCorrectPositionAfter();
   }
 
@@ -112,12 +116,11 @@ class Dash extends PositionComponent
     }
     _multiplayerCorrectPositionAfter =
         (game.gameMode as MultiplayerGameMode).gameConfig.correctPositionEvery *
-            FlappyDashRootComponent.gameSpeedMultiplier;
+        FlappyDashRootComponent.gameSpeedMultiplier;
   }
 
-  PlayingState get currentPlayingState => game.getCurrentPlayingState(
-        otherPlayerId: isMe ? null : playerId,
-      );
+  PlayingState get currentPlayingState =>
+      game.getCurrentPlayingState(otherPlayerId: isMe ? null : playerId);
 
   @override
   void update(double dt) {
@@ -208,18 +211,19 @@ class Dash extends PositionComponent
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    _dashSprite.render(
-      canvas,
-      size: size,
-    );
+    _dashSprite.render(canvas, size: size);
   }
 
   void resetVelocity() {
     _velocityY = 0;
   }
 
-  void updateState(double positionX, double positionY, double velocityY,
-      {double duration = 0.15}) {
+  void updateState(
+    double positionX,
+    double positionY,
+    double velocityY, {
+    double duration = 0.15,
+  }) {
     assert(game.gameMode is MultiplayerGameMode && !isMe);
     final xDiff = (positionX - x).abs();
     if (xDiff > 200 || duration == 0) {
@@ -235,9 +239,7 @@ class Dash extends PositionComponent
       _smoothUpdatingPositionEffect?.removeFromParent();
       add(
         _smoothUpdatingPositionEffect = UpdateDashStateEffect(
-          EffectController(
-            duration: scaledDuration,
-          ),
+          EffectController(duration: scaledDuration),
           positionX: newX,
           positionY: newY,
           velocityY: newVelocity,

@@ -14,16 +14,11 @@ class SingleplayerGameState with EquatableMixin {
   SingleplayerGameState copyWith({
     int? currentScore,
     PlayingState? currentPlayingState,
-  }) =>
-      SingleplayerGameState(
-        currentScore: currentScore ?? this.currentScore,
-        currentPlayingState: currentPlayingState ?? this.currentPlayingState,
-      );
+  }) => SingleplayerGameState(
+    currentScore: currentScore ?? this.currentScore,
+    currentPlayingState: currentPlayingState ?? this.currentPlayingState,
+  );
 
   @override
-  List<Object?> get props => [
-        gameMode,
-        currentScore,
-        currentPlayingState,
-      ];
+  List<Object?> get props => [gameMode, currentScore, currentPlayingState];
 }

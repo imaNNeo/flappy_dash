@@ -16,10 +16,9 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  runApp(DevicePreview(
-    enabled: kDebugMode,
-    builder: (context) => const MyApp(),
-  ));
+  runApp(
+    DevicePreview(enabled: kDebugMode, builder: (context) => const MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -35,18 +34,13 @@ class MyApp extends StatelessWidget {
           return Stack(
             children: [
               DevicePreview.appBuilder(context, child),
-              const Align(
-                alignment: Alignment.bottomLeft,
-                child: DebugPanel(),
-              ),
+              const Align(alignment: Alignment.bottomLeft, child: DebugPanel()),
             ],
           );
         },
         theme: ThemeData(
           fontFamily: 'Chewy',
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: AppColors.blueColor,
-          ),
+          colorScheme: ColorScheme.fromSeed(seedColor: AppColors.blueColor),
         ),
       ),
     );

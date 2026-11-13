@@ -46,10 +46,7 @@ class GameOverWidget extends StatelessWidget {
                       padding: EdgeInsets.all(8.0),
                       child: Text(
                         'PLAY AGAIN!',
-                        style: TextStyle(
-                          fontSize: 22,
-                          letterSpacing: 2,
-                        ),
+                        style: TextStyle(fontSize: 22, letterSpacing: 2),
                       ),
                     ),
                   ),

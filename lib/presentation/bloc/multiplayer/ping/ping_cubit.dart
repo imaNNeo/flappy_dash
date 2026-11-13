@@ -11,9 +11,7 @@ import 'package:uuid/uuid.dart';
 part 'ping_state.dart';
 
 class PingCubit extends Cubit<PingState> {
-  PingCubit(
-    this._multiplayerRepository,
-  ) : super(const PingState()) {
+  PingCubit(this._multiplayerRepository) : super(const PingState()) {
     _initializePing();
   }
 
@@ -41,9 +39,9 @@ class PingCubit extends Cubit<PingState> {
         _streamSubscription!.matchId != matchId) {
       _streamSubscription?.subscription.cancel();
       _streamSubscription = (
-        subscription: _multiplayerRepository.onMatchEvent(matchId).listen(
-              _onMatchEvent,
-            ),
+        subscription: _multiplayerRepository
+            .onMatchEvent(matchId)
+            .listen(_onMatchEvent),
         matchId: matchId,
       );
     }
@@ -56,10 +54,12 @@ class PingCubit extends Cubit<PingState> {
 
     final sinceLastPing = DateTime.now().difference(lastPingSentAt.time);
     if (sinceLastPing > _pingTimeout) {
-      emit(state.copyWith(
-        lastPingSentAt: const ValueWrapper(null),
-        currentPing: const ValueWrapper(null),
-      ));
+      emit(
+        state.copyWith(
+          lastPingSentAt: const ValueWrapper(null),
+          currentPing: const ValueWrapper(null),
+        ),
+      );
       _newPing();
     }
   }
@@ -70,18 +70,13 @@ class PingCubit extends Cubit<PingState> {
     final pingSentAt = DateTime.now();
     _multiplayerRepository.sendDispatchingEvent(
       matchId,
-      DispatchingPingEvent(
-        state.currentPing?.total ?? 0,
-        pingId,
-        pingSentAt,
+      DispatchingPingEvent(state.currentPing?.total ?? 0, pingId, pingSentAt),
+    );
+    emit(
+      state.copyWith(
+        lastPingSentAt: ValueWrapper((pingId: pingId, time: pingSentAt)),
       ),
     );
-    emit(state.copyWith(
-      lastPingSentAt: ValueWrapper((
-        pingId: pingId,
-        time: pingSentAt,
-      )),
-    ));
   }
 
   void _onMatchEvent(MatchEvent event) {
@@ -92,19 +87,25 @@ class PingCubit extends Cubit<PingState> {
         final serverReceiveTime = event.serverReceiveTime;
         final now = DateTime.now();
 
-        final sendPing =
-            serverReceiveTime.difference(pingSentAt).inMilliseconds.abs();
-        final receivePing =
-            now.difference(serverReceiveTime).inMilliseconds.abs();
+        final sendPing = serverReceiveTime
+            .difference(pingSentAt)
+            .inMilliseconds
+            .abs();
+        final receivePing = now
+            .difference(serverReceiveTime)
+            .inMilliseconds
+            .abs();
         final totalPing = now.difference(pingSentAt).inMilliseconds.abs();
-        emit(state.copyWith(
-          currentPing: ValueWrapper((
-            total: totalPing,
-            send: sendPing,
-            recieve: receivePing,
-          )),
-          lastPingSentAt: const ValueWrapper(null),
-        ));
+        emit(
+          state.copyWith(
+            currentPing: ValueWrapper((
+              total: totalPing,
+              send: sendPing,
+              recieve: receivePing,
+            )),
+            lastPingSentAt: const ValueWrapper(null),
+          ),
+        );
       }
     }
   }

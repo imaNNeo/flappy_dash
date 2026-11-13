@@ -36,9 +36,11 @@ class _MultiplayerScoreBoardState extends State<MultiplayerScoreBoard> {
     if (beforeMe.length + 1 <= widget.maxShowingRows) {
       result.addAll(beforeMe.map((score) => _ScoreRowPlayerItem(score: score)));
     } else {
-      result.addAll(beforeMe
-          .take(widget.maxShowingRows - 1)
-          .map((score) => _ScoreRowPlayerItem(score: score)));
+      result.addAll(
+        beforeMe
+            .take(widget.maxShowingRows - 1)
+            .map((score) => _ScoreRowPlayerItem(score: score)),
+      );
       result.add(_ScoreRowDotsItem());
     }
     result.add(_ScoreRowPlayerItem(score: me));
@@ -122,20 +124,19 @@ class _MultiplayerScoreBoardState extends State<MultiplayerScoreBoard> {
                 ),
               ),
               SizedBox(
-                  height: switch (screenSize) {
-                ScreenSize.extraSmall || ScreenSize.small => 4.0,
-                ScreenSize.medium => 6.0,
-                ScreenSize.large || ScreenSize.extraLarge => 8.0,
-              }),
+                height: switch (screenSize) {
+                  ScreenSize.extraSmall || ScreenSize.small => 4.0,
+                  ScreenSize.medium => 6.0,
+                  ScreenSize.large || ScreenSize.extraLarge => 8.0,
+                },
+              ),
               ...showingItems.map(
                 (item) => item is _ScoreRowPlayerItem
                     ? _MultiplayerScoreRowWidget(
                         score: item.score,
                         screenSize: screenSize,
                       )
-                    : _MultiplayerDotsRowWidget(
-                        screenSize: screenSize,
-                      ),
+                    : _MultiplayerDotsRowWidget(screenSize: screenSize),
               ),
             ],
           ),
@@ -164,13 +165,13 @@ class MultiplayerScore with EquatableMixin {
 
   @override
   List<Object?> get props => [
-        playerId,
-        displayName,
-        dashType,
-        score,
-        rank,
-        isMe,
-      ];
+    playerId,
+    displayName,
+    dashType,
+    score,
+    rank,
+    isMe,
+  ];
 }
 
 sealed class _ScoreRowItem with EquatableMixin {}
@@ -190,9 +191,7 @@ class _ScoreRowDotsItem extends _ScoreRowItem {
 }
 
 class _MultiplayerDotsRowWidget extends StatelessWidget {
-  const _MultiplayerDotsRowWidget({
-    required this.screenSize,
-  });
+  const _MultiplayerDotsRowWidget({required this.screenSize});
 
   final int dotsCount = 3;
   final ScreenSize screenSize;
@@ -295,8 +294,9 @@ class _MultiplayerScoreRowWidget extends StatelessWidget {
       dashGap: 8,
       strokeWidth: !score.isMe ? 0 : 1,
       borderColor: dashColor.withOpacity(0.7),
-      backgroundColor:
-          score.isMe ? Colors.black.withOpacity(0.13) : Colors.transparent,
+      backgroundColor: score.isMe
+          ? Colors.black.withOpacity(0.13)
+          : Colors.transparent,
       child: SizedBox(
         height: height,
         child: Row(
@@ -305,10 +305,7 @@ class _MultiplayerScoreRowWidget extends StatelessWidget {
               width: rankTextSpace,
               child: Text(
                 score.rank.toString(),
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: rankTextSize,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: rankTextSize),
                 textAlign: TextAlign.right,
               ),
             ),
@@ -322,20 +319,14 @@ class _MultiplayerScoreRowWidget extends StatelessWidget {
             Expanded(
               child: Text(
                 showingName,
-                style: TextStyle(
-                  color: dashColor,
-                  fontSize: normalTextSize,
-                ),
+                style: TextStyle(color: dashColor, fontSize: normalTextSize),
               ),
             ),
             SizedBox(
               width: scoreTextSpace,
               child: Text(
                 score.score.toString(),
-                style: TextStyle(
-                  color: dashColor,
-                  fontSize: normalTextSize,
-                ),
+                style: TextStyle(color: dashColor, fontSize: normalTextSize),
                 textAlign: TextAlign.right,
               ),
             ),
@@ -370,9 +361,9 @@ class DashedBorderPainter extends CustomPainter {
     this.drawLeft = true,
     this.borderRadius = 0.0,
   }) : _paint = Paint()
-          ..color = color
-          ..strokeWidth = strokeWidth
-          ..style = PaintingStyle.stroke;
+         ..color = color
+         ..strokeWidth = strokeWidth
+         ..style = PaintingStyle.stroke;
 
   Path? _path;
 
@@ -400,13 +391,15 @@ class DashedBorderPainter extends CustomPainter {
           path.lineTo(0, 0);
         }
       } else {
-        path.addRRect(RRect.fromLTRBR(
-          0,
-          0,
-          size.width,
-          size.height,
-          Radius.circular(borderRadius),
-        ));
+        path.addRRect(
+          RRect.fromLTRBR(
+            0,
+            0,
+            size.width,
+            size.height,
+            Radius.circular(borderRadius),
+          ),
+        );
       }
 
       // Create the dashed path
@@ -470,9 +463,7 @@ class DashedContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: backgroundColor,
-      ),
+      decoration: BoxDecoration(color: backgroundColor),
       child: CustomPaint(
         painter: DashedBorderPainter(
           color: borderColor,
@@ -485,10 +476,7 @@ class DashedContainer extends StatelessWidget {
           drawLeft: drawLeft,
           borderRadius: borderRadius,
         ),
-        child: Padding(
-          padding: EdgeInsets.all(strokeWidth),
-          child: child,
-        ),
+        child: Padding(padding: EdgeInsets.all(strokeWidth), child: child),
       ),
     );
   }

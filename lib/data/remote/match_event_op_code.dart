@@ -28,29 +28,27 @@ enum MatchEventOpCode {
   const MatchEventOpCode(this.opCode);
 
   MatchEvent parseIncomingEvent(MatchData data) => switch (this) {
-        MatchEventOpCode.matchWelcome => MatchWelcomeEvent(data),
-        MatchEventOpCode.matchWaitingTimeIncreased =>
-          MatchWaitingTimeIncreasedEvent(data),
-        MatchEventOpCode.matchPresencesUpdated =>
-          MatchPresencesUpdatedEvent(data),
-        MatchEventOpCode.matchStarted => MatchStartedEvent(data),
-        MatchEventOpCode.matchFinished => MatchFinishedEvent(data),
-        MatchEventOpCode.matchPong => MatchPongEvent(data),
-        MatchEventOpCode.playerJoinedTheLobby => PlayerJoinedTheLobby(data),
-        MatchEventOpCode.playerStarted => PlayerStartedEvent(data),
-        MatchEventOpCode.playerJumped => PlayerJumpedEvent(data),
-        MatchEventOpCode.playerScored => PlayerScoredEvent(data),
-        MatchEventOpCode.playerDied => PlayerDiedEvent(data),
-        MatchEventOpCode.playerIsIdle => PlayerIsIdleEvent(data),
-        MatchEventOpCode.playerKickedFromTheLobby =>
-          PlayerKickedFromTheLobbyEvent(data),
-        MatchEventOpCode.playerCorrectPosition =>
-          PlayerCorrectPositionEvent(data),
-        MatchEventOpCode.playerWillSpawnsAt => PlayerWillSpawnAtEvent(data),
-        MatchEventOpCode.matchPing ||
-        MatchEventOpCode.playerDisplayNameUpdated =>
-          throw UnimplementedError('It is not an incoming event'),
-      };
+    MatchEventOpCode.matchWelcome => MatchWelcomeEvent(data),
+    MatchEventOpCode.matchWaitingTimeIncreased =>
+      MatchWaitingTimeIncreasedEvent(data),
+    MatchEventOpCode.matchPresencesUpdated => MatchPresencesUpdatedEvent(data),
+    MatchEventOpCode.matchStarted => MatchStartedEvent(data),
+    MatchEventOpCode.matchFinished => MatchFinishedEvent(data),
+    MatchEventOpCode.matchPong => MatchPongEvent(data),
+    MatchEventOpCode.playerJoinedTheLobby => PlayerJoinedTheLobby(data),
+    MatchEventOpCode.playerStarted => PlayerStartedEvent(data),
+    MatchEventOpCode.playerJumped => PlayerJumpedEvent(data),
+    MatchEventOpCode.playerScored => PlayerScoredEvent(data),
+    MatchEventOpCode.playerDied => PlayerDiedEvent(data),
+    MatchEventOpCode.playerIsIdle => PlayerIsIdleEvent(data),
+    MatchEventOpCode.playerKickedFromTheLobby => PlayerKickedFromTheLobbyEvent(
+      data,
+    ),
+    MatchEventOpCode.playerCorrectPosition => PlayerCorrectPositionEvent(data),
+    MatchEventOpCode.playerWillSpawnsAt => PlayerWillSpawnAtEvent(data),
+    MatchEventOpCode.matchPing || MatchEventOpCode.playerDisplayNameUpdated =>
+      throw UnimplementedError('It is not an incoming event'),
+  };
 
   static MatchEventOpCode fromDispatchingEvent(DispatchingMatchEvent event) =>
       switch (event) {

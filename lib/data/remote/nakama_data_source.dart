@@ -50,12 +50,8 @@ class NakamaDataSource {
 
   final _accountUpdateStreamController = StreamController<Account>.broadcast();
 
-  Future<Session> initSession(
-    String deviceId,
-  ) async {
-    _currentSession = await client.authenticateDevice(
-      deviceId: deviceId,
-    );
+  Future<Session> initSession(String deviceId) async {
+    _currentSession = await client.authenticateDevice(deviceId: deviceId);
     _websocketClient = _initWebsocketClient(_currentSession.token);
     return _currentSession;
   }
@@ -94,10 +90,8 @@ class NakamaDataSource {
     yield* _accountUpdateStreamController.stream;
   }
 
-  Future<List<User>> getUsers(List<String> userIds) => client.getUsers(
-        session: _currentSession,
-        ids: userIds,
-      );
+  Future<List<User>> getUsers(List<String> userIds) =>
+      client.getUsers(session: _currentSession, ids: userIds);
 
   Future<Account> updateUserDisplayName(String newDisplayName) async {
     await client.updateAccount(
@@ -110,7 +104,8 @@ class NakamaDataSource {
   }
 
   Future<LeaderboardRecordList> listLeaderboardRecordsAroundOwner(
-      String leaderboardName) {
+    String leaderboardName,
+  ) {
     return client.listLeaderboardRecordsAroundOwner(
       session: _currentSession,
       ownerId: _currentSession.userId,
@@ -134,8 +129,9 @@ class NakamaDataSource {
       if (data.matchId != matchId) {
         return;
       }
-      final index = MatchEventOpCode.values
-          .indexWhere((element) => element.opCode == data.opCode);
+      final index = MatchEventOpCode.values.indexWhere(
+        (element) => element.opCode == data.opCode,
+      );
       if (index == -1) {
         // opCode is not defined in the client
         debugPrint('Unknown event type with opCode: ${data.opCode}');
@@ -148,8 +144,8 @@ class NakamaDataSource {
 
   Future<MatchEvent> _parseData(MatchEventOpCode opCode, MatchData data) =>
       kIsolatesDisabled
-          ? Future.value(opCode.parseIncomingEvent(data))
-          : compute(opCode.parseIncomingEvent, data);
+      ? Future.value(opCode.parseIncomingEvent(data))
+      : compute(opCode.parseIncomingEvent, data);
 
   Future<Match> joinMatch(String matchId) async {
     final match = await _websocketClient.joinMatch(matchId);
@@ -179,9 +175,7 @@ class NakamaDataSource {
     final response = await client.rpc(
       session: _currentSession,
       id: 'get_match_result',
-      payload: _makePayload({
-        'matchId': matchId,
-      }),
+      payload: _makePayload({'matchId': matchId}),
     );
     if (response == null || response.isBlank) {
       throw Exception('Failed to get match result');

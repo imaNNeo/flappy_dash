@@ -14,10 +14,7 @@ class ShareQRContentDialog extends StatefulWidget {
     return showDialog<String?>(
       context: context,
       builder: (context) {
-        return ShareQRContentDialog(
-          title: title,
-          data: data,
-        );
+        return ShareQRContentDialog(title: title, data: data);
       },
     );
   }
@@ -46,21 +43,14 @@ class _ShareQRContentDialogState extends State<ShareQRContentDialog> {
         child: Container(
           decoration: const BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.all(
-              Radius.circular(16),
-            ),
+            borderRadius: BorderRadius.all(Radius.circular(16)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  widget.title,
-                  style: const TextStyle(
-                    fontSize: 28,
-                  ),
-                ),
+                Text(widget.title, style: const TextStyle(fontSize: 28)),
                 const SizedBox(height: 24),
                 AspectRatio(
                   aspectRatio: 1.0,
@@ -91,7 +81,7 @@ class _ShareQRContentDialogState extends State<ShareQRContentDialog> {
                       },
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),

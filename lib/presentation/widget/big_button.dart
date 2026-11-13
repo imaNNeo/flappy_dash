@@ -66,7 +66,7 @@ class BigButton extends StatelessWidget {
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               ),
-            )
+            ),
         ],
       ),
     );

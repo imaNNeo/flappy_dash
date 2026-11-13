@@ -31,9 +31,7 @@ class AutoJumpDash extends Component with ParentIsA<Dash> {
 
   final double jumpEvery;
 
-  AutoJumpDash({
-    this.jumpEvery = 0.2,
-  }) : canJumpIn = jumpEvery;
+  AutoJumpDash({this.jumpEvery = 0.2}) : canJumpIn = jumpEvery;
 
   @override
   void update(double dt) {
@@ -53,8 +51,9 @@ class AutoJumpDash extends Component with ParentIsA<Dash> {
       return _nextPipe!;
     }
 
-    final pipes =
-        gameRef.world.rootComponent.children.whereType<PipePair>().toList();
+    final pipes = gameRef.world.rootComponent.children
+        .whereType<PipePair>()
+        .toList();
     if (pipes.isEmpty) {
       return null;
     }
@@ -123,10 +122,7 @@ class AutoJumpDash extends Component with ParentIsA<Dash> {
         final targetY = getBottomLineEdge(_nextPipe!);
         canvas.drawLine(
           (parent.size / 2).toOffset(),
-          Offset(
-            targetX - position.x,
-            targetY - position.y,
-          ),
+          Offset(targetX - position.x, targetY - position.y),
           Paint()
             ..color = const Color(0xFFFF0000)
             ..strokeWidth = 2,

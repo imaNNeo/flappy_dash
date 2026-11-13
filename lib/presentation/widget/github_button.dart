@@ -6,10 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class GithubButton extends StatelessWidget {
-  const GithubButton({
-    super.key,
-    required this.screenSize,
-  });
+  const GithubButton({super.key, required this.screenSize});
 
   final ScreenSize screenSize;
 

@@ -12,7 +12,7 @@ class Pipe extends PositionComponent {
     required this.isFlipped,
     required super.position,
     required this.pipeWidth,
-  }): super(priority: 2);
+  }) : super(priority: 2);
 
   @override
   Future<void> onLoad() async {
@@ -31,10 +31,6 @@ class Pipe extends PositionComponent {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    _pipeSprite.render(
-      canvas,
-      position: Vector2.zero(),
-      size: size,
-    );
+    _pipeSprite.render(canvas, position: Vector2.zero(), size: size);
   }
 }

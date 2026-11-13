@@ -35,11 +35,7 @@ class GameRepository {
       users.map((user) => MapEntry(user.id, user)),
     );
     final currentUserId = await getCurrentUserId();
-    return LeaderboardEntity(
-      recordList,
-      usersMap,
-      currentUserId,
-    );
+    return LeaderboardEntity(recordList, usersMap, currentUserId);
   }
 
   Future<String> getCurrentUserId() async {

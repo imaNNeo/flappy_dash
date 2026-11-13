@@ -68,7 +68,9 @@ class _SplashPageState extends State<SplashPage> {
                           Text(
                             'Flappy Dash',
                             style: TextStyle(
-                                fontSize: 28, color: Color(0xFF25165F)),
+                              fontSize: 28,
+                              color: Color(0xFF25165F),
+                            ),
                           ),
                         ],
                       ),
@@ -79,7 +81,7 @@ class _SplashPageState extends State<SplashPage> {
               const Align(
                 alignment: Alignment.bottomRight,
                 child: AppVersionWidget(),
-              )
+              ),
             ],
           ),
         );

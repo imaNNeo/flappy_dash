@@ -14,8 +14,8 @@ class OutlinedTextComponent extends PositionComponent {
     ),
     this.strokeColor = Colors.black,
     this.strokeWidth = 4.0,
-  })  : _text = text,
-        super();
+  }) : _text = text,
+       super();
 
   String _text;
 
@@ -36,26 +36,26 @@ class OutlinedTextComponent extends PositionComponent {
   @override
   void onLoad() {
     super.onLoad();
-    add(_textComponent1 = TextComponent(
-      text: text,
-      anchor: Anchor.bottomCenter,
-      textRenderer: TextPaint(
-        style: textStyle.copyWith(
-          color: null,
-          foreground: Paint()
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = strokeWidth
-            ..color = strokeColor,
-        ),
-      ),
-      children: [
-        _textComponent2 = TextComponent(
-          text: text,
-          textRenderer: TextPaint(
-            style: textStyle,
+    add(
+      _textComponent1 = TextComponent(
+        text: text,
+        anchor: Anchor.bottomCenter,
+        textRenderer: TextPaint(
+          style: textStyle.copyWith(
+            color: null,
+            foreground: Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = strokeWidth
+              ..color = strokeColor,
           ),
         ),
-      ],
-    ));
+        children: [
+          _textComponent2 = TextComponent(
+            text: text,
+            textRenderer: TextPaint(style: textStyle),
+          ),
+        ],
+      ),
+    );
   }
 }

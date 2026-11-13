@@ -6,10 +6,7 @@ class BoxOverlay extends StatelessWidget {
     super.key,
     required this.child,
     this.onTap,
-    this.padding = const EdgeInsets.symmetric(
-      horizontal: 18.0,
-      vertical: 12.0,
-    ),
+    this.padding = const EdgeInsets.symmetric(horizontal: 18.0, vertical: 12.0),
     this.borderRadius = PresentationConstants.defaultBorderRadiusSmall,
   });
 
@@ -23,16 +20,12 @@ class BoxOverlay extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.all(
-          Radius.circular(borderRadius),
-        ),
+        borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
             color: AppColors.boxBgColor,
-            borderRadius: BorderRadius.all(
-              Radius.circular(borderRadius),
-            ),
+            borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
           ),
           padding: padding,
           child: child,

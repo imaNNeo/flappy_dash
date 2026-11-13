@@ -17,8 +17,8 @@ sealed class MatchEvent {
   MatchEvent(MatchData matchData) {
     sender =
         matchData.presence == null || matchData.presence!.userId.isNullOrBlank
-            ? null
-            : matchData.presence!;
+        ? null
+        : matchData.presence!;
   }
 
   late UserPresence? sender;

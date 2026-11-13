@@ -1,10 +1,7 @@
 part of '../home_page.dart';
 
 class SinglePlayerButton extends StatelessWidget {
-  const SinglePlayerButton({
-    super.key,
-    required this.onPressed,
-  });
+  const SinglePlayerButton({super.key, required this.onPressed});
 
   final VoidCallback onPressed;
 
@@ -15,10 +12,7 @@ class SinglePlayerButton extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SvgPicture.asset(
-            "assets/images/dashes/flutter_dash.svg",
-            height: 58,
-          ),
+          SvgPicture.asset("assets/images/dashes/flutter_dash.svg", height: 58),
           const SizedBox(width: 8),
           const OutlineText(
             Text(

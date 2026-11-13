@@ -25,29 +25,27 @@ class PlayerState with EquatableMixin {
   });
 
   factory PlayerState.fromJson(Map<String, dynamic> json) => PlayerState(
-        userId: json['userId'],
-        displayName: json['displayName'],
-        isInLobby: json['isInLobby'],
-        lastKnownX: double.parse(json['lastKnownX'].toString()),
-        lastKnownY: double.parse(json['lastKnownY'].toString()),
-        lastKnownVelocityY: double.parse(json['lastKnownVelocityY'].toString()),
-        score: json['score'],
-        playingState: PlayingState.values[json['playingState']],
-        spawnsAgainAt: DateTime.fromMillisecondsSinceEpoch(
-          json['spawnsAgainAt'],
-        ),
-      );
+    userId: json['userId'],
+    displayName: json['displayName'],
+    isInLobby: json['isInLobby'],
+    lastKnownX: double.parse(json['lastKnownX'].toString()),
+    lastKnownY: double.parse(json['lastKnownY'].toString()),
+    lastKnownVelocityY: double.parse(json['lastKnownVelocityY'].toString()),
+    score: json['score'],
+    playingState: PlayingState.values[json['playingState']],
+    spawnsAgainAt: DateTime.fromMillisecondsSinceEpoch(json['spawnsAgainAt']),
+  );
 
   @override
   List<Object?> get props => [
-        userId,
-        displayName,
-        isInLobby,
-        lastKnownX,
-        lastKnownY,
-        lastKnownVelocityY,
-        score,
-        playingState,
-        spawnsAgainAt,
-      ];
+    userId,
+    displayName,
+    isInLobby,
+    lastKnownX,
+    lastKnownY,
+    lastKnownVelocityY,
+    score,
+    playingState,
+    spawnsAgainAt,
+  ];
 }

@@ -78,11 +78,11 @@ class PendingMatchBox extends StatelessWidget {
                             ),
                             gridDelegate:
                                 const SliverGridDelegateWithMaxCrossAxisExtent(
-                              maxCrossAxisExtent: 174,
-                              crossAxisSpacing: 12,
-                              mainAxisSpacing: 12,
-                              childAspectRatio: 3,
-                            ),
+                                  maxCrossAxisExtent: 174,
+                                  crossAxisSpacing: 12,
+                                  mainAxisSpacing: 12,
+                                  childAspectRatio: 3,
+                                ),
                             itemCount: state.inLobbyPlayers.length,
                             itemBuilder: (context, index) {
                               final player = state.inLobbyPlayers[index];
@@ -109,13 +109,12 @@ class PendingMatchBox extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: horizontalPadding),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: horizontalPadding,
+                    ),
                     child: Row(
                       children: [
-                        Expanded(
-                          child: AutoJumpWidget(state: state),
-                        ),
+                        Expanded(child: AutoJumpWidget(state: state)),
                         BigButton(
                           strokeColor: Colors.white,
                           bgColor: AppColors.blueButtonBgColor,
@@ -124,10 +123,7 @@ class PendingMatchBox extends StatelessWidget {
                               : () => _onJoinMatchPressed(context),
                           child: const Text(
                             'JOIN',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 42,
-                            ),
+                            style: TextStyle(color: Colors.white, fontSize: 42),
                           ),
                         ),
                         Expanded(child: Container()),
@@ -139,10 +135,8 @@ class PendingMatchBox extends StatelessWidget {
               ),
               Transform.translate(
                 offset: Offset(18, -lastWinnerHeight),
-                child: LastMatchWinnerWidget(
-                  height: lastWinnerHeight,
-                ),
-              )
+                child: LastMatchWinnerWidget(height: lastWinnerHeight),
+              ),
             ],
           ),
         );
@@ -174,10 +168,6 @@ class PendingMatchBox extends StatelessWidget {
   void _shareLobby(BuildContext context, String matchId) {
     final currentRoute = GoRouterState.of(context).uri.toString();
     final url = '${AppConstants.baseUrl}$currentRoute';
-    ShareQRContentDialog.show(
-      context,
-      title: 'Share Lobby',
-      data: url,
-    );
+    ShareQRContentDialog.show(context, title: 'Share Lobby', data: url);
   }
 }
