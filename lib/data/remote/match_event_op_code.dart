@@ -27,6 +27,12 @@ enum MatchEventOpCode {
 
   const MatchEventOpCode(this.opCode);
 
+  static final Map<int, MatchEventOpCode> _byOpCode = {
+    for (final value in values) value.opCode: value,
+  };
+
+  static MatchEventOpCode? fromOpCode(int opCode) => _byOpCode[opCode];
+
   MatchEvent parseIncomingEvent(MatchData data) => switch (this) {
     MatchEventOpCode.matchWelcome => MatchWelcomeEvent(data),
     MatchEventOpCode.matchWaitingTimeIncreased =>

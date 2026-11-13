@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:isolate';
 
 import 'package:flappy_dash/domain/entities/dispatching_match_event.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
@@ -39,8 +38,6 @@ class NakamaDataSource {
     grpcPort: _grpcPort,
     httpPort: _httpPort,
   );
-  static const kIsolatesDisabled = kIsWeb || kIsWasm;
-
   String _makePayload(Map<String, dynamic> json) => kIsWeb || kIsWasm
       ? '"${jsonEncode(json).replaceAll('"', '\\"')}"'
       : jsonEncode(json);
@@ -220,29 +217,35 @@ class NakamaDataSource {
     return matchId;
   }
 
-  Stream<MatchEvent> onMatchEvent(String matchId) async* {
-    await for (final data in _matchDataController.stream) {
-      if (data.matchId != matchId) {
-        // Data of another match (e.g. the previous one); not for this listener.
-        continue;
-      }
-      final index = MatchEventOpCode.values.indexWhere(
-        (element) => element.opCode == data.opCode,
-      );
-      if (index == -1) {
-        // opCode is not defined in the client
-        debugPrint('Unknown event type with opCode: ${data.opCode}');
-        continue;
-      }
-      final opCode = MatchEventOpCode.values[index];
-      yield await _parseData(opCode, data);
+  /// Every incoming message is parsed once here and shared by all listeners
+  /// (the game, the cubits, the ping meter), instead of once per listener.
+  late final Stream<({String matchId, MatchEvent event})> _matchEvents =
+      _matchDataController.stream
+          .map(_parseMatchData)
+          .where((e) => e != null)
+          .cast<({String matchId, MatchEvent event})>()
+          .asBroadcastStream();
+
+  Stream<MatchEvent> onMatchEvent(String matchId) =>
+      _matchEvents.where((e) => e.matchId == matchId).map((e) => e.event);
+
+  static ({String matchId, MatchEvent event})? _parseMatchData(MatchData data) {
+    final opCode = MatchEventOpCode.fromOpCode(data.opCode);
+    if (opCode == null) {
+      // opCode is not defined in the client
+      debugPrint('Unknown event type with opCode: ${data.opCode}');
+      return null;
+    }
+    try {
+      // The payload is a few KB of JSON, so it is parsed right here: handing
+      // it to another isolate costs far more than the parsing itself. The
+      // match state inside is decoded lazily, on first use.
+      return (matchId: data.matchId, event: opCode.parseIncomingEvent(data));
+    } catch (e) {
+      debugPrint('Failed to parse event with opCode ${data.opCode}: $e');
+      return null;
     }
   }
-
-  Future<MatchEvent> _parseData(MatchEventOpCode opCode, MatchData data) =>
-      kIsolatesDisabled
-      ? Future.value(opCode.parseIncomingEvent(data))
-      : compute(opCode.parseIncomingEvent, data);
 
   Future<Match> joinMatch(String matchId) async {
     final socket = await _ensureWebsocket();
@@ -262,8 +265,8 @@ class NakamaDataSource {
     await socket.leaveMatch(matchId);
   }
 
-  void sendDispatchingEvent(String matchId, DispatchingMatchEvent event) async {
-    if (!event.hideInDebugPanel) {
+  void sendDispatchingEvent(String matchId, DispatchingMatchEvent event) {
+    if (kDebugMode && !event.hideInDebugPanel) {
       debugPrint('Sending event: $event');
     }
     final socket = _websocketClient;
@@ -271,12 +274,12 @@ class NakamaDataSource {
       // Disconnected; a reconnect is already scheduled.
       return;
     }
+    // Encoding a handful of numbers is cheaper than starting an isolate for
+    // it, and sending synchronously keeps the events in order.
     socket.sendMatchData(
       matchId: matchId,
       opCode: MatchEventOpCode.fromDispatchingEvent(event).opCode,
-      data: kIsolatesDisabled
-          ? event.toBytes()
-          : await Isolate.run(() => event.toBytes()),
+      data: event.toBytes(),
     );
   }
 
