@@ -17,6 +17,7 @@ import 'package:flappy_dash/domain/entities/value_wrapper.dart';
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
 import 'package:flappy_dash/domain/repositories/game_repository.dart';
 import 'package:flappy_dash/domain/repositories/multiplayer_repository.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nakama/nakama.dart';
 
@@ -46,6 +47,40 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     });
     _listenToUserDisplayNameUpdates();
     _listenToDispatchingEvents();
+    _reconnectedSubscription = _multiplayerRepository.onReconnected.listen(
+      (_) => _rejoinAfterReconnect(),
+    );
+  }
+
+  /// The server drops us from the match when the socket closes. Join again
+  /// (the server keeps our score) and get back into the lobby if we were in it.
+  void _rejoinAfterReconnect() async {
+    final matchId = state.matchId;
+    if (matchId.isBlank || state.currentMatch == null) {
+      return;
+    }
+    if (state.matchState?.currentPhase == MatchPhase.finished) {
+      return;
+    }
+    final wasInLobby = state.joinedInLobby;
+    try {
+      final match = await _multiplayerRepository.joinMatch(matchId);
+      if (isClosed || state.matchId != matchId) {
+        return;
+      }
+      emit(state.copyWith(currentMatch: match));
+      if (wasInLobby && state.matchState?.currentPhase != MatchPhase.running) {
+        _multiplayerRepository.joinLobby(matchId);
+      }
+    } catch (e) {
+      _addDebugMessage(
+        DebugFunctionCallEvent(
+          'MultiplayerCubit',
+          'rejoinAfterReconnect failed',
+          {'error': e.toString()},
+        ),
+      );
+    }
   }
 
   void _listenToUserDisplayNameUpdates() {
@@ -64,8 +99,9 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
   final GameRepository _gameRepository;
 
   Timer? _timer;
-  late StreamSubscription _matchEventsSubscription;
+  StreamSubscription? _matchEventsSubscription;
   late StreamSubscription _dispatchingEventsSubscription;
+  late StreamSubscription _reconnectedSubscription;
 
   void _refreshRemainingTime() {
     final waitingRemaining = state.matchState?.matchRunsAt
@@ -110,16 +146,39 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
       ),
     );
     try {
-      _matchEventsSubscription = _multiplayerRepository
-          .onMatchEvent(state.matchId)
-          .listen(_onMatchEvent);
-      final match = await _multiplayerRepository.joinMatch(state.matchId);
-      emit(state.copyWith(joinMatchLoading: false, currentMatch: match));
+      await _listenAndJoin(state.matchId);
     } catch (e) {
-      emit(
-        state.copyWith(joinMatchLoading: false, joinMatchError: e.toString()),
-      );
+      // The match may have started or ended in the meantime (e.g. an old
+      // lobby link). Fall back to the match that is waiting for players now.
+      try {
+        final waitingMatchId = await _multiplayerRepository.getWaitingMatchId();
+        if (waitingMatchId == state.matchId) {
+          rethrow;
+        }
+        emit(
+          MultiplayerState(
+            matchId: waitingMatchId,
+            currentUserId: state.currentUserId,
+            currentAccount: state.currentAccount,
+            joinMatchLoading: true,
+          ),
+        );
+        await _listenAndJoin(waitingMatchId);
+      } catch (_) {
+        emit(
+          state.copyWith(joinMatchLoading: false, joinMatchError: e.toString()),
+        );
+      }
     }
+  }
+
+  Future<void> _listenAndJoin(String matchId) async {
+    await _matchEventsSubscription?.cancel();
+    _matchEventsSubscription = _multiplayerRepository
+        .onMatchEvent(matchId)
+        .listen(_onMatchEvent);
+    final match = await _multiplayerRepository.joinMatch(matchId);
+    emit(state.copyWith(joinMatchLoading: false, currentMatch: match));
   }
 
   void _updateLobby(MatchState newState) {
@@ -224,7 +283,8 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
       return;
     }
 
-    _matchEventsSubscription.cancel();
+    _matchEventsSubscription?.cancel();
+    _matchEventsSubscription = null;
     await _multiplayerRepository.leaveMatch(state.matchId);
   }
 
@@ -418,8 +478,14 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
   }
 
   void refreshLastMatchOverview() async {
-    final overview = await _multiplayerRepository.getLastMatchOverview();
-    emit(state.copyWith(lastMatchOverview: ValueWrapper(overview)));
+    try {
+      final overview = await _multiplayerRepository.getLastMatchOverview();
+      emit(state.copyWith(lastMatchOverview: ValueWrapper(overview)));
+    } catch (e) {
+      // No finished match yet (or the server is unreachable); the lobby
+      // simply doesn't show the last winner then.
+      debugPrint('Failed to load the last match overview: $e');
+    }
   }
 
   void tappedOnAutoJumpArea() {
@@ -440,8 +506,9 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
   @override
   Future<void> close() {
     _timer?.cancel();
-    _matchEventsSubscription.cancel();
+    _matchEventsSubscription?.cancel();
     _dispatchingEventsSubscription.cancel();
+    _reconnectedSubscription.cancel();
 
     return super.close();
   }

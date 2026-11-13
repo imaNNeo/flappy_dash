@@ -17,6 +17,9 @@ class MultiplayerRepository {
 
   Future<String> getWaitingMatchId() => _nakamaDataSource.getWaitingMatchId();
 
+  /// Emits when the realtime connection dropped and came back.
+  Stream<void> get onReconnected => _nakamaDataSource.onReconnected;
+
   Stream<MatchEvent> onMatchEvent(String matchId) =>
       _nakamaDataSource.onMatchEvent(matchId);
 

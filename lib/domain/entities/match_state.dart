@@ -4,7 +4,7 @@ import 'package:nakama/nakama.dart';
 import 'match_phase.dart';
 import 'player_state.dart';
 
-class MatchState with EquatableMixin {
+class MatchState with Equatable {
   final DateTime matchInitializedAt;
   final DateTime matchRunsAt;
   final DateTime matchFinishesAt;
@@ -63,7 +63,9 @@ class MatchState with EquatableMixin {
     players: (json['players'] as Map<String, dynamic>).map(
       (k, v) => MapEntry(k, PlayerState.fromJson(v)),
     ),
-    pipesPositions: (json['pipesPositions'] as List).cast<double>(),
+    pipesPositions: (json['pipesPositions'] as List)
+        .map((e) => (e as num).toDouble())
+        .toList(),
   );
 
   @override

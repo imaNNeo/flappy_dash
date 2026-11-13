@@ -18,10 +18,13 @@ class GameRepository {
     try {
       final deviceId = await _deviceDataSource.getDeviceId();
       final session = await _nakamaDataSource.initSession(deviceId);
-      _initializationCompleter.complete();
+      if (!_initializationCompleter.isCompleted) {
+        _initializationCompleter.complete();
+      }
       return session;
     } catch (e) {
-      _initializationCompleter.completeError(e);
+      // Leave the completer pending so a retry (splash screen) can still
+      // complete it; completing it with an error would break every later call.
       rethrow;
     }
   }
