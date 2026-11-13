@@ -17,6 +17,8 @@ class LastMatchWinnerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<MultiplayerCubit, MultiplayerState>(
+      buildWhen: (previous, current) =>
+          previous.lastMatchOverview != current.lastMatchOverview,
       builder: (context, state) {
         return _AnimatedLastMatchWidget(
           lastMatch: state.lastMatchOverview,

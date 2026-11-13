@@ -29,6 +29,9 @@ class _DebugPanelState extends State<DebugPanel> {
           return const SizedBox.shrink();
         }
         return BlocBuilder<MultiplayerCubit, MultiplayerState>(
+          buildWhen: (previous, current) =>
+              previous.debugMessages != current.debugMessages ||
+              previous.currentUserId != current.currentUserId,
           builder: (context, state) {
             return Material(
               color: Colors.transparent,

@@ -13,7 +13,6 @@ import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart
 import 'package:flappy_dash/presentation/component/dash/dash.dart';
 import 'package:flappy_dash/presentation/component/flappy_dash_root_component.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
-import 'package:flutter/foundation.dart';
 
 import 'dash/dash_spawn_effect.dart';
 import 'dash/dash_spawn_portal.dart';
@@ -39,14 +38,36 @@ class MultiplayerController extends Component
   }
 
   void _onNewState(MultiplayerState state) {
-    if (mapEquals(
-      _previousState?.matchState?.players,
-      state.matchState?.players,
-    )) {
-      _onPlayersUpdated(state.matchState?.players);
+    // Only the set of players matters here (adding and removing dashes);
+    // positions and scores change on almost every state and are handled by
+    // the events. Comparing the keys is also much cheaper than comparing
+    // every player.
+    final previous = _previousState;
+    final players = state.matchState?.players;
+    if (previous == null ||
+        !_haveSamePlayers(previous.matchState?.players, players)) {
+      _onPlayersUpdated(players);
     }
 
     _previousState = state;
+  }
+
+  static bool _haveSamePlayers(
+    Map<String, PlayerState>? a,
+    Map<String, PlayerState>? b,
+  ) {
+    if (identical(a, b)) {
+      return true;
+    }
+    if (a == null || b == null || a.length != b.length) {
+      return false;
+    }
+    for (final id in b.keys) {
+      if (!a.containsKey(id)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   void _onPlayersUpdated(Map<String, PlayerState>? players) {
@@ -106,7 +127,6 @@ class MultiplayerController extends Component
       // We don't have a dash for this player yet
       return;
     }
-    print('Controller received event: $event');
     switch (event) {
       case PlayerStartedEvent():
         final dash = _otherDashes[event.sender!.userId]!.dash;

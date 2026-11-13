@@ -67,6 +67,12 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
         }
       },
       child: BlocBuilder<MultiplayerCubit, MultiplayerState>(
+        // Other players' moves change the state many times a second; this
+        // part of the page only shows the playing state and our own score.
+        buildWhen: (previous, current) =>
+            previous.currentPlayingState != current.currentPlayingState ||
+            previous.currentScore != current.currentScore ||
+            previous.currentUserId != current.currentUserId,
         builder: (context, state) {
           return Scaffold(
             resizeToAvoidBottomInset: false,
@@ -143,6 +149,9 @@ class _RemainingPlayingTimer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<MultiplayerCubit, MultiplayerState>(
+      buildWhen: (previous, current) =>
+          previous.matchPlayingRemainingSeconds !=
+          current.matchPlayingRemainingSeconds,
       builder: (context, state) {
         return Text(
           PresentationUtils.formatSeconds(state.matchPlayingRemainingSeconds),
@@ -177,9 +186,38 @@ class _ScoreboardSection extends StatelessWidget {
     }).toList();
   }
 
+  /// Positions arrive many times a second, but the scoreboard only shows
+  /// names and scores.
+  static bool _scoresChanged(
+    MultiplayerState previous,
+    MultiplayerState current,
+  ) {
+    if (previous.currentUserId != current.currentUserId) {
+      return true;
+    }
+    final before = previous.matchState?.players;
+    final after = current.matchState?.players;
+    if (identical(before, after)) {
+      return false;
+    }
+    if (before == null || after == null || before.length != after.length) {
+      return true;
+    }
+    for (final entry in after.entries) {
+      final old = before[entry.key];
+      if (old == null ||
+          old.score != entry.value.score ||
+          old.displayName != entry.value.displayName) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<MultiplayerCubit, MultiplayerState>(
+      buildWhen: _scoresChanged,
       builder: (context, state) {
         if (state.matchState == null) {
           return const SizedBox();

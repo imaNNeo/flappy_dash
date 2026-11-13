@@ -20,7 +20,7 @@ class MultiplayerState with Equatable {
     this.spawnRemainingSeconds = 0,
     this.multiplayerDiedMessage,
     this.diedCount = 0,
-    this.debugMessages = const [],
+    this.debugMessages = const DebugMessageLog.empty(),
     this.lastMatchOverview,
     this.isCurrentPlayerAutoJump = false,
     this.countToTapForAutoJump = 10,
@@ -44,7 +44,7 @@ class MultiplayerState with Equatable {
   final int spawnRemainingSeconds;
   final MultiplayerDiedMessage? multiplayerDiedMessage;
   final int diedCount;
-  final List<DebugMessage> debugMessages;
+  final DebugMessageLog debugMessages;
   final MatchOverviewEntity? lastMatchOverview;
   final bool isCurrentPlayerAutoJump;
   final int countToTapForAutoJump;
@@ -67,7 +67,7 @@ class MultiplayerState with Equatable {
     int? spawnRemainingSeconds,
     MultiplayerDiedMessage? multiplayerDiedMessage,
     int? diedCount,
-    List<DebugMessage>? debugMessages,
+    DebugMessageLog? debugMessages,
     ValueWrapper<MatchOverviewEntity>? lastMatchOverview,
     bool? isCurrentPlayerAutoJump,
     int? countToTapForAutoJump,

@@ -6,6 +6,50 @@ import 'package:flappy_dash/domain/extensions/string_extension.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flutter/material.dart';
 
+/// The debug panel's log: an immutable view over an append-only list.
+///
+/// A match produces thousands of messages. Copying the whole list for every
+/// new message, and comparing it element by element on every state emit, made
+/// the cost of each incoming event grow during the match. Appending here is
+/// O(1) and two logs compare by identity and length.
+class DebugMessageLog {
+  const DebugMessageLog.empty() : _messages = const [], length = 0;
+
+  const DebugMessageLog._(this._messages, this.length);
+
+  final List<DebugMessage> _messages;
+  final int length;
+
+  bool get isEmpty => length == 0;
+
+  DebugMessage operator [](int index) {
+    RangeError.checkValidIndex(index, this, 'index', length);
+    return _messages[index];
+  }
+
+  DebugMessageLog add(DebugMessage message) {
+    if (length == 0) {
+      return DebugMessageLog._([message], 1);
+    }
+    // Older snapshots keep seeing only their first [length] messages. If one
+    // of them is appended to again, it gets its own copy.
+    final messages = length == _messages.length
+        ? _messages
+        : _messages.sublist(0, length);
+    messages.add(message);
+    return DebugMessageLog._(messages, length + 1);
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is DebugMessageLog &&
+      identical(other._messages, _messages) &&
+      other.length == length;
+
+  @override
+  int get hashCode => Object.hash(identityHashCode(_messages), length);
+}
+
 sealed class DebugMessage {
   Color get incomingEventColor => Colors.green;
 

@@ -180,28 +180,27 @@ class Dash extends PositionComponent
 
   @override
   void renderTree(Canvas canvas) {
-    if (!isMe &&
-        currentPlayingState.isNotPlaying &&
-        currentPlayingState.isNotIdle) {
+    final playingState = currentPlayingState;
+    if (!isMe && playingState.isNotPlaying && playingState.isNotIdle) {
       return;
     }
-    if (!visibleOnIdle && currentPlayingState.isIdle) {
+    if (!visibleOnIdle && playingState.isIdle) {
       return;
     }
     super.renderTree(canvas);
     if (game.gameMode is MultiplayerGameMode && !isMe) {
       final worldWidth = game.worldWidth;
-      final visibleWidth = game.camera.visibleWorldRect.size.width;
+      final visibleWidth = game.camera.visibleWorldRect.width;
       if (x < visibleWidth) {
         // mirror for the right side
         canvas.save();
-        canvas.translate(game.worldWidth, 0);
+        canvas.translate(worldWidth, 0);
         super.renderTree(canvas);
         canvas.restore();
       } else if (x > worldWidth - visibleWidth) {
         // mirror for the left side
         canvas.save();
-        canvas.translate(-game.worldWidth, 0);
+        canvas.translate(-worldWidth, 0);
         super.renderTree(canvas);
         canvas.restore();
       }
