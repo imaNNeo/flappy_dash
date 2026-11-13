@@ -21,8 +21,8 @@ class AudioHelper {
     }
   }
 
-  void playBackgroundAudio() async {
-    _playingBackground = await _soLoud.play(_backgroundSource, looping: true);
+  void playBackgroundAudio() {
+    _playingBackground = _soLoud.play(_backgroundSource, looping: true);
     _soLoud.setProtectVoice(_playingBackground!, true);
   }
 
@@ -37,7 +37,7 @@ class AudioHelper {
     );
   }
 
-  void playScoreCollectSound() async {
-    await _soLoud.play(_scoreSource);
+  void playScoreCollectSound() {
+    _soLoud.play(_scoreSource);
   }
 }

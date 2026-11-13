@@ -27,8 +27,10 @@ class BestScoreOverlay extends StatelessWidget {
     return BlocBuilder<LeaderboardCubit, LeaderboardState>(
       builder: (context, state) {
         final record = state.leaderboardEntity?.ownerRecord;
-        int? rank = int.tryParse(record?.rank ?? '');
-        int score = int.tryParse(record?.score ?? '') ?? 0;
+        final int? rank = record == null || record.rank == 0
+            ? null
+            : record.rank;
+        final int score = record?.score ?? 0;
         return BoxOverlay(
           padding: EdgeInsets.symmetric(
             horizontal: relative(14.0),

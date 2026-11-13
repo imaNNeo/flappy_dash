@@ -125,7 +125,7 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
 }
 
 class FlappyDashWorld extends World
-    with TapCallbacks, HasGameRef<FlappyDashGame> {
+    with TapCallbacks, HasGameReference<FlappyDashGame> {
   late FlappyDashRootComponent _rootComponent;
 
   FlappyDashRootComponent get rootComponent => _rootComponent;

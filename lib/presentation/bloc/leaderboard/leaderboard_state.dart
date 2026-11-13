@@ -1,6 +1,6 @@
 part of 'leaderboard_cubit.dart';
 
-class LeaderboardState with EquatableMixin {
+class LeaderboardState with Equatable {
   const LeaderboardState({this.leaderboardEntity, this.currentAccount});
 
   final LeaderboardEntity? leaderboardEntity;

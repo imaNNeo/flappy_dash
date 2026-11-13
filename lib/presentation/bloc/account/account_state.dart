@@ -1,6 +1,6 @@
 part of 'account_cubit.dart';
 
-class AccountState with EquatableMixin {
+class AccountState with Equatable {
   const AccountState({this.currentAccount});
 
   final Account? currentAccount;

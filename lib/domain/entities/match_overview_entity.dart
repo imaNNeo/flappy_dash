@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flappy_dash/domain/entities/user_json_parser.dart';
 import 'package:nakama/nakama.dart';
 
-class MatchOverviewEntity with EquatableMixin {
+class MatchOverviewEntity with Equatable {
   String id;
   DateTime initializedAt;
   DateTime startedAt;
@@ -52,7 +52,7 @@ class MatchOverviewEntity with EquatableMixin {
   List<Object?> get props => [id, initializedAt, startedAt, finishedAt, scores];
 }
 
-class MatchScoreEntity with EquatableMixin {
+class MatchScoreEntity with Equatable {
   final int score;
   final User user;
 

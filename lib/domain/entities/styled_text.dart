@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
 
-class StyledText with EquatableMixin {
+class StyledText with Equatable {
   final String text;
   final Color color;
   final bool isBold;

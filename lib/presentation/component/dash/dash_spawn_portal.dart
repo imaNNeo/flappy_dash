@@ -4,7 +4,8 @@ import 'package:flame/extensions.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flutter/material.dart';
 
-class SpawningPortal extends PositionComponent with HasGameRef<FlappyDashGame> {
+class SpawningPortal extends PositionComponent
+    with HasGameReference<FlappyDashGame> {
   SpawningPortal({
     required super.position,
     required super.size,

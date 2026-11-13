@@ -1,6 +1,6 @@
 part of 'singleplayer_game_cubit.dart';
 
-class SingleplayerGameState with EquatableMixin {
+class SingleplayerGameState with Equatable {
   const SingleplayerGameState({
     this.gameMode = const SinglePlayerGameMode(),
     this.currentScore = 0,

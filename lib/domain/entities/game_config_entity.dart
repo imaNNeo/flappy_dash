@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-sealed class GameConfigEntity with EquatableMixin {
+sealed class GameConfigEntity with Equatable {
   const GameConfigEntity();
 
   final double dashMoveSpeed = 160.0;

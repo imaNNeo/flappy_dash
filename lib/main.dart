@@ -1,7 +1,5 @@
-import 'package:device_preview/device_preview.dart';
 import 'package:flappy_dash/presentation/pages/debug/debug_panel.dart';
 import 'package:flappy_dash/service_locator.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -16,9 +14,7 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  runApp(
-    DevicePreview(enabled: kDebugMode, builder: (context) => const MyApp()),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -33,7 +29,7 @@ class MyApp extends StatelessWidget {
         builder: (context, child) {
           return Stack(
             children: [
-              DevicePreview.appBuilder(context, child),
+              child ?? const SizedBox.shrink(),
               const Align(alignment: Alignment.bottomLeft, child: DebugPanel()),
             ],
           );

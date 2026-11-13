@@ -1,6 +1,6 @@
 part of 'multiplayer_cubit.dart';
 
-class MultiplayerState with EquatableMixin {
+class MultiplayerState with Equatable {
   const MultiplayerState({
     this.gameMode = const MultiplayerGameMode(),
     this.currentScore = 0,

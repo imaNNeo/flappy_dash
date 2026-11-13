@@ -1,6 +1,6 @@
 part of 'home_cubit.dart';
 
-class HomeState with EquatableMixin {
+class HomeState with Equatable {
   final bool multiPlayerMatchIdLoading;
   final String multiPlayerMatchIdError;
   final String openMultiplayerLobby;

@@ -4,7 +4,7 @@ import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 
 import 'hidden_coin.dart';
 
-class PipePair extends PositionComponent with HasGameRef<FlappyDashGame> {
+class PipePair extends PositionComponent with HasGameReference<FlappyDashGame> {
   PipePair({
     required super.position,
     required this.gap,

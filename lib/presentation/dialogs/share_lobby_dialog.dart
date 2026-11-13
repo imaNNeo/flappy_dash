@@ -55,8 +55,11 @@ class _ShareQRContentDialogState extends State<ShareQRContentDialog> {
                 AspectRatio(
                   aspectRatio: 1.0,
                   child: QrCodeWidget(
-                    qrCode: QrCode(5, QrErrorCorrectLevel.M)
-                      ..addData(widget.data),
+                    qrCode: QrCode(
+                      payload: QrPayload.fromString(widget.data),
+                      errorCorrectLevel: QrErrorCorrectLevel.medium,
+                      minTypeNumber: 5,
+                    ),
                     color: AppColors.dialogBgColor,
                   ),
                 ),

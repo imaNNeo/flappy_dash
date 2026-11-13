@@ -15,7 +15,7 @@ import 'dash/dash.dart';
 import 'pipe_pair.dart';
 
 class FlappyDashRootComponent extends Component
-    with HasGameRef<FlappyDashGame> {
+    with HasGameReference<FlappyDashGame> {
   late Dash _dash;
   late PipePair _lastPipe;
 

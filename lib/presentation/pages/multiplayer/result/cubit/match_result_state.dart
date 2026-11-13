@@ -1,6 +1,6 @@
 part of 'match_result_cubit.dart';
 
-class MatchResultState with EquatableMixin {
+class MatchResultState with Equatable {
   const MatchResultState({
     required this.matchId,
     this.matchResult,

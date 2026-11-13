@@ -35,8 +35,8 @@ class _LeaderBoardDialogState extends State<LeaderBoardDialog> {
             name: name,
             isMe: record.ownerId == state.currentAccount?.user.id,
             dashType: DashType.fromUserId(record.ownerId ?? ''),
-            score: int.parse(record.score ?? '0'),
-            rank: int.parse(record.rank ?? '9999'),
+            score: record.score,
+            rank: record.rank == 0 ? 9999 : record.rank,
           );
         });
         return RawScoresDialog(scores: records?.toList() ?? []);

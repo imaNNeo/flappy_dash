@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flappy_dash/domain/extensions/user_extension.dart';
 import 'package:nakama/nakama.dart';
 
-class LeaderboardEntity with EquatableMixin {
+class LeaderboardEntity with Equatable {
   final LeaderboardRecordList _recordList;
   final Map<String, User> _userProfiles;
   final String _currentUserId;

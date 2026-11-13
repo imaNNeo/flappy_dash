@@ -16,7 +16,7 @@ class AutoJumpDash extends Component with ParentIsA<Dash> {
 
   double get myLeft => position.x - parent.size.x / 2;
 
-  FlappyDashGame get gameRef => parent.gameRef;
+  FlappyDashGame get game => parent.game;
 
   double get velocityY => parent.velocityY;
 
@@ -51,7 +51,7 @@ class AutoJumpDash extends Component with ParentIsA<Dash> {
       return _nextPipe!;
     }
 
-    final pipes = gameRef.world.rootComponent.children
+    final pipes = game.world.rootComponent.children
         .whereType<PipePair>()
         .toList();
     if (pipes.isEmpty) {
@@ -64,8 +64,8 @@ class AutoJumpDash extends Component with ParentIsA<Dash> {
       final pipeRight = pipe.position.x + pipe.pipeWidth;
 
       if (myLeft < pipeRight) {
-        randomFail = gameRef.random.nextDouble() < 0.2;
-        failByExtraJump = gameRef.random.nextBool();
+        randomFail = game.random.nextDouble() < 0.2;
+        failByExtraJump = game.random.nextBool();
         _nextPipe = pipe;
         return _nextPipe!;
       }
@@ -104,7 +104,7 @@ class AutoJumpDash extends Component with ParentIsA<Dash> {
       return;
     }
     canJumpIn = jumpEvery;
-    gameRef.world.rootComponent.onSpaceDown();
+    game.world.rootComponent.onSpaceDown();
   }
 
   void onDashDied() {

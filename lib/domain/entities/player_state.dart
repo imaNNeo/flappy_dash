@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
 
-class PlayerState with EquatableMixin {
+class PlayerState with Equatable {
   final String userId;
   final String displayName;
   final bool isInLobby;

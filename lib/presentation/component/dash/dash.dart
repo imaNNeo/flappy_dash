@@ -18,7 +18,7 @@ import 'package:flutter/material.dart';
 import 'auto_jump_dash.dart';
 
 class Dash extends PositionComponent
-    with CollisionCallbacks, HasGameRef<FlappyDashGame> {
+    with CollisionCallbacks, HasGameReference<FlappyDashGame> {
   Dash({
     required this.speed,
     required this.playerId,
@@ -44,7 +44,7 @@ class Dash extends PositionComponent
 
   double get velocityY => _velocityY;
 
-  double get gravity => gameRef.world.rootComponent.gravity;
+  double get gravity => game.world.rootComponent.gravity;
 
   double get jumpForce => _jumpForce;
 

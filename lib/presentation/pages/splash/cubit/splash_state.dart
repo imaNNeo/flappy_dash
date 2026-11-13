@@ -1,6 +1,6 @@
 part of 'splash_cubit.dart';
 
-class SplashState with EquatableMixin {
+class SplashState with Equatable {
   const SplashState({
     this.isLoading = false,
     this.openTheNextPage = false,

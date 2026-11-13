@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-class ServerConfigEntity with EquatableMixin {
+class ServerConfigEntity with Equatable {
   final int minimumAppVersion;
 
   ServerConfigEntity({required this.minimumAppVersion});

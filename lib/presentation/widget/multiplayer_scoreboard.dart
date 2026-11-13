@@ -146,7 +146,7 @@ class _MultiplayerScoreBoardState extends State<MultiplayerScoreBoard> {
   }
 }
 
-class MultiplayerScore with EquatableMixin {
+class MultiplayerScore with Equatable {
   final String playerId;
   final String displayName;
   final DashType dashType;
@@ -174,7 +174,7 @@ class MultiplayerScore with EquatableMixin {
   ];
 }
 
-sealed class _ScoreRowItem with EquatableMixin {}
+sealed class _ScoreRowItem with Equatable {}
 
 class _ScoreRowPlayerItem extends _ScoreRowItem {
   final MultiplayerScore score;
@@ -293,9 +293,9 @@ class _MultiplayerScoreRowWidget extends StatelessWidget {
       dashWidth: 8,
       dashGap: 8,
       strokeWidth: !score.isMe ? 0 : 1,
-      borderColor: dashColor.withOpacity(0.7),
+      borderColor: dashColor.withValues(alpha: 0.7),
       backgroundColor: score.isMe
-          ? Colors.black.withOpacity(0.13)
+          ? Colors.black.withValues(alpha: 0.13)
           : Colors.transparent,
       child: SizedBox(
         height: height,

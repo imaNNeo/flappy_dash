@@ -19,7 +19,7 @@ import 'dash/dash_spawn_effect.dart';
 import 'dash/dash_spawn_portal.dart';
 
 class MultiplayerController extends Component
-    with ParentIsA<FlappyDashRootComponent>, HasGameRef<FlappyDashGame> {
+    with ParentIsA<FlappyDashRootComponent>, HasGameReference<FlappyDashGame> {
   MultiplayerController({super.priority});
 
   late StreamSubscription<MultiplayerState> _stateStreamSubscription;
@@ -241,7 +241,7 @@ class MultiplayerController extends Component
   }
 }
 
-class _OtherDashBundle with EquatableMixin {
+class _OtherDashBundle with Equatable {
   final Dash dash;
   final PlayerState playerState;
 
