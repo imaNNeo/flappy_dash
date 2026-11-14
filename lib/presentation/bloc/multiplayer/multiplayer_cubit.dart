@@ -15,6 +15,7 @@ import 'package:flappy_dash/domain/entities/player_state.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/domain/entities/value_wrapper.dart';
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
+import 'package:flappy_dash/domain/netcode/net_protocol.dart';
 import 'package:flappy_dash/domain/repositories/game_repository.dart';
 import 'package:flappy_dash/domain/repositories/multiplayer_repository.dart';
 import 'package:flutter/foundation.dart';
@@ -259,6 +260,9 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
           );
         }
         switch (event) {
+          case MatchSnapshotEvent():
+            _applySnapshotScores(event);
+            break;
           case MatchFinishedEvent():
             _onGameFinished();
             break;
@@ -288,6 +292,31 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     _matchEvents.add(event);
   }
 
+  /// Scores travel in the snapshots (the server doesn't send the whole match
+  /// state on every point any more). Only emit when one actually changed.
+  void _applySnapshotScores(MatchSnapshotEvent event) {
+    final matchState = state.matchState;
+    if (matchState == null) {
+      return;
+    }
+    Map<String, PlayerState>? players;
+    for (final entry in event.snapshot.entries) {
+      if (entry.rosterIndex >= matchState.roster.length) {
+        continue;
+      }
+      final userId = matchState.roster[entry.rosterIndex];
+      final player = matchState.players[userId];
+      if (player == null || player.score == entry.score) {
+        continue;
+      }
+      players ??= Map.of(matchState.players);
+      players[userId] = player.copyWith(score: entry.score);
+    }
+    if (players != null) {
+      emit(state.copyWith(matchState: matchState.copyWith(players: players)));
+    }
+  }
+
   void joinLobby() {
     if (state.matchId.isBlank) {
       throw StateError('You are not allowed to join the lobby');
@@ -309,69 +338,49 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     await _multiplayerRepository.leaveMatch(state.matchId);
   }
 
-  void dispatchJumpEvent(double x, double y, double velocityY) {
-    if (state.matchId.isBlank) {
-      return;
-    }
-    _multiplayerRepository.sendDispatchingEvent(
-      state.matchId,
-      DispatchingPlayerJumpedEvent(
-        x,
-        y,
-        velocityY,
-        DateTime.now().millisecondsSinceEpoch,
-      ),
-    );
-  }
-
+  /// Our predicted dash collected a coin. The server finds the same on its
+  /// own (it simulates our inputs), so nothing is sent.
   void increaseScore(double x, double y, double velocityY) {
     if (state.matchId.isBlank) {
       return;
     }
     _audioHelper.playScoreCollectSound();
     emit(state.copyWith(currentScore: state.currentScore + 1));
+  }
+
+  /// The server corrected our score (a misprediction).
+  void correctScore(int score) {
+    if (score == state.currentScore) {
+      return;
+    }
+    emit(state.copyWith(currentScore: score));
+  }
+
+  /// Sends our input commands (see DashPredictor).
+  void sendInput(InputPacket packet) {
+    if (state.matchId.isBlank) {
+      return;
+    }
     _multiplayerRepository.sendDispatchingEvent(
       state.matchId,
-      DispatchingPlayerScoredEvent(
-        x,
-        y,
-        velocityY,
-        DateTime.now().millisecondsSinceEpoch,
-      ),
+      DispatchingPlayerInputEvent(packet),
     );
   }
 
+  /// Our dash died (predicted locally, or the server said so). The server
+  /// decides where and when we respawn (PlayerWillSpawnAt).
   void playerDied(double x, double y, double velocityY) {
     if (state.matchId.isBlank) {
       return;
     }
-    final pipesDistance = state.gameMode.gameConfig.pipesDistance;
-    final spawnOnPipeIndex = Random().nextInt(
-      state.matchState!.pipesPositions.length - 1,
-    );
-    final newX = ((spawnOnPipeIndex + 1) * pipesDistance).toDouble();
-    final newY =
-        state.matchState!.pipesPositions[spawnOnPipeIndex] *
-        state.gameMode.gameConfig.pipesPositionArea;
+    if (state.currentPlayingState.isGameOver) {
+      return;
+    }
     _addDebugMessage(
       DebugFunctionCallEvent('MultiplayerCubit', 'playerDied', {
         'x': x.toStringAsFixed(2),
         'y': y.toStringAsFixed(2),
-        'newPosPipeIndex': spawnOnPipeIndex.toString(),
-        'newX': newX.toStringAsFixed(2),
-        'newY': newY.toStringAsFixed(2),
       }),
-    );
-    _multiplayerRepository.sendDispatchingEvent(
-      state.matchId,
-      DispatchingPlayerDiedEvent(
-        x,
-        y,
-        velocityY,
-        DateTime.now().millisecondsSinceEpoch,
-        newX,
-        newY,
-      ),
     );
     emit(
       state.copyWith(
@@ -416,10 +425,7 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
     if (state.diedCount == 0) {
       _audioHelper.playBackgroundAudio();
     }
-    _multiplayerRepository.sendDispatchingEvent(
-      state.matchId,
-      DispatchingPlayerStartedEvent(),
-    );
+    // The server starts our life with our first input command.
     emit(state.copyWith(currentPlayingState: PlayingState.playing));
   }
 
@@ -461,25 +467,6 @@ class MultiplayerCubit extends Cubit<MultiplayerState> {
         ),
       );
     }
-  }
-
-  void dispatchCorrectPosition(double x, double y, double yVelocity) {
-    _multiplayerRepository.sendDispatchingEvent(
-      state.matchId,
-      DispatchingPlayerCorrectPositionEvent(
-        x,
-        y,
-        yVelocity,
-        DateTime.now().millisecondsSinceEpoch,
-      ),
-    );
-  }
-
-  void dispatchIdleEvent(double x, double y) {
-    _multiplayerRepository.sendDispatchingEvent(
-      state.matchId,
-      DispatchingPlayerIsIdleEvent(x, y, DateTime.now().millisecondsSinceEpoch),
-    );
   }
 
   void _listenToDispatchingEvents() {

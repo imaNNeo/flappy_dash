@@ -11,17 +11,19 @@ enum MatchEventOpCode {
   matchFinished(104),
   matchPing(105),
   matchPong(106),
+  matchSnapshot(110),
   // Player events
   playerJoinedTheLobby(200),
   playerStarted(201),
-  playerJumped(202),
+  // 202 (playerJumped) and 207 (playerCorrectPosition) were the old
+  // client-authoritative position updates; the server simulates now.
   playerScored(203),
   playerDied(204),
   playerIsIdle(205),
   playerKickedFromTheLobby(206),
-  playerCorrectPosition(207),
   playerDisplayNameUpdated(208),
-  playerWillSpawnsAt(209);
+  playerWillSpawnsAt(209),
+  playerInput(210);
 
   final int opCode;
 
@@ -41,34 +43,30 @@ enum MatchEventOpCode {
     MatchEventOpCode.matchStarted => MatchStartedEvent(data),
     MatchEventOpCode.matchFinished => MatchFinishedEvent(data),
     MatchEventOpCode.matchPong => MatchPongEvent(data),
+    MatchEventOpCode.matchSnapshot => MatchSnapshotEvent(data),
     MatchEventOpCode.playerJoinedTheLobby => PlayerJoinedTheLobby(data),
     MatchEventOpCode.playerStarted => PlayerStartedEvent(data),
-    MatchEventOpCode.playerJumped => PlayerJumpedEvent(data),
     MatchEventOpCode.playerScored => PlayerScoredEvent(data),
     MatchEventOpCode.playerDied => PlayerDiedEvent(data),
     MatchEventOpCode.playerIsIdle => PlayerIsIdleEvent(data),
     MatchEventOpCode.playerKickedFromTheLobby => PlayerKickedFromTheLobbyEvent(
       data,
     ),
-    MatchEventOpCode.playerCorrectPosition => PlayerCorrectPositionEvent(data),
     MatchEventOpCode.playerWillSpawnsAt => PlayerWillSpawnAtEvent(data),
-    MatchEventOpCode.matchPing || MatchEventOpCode.playerDisplayNameUpdated =>
-      throw UnimplementedError('It is not an incoming event'),
+    MatchEventOpCode.matchPing ||
+    MatchEventOpCode.playerDisplayNameUpdated ||
+    MatchEventOpCode.playerInput => throw UnimplementedError(
+      'It is not an incoming event',
+    ),
   };
 
   static MatchEventOpCode fromDispatchingEvent(DispatchingMatchEvent event) =>
       switch (event) {
         DispatchingPlayerJoinedLobbyEvent() =>
           MatchEventOpCode.playerJoinedTheLobby,
-        DispatchingPlayerStartedEvent() => MatchEventOpCode.playerStarted,
-        DispatchingPlayerJumpedEvent() => MatchEventOpCode.playerJumped,
-        DispatchingPlayerScoredEvent() => MatchEventOpCode.playerScored,
-        DispatchingPlayerDiedEvent() => MatchEventOpCode.playerDied,
-        DispatchingPlayerIsIdleEvent() => MatchEventOpCode.playerIsIdle,
         DispatchingUserDisplayNameUpdatedEvent() =>
           MatchEventOpCode.playerDisplayNameUpdated,
-        DispatchingPlayerCorrectPositionEvent() =>
-          MatchEventOpCode.playerCorrectPosition,
+        DispatchingPlayerInputEvent() => MatchEventOpCode.playerInput,
         DispatchingPingEvent() => MatchEventOpCode.matchPing,
       };
 }

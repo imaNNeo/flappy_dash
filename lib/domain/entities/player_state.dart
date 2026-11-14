@@ -24,6 +24,18 @@ class PlayerState with Equatable {
     required this.spawnsAgainAt,
   });
 
+  PlayerState copyWith({int? score}) => PlayerState(
+    userId: userId,
+    displayName: displayName,
+    isInLobby: isInLobby,
+    lastKnownX: lastKnownX,
+    lastKnownY: lastKnownY,
+    lastKnownVelocityY: lastKnownVelocityY,
+    score: score ?? this.score,
+    playingState: playingState,
+    spawnsAgainAt: spawnsAgainAt,
+  );
+
   factory PlayerState.fromJson(Map<String, dynamic> json) => PlayerState(
     userId: json['userId'],
     displayName: json['displayName'],

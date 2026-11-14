@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
+import 'package:flappy_dash/domain/netcode/net_protocol.dart';
 import 'package:nakama/nakama.dart';
 
 import 'match_state.dart';
@@ -93,6 +94,20 @@ class MatchPongEvent extends MatchEvent {
   String get debugName => 'MatchPong';
 }
 
+/// Binary, 20 times a second while the match runs (see [Snapshot]).
+class MatchSnapshotEvent extends MatchEvent {
+  MatchSnapshotEvent(super.matchData)
+    : snapshot = Snapshot.fromBytes(matchData.data!);
+
+  final Snapshot snapshot;
+
+  @override
+  bool get hideInDebugPanel => true;
+
+  @override
+  String get debugName => 'MatchSnapshot';
+}
+
 // Player Events:
 class PlayerJoinedTheLobby extends MatchEvent with HasMatchState {
   PlayerJoinedTheLobby(MatchData matchData) : super(matchData) {
@@ -108,41 +123,14 @@ class PlayerStartedEvent extends MatchEvent with HasMatchState {
     data = matchData;
   }
 
-  double get dashX => state.players[sender!.userId]!.lastKnownX;
-
-  double get dashY => state.players[sender!.userId]!.lastKnownY;
-
-  double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
-
   @override
   String get debugName => 'PlayerStarted';
-}
-
-class PlayerJumpedEvent extends MatchEvent with HasMatchState {
-  PlayerJumpedEvent(MatchData matchData) : super(matchData) {
-    data = matchData;
-  }
-
-  double get dashX => state.players[sender!.userId]!.lastKnownX;
-
-  double get dashY => state.players[sender!.userId]!.lastKnownY;
-
-  double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
-
-  @override
-  String get debugName => 'PlayerJumped';
 }
 
 class PlayerScoredEvent extends MatchEvent with HasMatchState {
   PlayerScoredEvent(MatchData matchData) : super(matchData) {
     data = matchData;
   }
-
-  double get dashX => state.players[sender!.userId]!.lastKnownX;
-
-  double get dashY => state.players[sender!.userId]!.lastKnownY;
-
-  double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
 
   @override
   String get debugName => 'PlayerScored';
@@ -153,12 +141,6 @@ class PlayerDiedEvent extends MatchEvent with HasMatchState {
     data = matchData;
   }
 
-  double get dashX => state.players[sender!.userId]!.lastKnownX;
-
-  double get dashY => state.players[sender!.userId]!.lastKnownY;
-
-  double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
-
   @override
   String get debugName => 'PlayerDied';
 }
@@ -167,12 +149,6 @@ class PlayerIsIdleEvent extends MatchEvent with HasMatchState {
   PlayerIsIdleEvent(MatchData matchData) : super(matchData) {
     data = matchData;
   }
-
-  double get dashX => state.players[sender!.userId]!.lastKnownX;
-
-  double get dashY => state.players[sender!.userId]!.lastKnownY;
-
-  double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
 
   @override
   String get debugName => 'PlayerIsIdle';
@@ -187,29 +163,10 @@ class PlayerKickedFromTheLobbyEvent extends MatchEvent with HasMatchState {
   String get debugName => 'PlayerKickedFromTheLobby';
 }
 
-class PlayerCorrectPositionEvent extends MatchEvent with HasMatchState {
-  PlayerCorrectPositionEvent(MatchData matchData) : super(matchData) {
-    data = matchData;
-  }
-
-  double get dashX => state.players[sender!.userId]!.lastKnownX;
-
-  double get dashY => state.players[sender!.userId]!.lastKnownY;
-
-  double get dashVelocityY => state.players[sender!.userId]!.lastKnownVelocityY;
-
-  @override
-  String get debugName => 'PlayerCorrectPosition';
-}
-
 class PlayerWillSpawnAtEvent extends MatchEvent with HasMatchState {
   PlayerWillSpawnAtEvent(MatchData matchData) : super(matchData) {
     data = matchData;
   }
-
-  double get dashX => state.players[sender!.userId]!.lastKnownX;
-
-  double get dashY => state.players[sender!.userId]!.lastKnownY;
 
   @override
   String get debugName => 'PlayerWillSpawnAt';

@@ -9,6 +9,7 @@ import 'dart:isolate';
 import 'package:flappy_dash/data/remote/match_event_op_code.dart';
 import 'package:flappy_dash/domain/entities/dispatching_match_event.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
+import 'package:flappy_dash/domain/netcode/net_protocol.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nakama/nakama.dart';
@@ -20,7 +21,7 @@ String _id(int i) =>
 
 MatchData _message(int i) => MatchData(
   matchId: 'm',
-  opCode: MatchEventOpCode.playerJumped.opCode,
+  opCode: MatchEventOpCode.playerScored.opCode,
   presence: UserPresence(
     userId: _id(1),
     sessionId: _id(2),
@@ -91,7 +92,13 @@ void main() {
   test('outgoing: Isolate.run per event vs in-place encode', () async {
     final events = [
       for (var i = 0; i < _messages; i++)
-        DispatchingPlayerJumpedEvent(1.0 * i, -12.3, -500, 1700000000000 + i),
+        DispatchingPlayerInputEvent(
+          InputPacket(
+            lifeStartSeq: 100,
+            upToSeq: 100 + i,
+            jumpSeqs: [i, i + 1],
+          ),
+        ),
     ];
     final before = Stopwatch()..start();
     for (final e in events) {

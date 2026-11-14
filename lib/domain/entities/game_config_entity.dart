@@ -45,7 +45,6 @@ class MultiplayerGameConfigEntity extends GameConfigEntity {
     this.pipesDistance = 420.0,
     this.pipeWidth = 82.0,
     this.pipeHoleGap = 240,
-    this.correctPositionEvery = 5.0,
   });
 
   @override
@@ -60,14 +59,11 @@ class MultiplayerGameConfigEntity extends GameConfigEntity {
   @override
   final double pipeHoleGap;
 
-  final double correctPositionEvery;
-
   @override
   List<Object?> get props => [
     pipesPositionArea,
     pipesDistance,
     pipeWidth,
     pipeHoleGap,
-    correctPositionEvery,
   ];
 }

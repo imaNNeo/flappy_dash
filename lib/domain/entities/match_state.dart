@@ -13,6 +13,10 @@ class MatchState with Equatable {
   final Map<String, PlayerState> players;
   final List<double> pipesPositions;
 
+  /// The user ids of the players of a running match. Snapshots refer to a
+  /// player by its index in this list.
+  final List<String> roster;
+
   MatchState({
     required this.matchInitializedAt,
     required this.matchRunsAt,
@@ -21,6 +25,7 @@ class MatchState with Equatable {
     required this.presences,
     required this.players,
     required this.pipesPositions,
+    this.roster = const [],
   });
 
   MatchState copyWith({
@@ -31,6 +36,7 @@ class MatchState with Equatable {
     List<UserPresence>? presences,
     Map<String, PlayerState>? players,
     List<double>? pipesPositions,
+    List<String>? roster,
   }) => MatchState(
     matchInitializedAt: matchInitializedAt ?? this.matchInitializedAt,
     matchRunsAt: matchRunsAt ?? this.matchRunsAt,
@@ -39,6 +45,7 @@ class MatchState with Equatable {
     presences: presences ?? this.presences,
     players: players ?? this.players,
     pipesPositions: pipesPositions ?? this.pipesPositions,
+    roster: roster ?? this.roster,
   );
 
   factory MatchState.fromJson(Map<String, dynamic> json) => MatchState(
@@ -66,6 +73,7 @@ class MatchState with Equatable {
     pipesPositions: (json['pipesPositions'] as List)
         .map((e) => (e as num).toDouble())
         .toList(),
+    roster: (json['roster'] as List?)?.cast<String>() ?? const [],
   );
 
   @override
@@ -77,5 +85,6 @@ class MatchState with Equatable {
     presences,
     players,
     pipesPositions,
+    roster,
   ];
 }
