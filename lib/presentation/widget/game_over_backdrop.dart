@@ -20,34 +20,38 @@ class GameOverBackdrop extends StatelessWidget {
   Widget build(BuildContext context) {
     return Animate(
       effects: [
-        CustomEffect(
+        // Fade a fixed blur in. Animating the blur radius instead makes the
+        // GPU build a new blur for every radius (a stutter on the web).
+        FadeEffect(
           delay: delay,
           duration: fadeDuration,
           curve: Curves.easeOut,
-          builder: (context, value, child) => BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 6 * value, sigmaY: 6 * value),
-            child: ColoredBox(
-              color: Colors.black.withValues(alpha: 0.54 * value),
-              child: child,
-            ),
-          ),
+          begin: 0,
+          end: 1,
         ),
       ],
-      child: SafeArea(
-        minimum: const EdgeInsets.all(24),
-        child: Center(
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: child
-                .animate(delay: delay)
-                .fadeIn(duration: 200.ms)
-                .scale(
-                  begin: const Offset(0.6, 0.6),
-                  end: const Offset(1, 1),
-                  duration: 500.ms,
-                  curve: Curves.elasticOut,
-                ),
-          ),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+        child: ColoredBox(color: Colors.black54, child: _content()),
+      ),
+    );
+  }
+
+  Widget _content() {
+    return SafeArea(
+      minimum: const EdgeInsets.all(24),
+      child: Center(
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: child
+              .animate(delay: delay)
+              .fadeIn(duration: 200.ms)
+              .scale(
+                begin: const Offset(0.6, 0.6),
+                end: const Offset(1, 1),
+                duration: 500.ms,
+                curve: Curves.elasticOut,
+              ),
         ),
       ),
     );

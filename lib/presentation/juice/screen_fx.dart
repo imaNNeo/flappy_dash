@@ -6,12 +6,12 @@ import 'package:flutter/painting.dart';
 
 import 'game_shaders.dart';
 
-/// Whole-screen effects: trauma based screen shake and the shockwave post
-/// effect. [FlappyDashGame.renderTree] calls [render].
+/// Whole-screen effects: trauma based screen shake and the shockwave
+/// overlay. [FlappyDashGame.renderTree] calls [render].
 ///
-/// The shockwave renders the frame into an image and draws it back through
-/// [GameShaders.shockwave], so it only runs while a wave is playing (well
-/// under a second); every other frame is drawn directly.
+/// The shockwave is drawn on top of the frame with [GameShaders.shockwave];
+/// it never reads the frame back (on the web that is a GPU→CPU copy that
+/// stalls every frame it's used).
 class ScreenFx {
   /// 0..1, decays over time. Shake is trauma², so small hits barely move the
   /// screen and big ones really kick.
@@ -50,14 +50,28 @@ class ScreenFx {
   }
 
   void render(ui.Canvas canvas, Vector2 size, void Function(ui.Canvas) draw) {
+    _renderShaken(canvas, size, draw);
     final wave = _wave;
     final program = GameShaders.shockwave;
-    if (wave != null && program != null && size.x > 0 && size.y > 0) {
-      _renderWithShockwave(canvas, size, draw, wave, program);
+    if (wave == null || program == null || size.x <= 0 || size.y <= 0) {
       return;
     }
-    _renderShaken(canvas, size, draw);
+    final shader = _shader ??= program.fragmentShader();
+    final progress = (wave.elapsed / wave.duration).clamp(0.0, 1.0);
+    shader
+      ..setFloat(0, size.x)
+      ..setFloat(1, size.y)
+      ..setFloat(2, wave.center.dx)
+      ..setFloat(3, wave.center.dy)
+      ..setFloat(4, progress)
+      ..setFloat(5, wave.strength);
+    canvas.drawRect(
+      ui.Rect.fromLTWH(0, 0, size.x, size.y),
+      _paint..shader = shader,
+    );
   }
+
+  final ui.Paint _paint = ui.Paint();
 
   void _renderShaken(
     ui.Canvas canvas,
@@ -84,46 +98,6 @@ class ScreenFx {
     canvas.translate(-size.x / 2, -size.y / 2);
     draw(canvas);
     canvas.restore();
-  }
-
-  void _renderWithShockwave(
-    ui.Canvas canvas,
-    Vector2 size,
-    void Function(ui.Canvas) draw,
-    _Shockwave wave,
-    ui.FragmentProgram program,
-  ) {
-    // Render at up to 2x: sharp enough while it moves, and cheaper than 3x.
-    final pixelRatio = min(
-      2.0,
-      ui.PlatformDispatcher.instance.views.first.devicePixelRatio,
-    );
-    final width = (size.x * pixelRatio).ceil();
-    final height = (size.y * pixelRatio).ceil();
-
-    final recorder = ui.PictureRecorder();
-    final inner = ui.Canvas(recorder);
-    inner.scale(pixelRatio);
-    _renderShaken(inner, size, draw);
-    final picture = recorder.endRecording();
-    final image = picture.toImageSync(width, height);
-    picture.dispose();
-
-    final shader = _shader ??= program.fragmentShader();
-    final progress = (wave.elapsed / wave.duration).clamp(0.0, 1.0);
-    shader
-      ..setFloat(0, size.x)
-      ..setFloat(1, size.y)
-      ..setFloat(2, wave.center.dx)
-      ..setFloat(3, wave.center.dy)
-      ..setFloat(4, progress)
-      ..setFloat(5, wave.strength)
-      ..setImageSampler(0, image);
-    canvas.drawRect(
-      ui.Rect.fromLTWH(0, 0, size.x, size.y),
-      ui.Paint()..shader = shader,
-    );
-    image.dispose();
   }
 }
 

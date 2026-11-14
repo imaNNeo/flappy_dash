@@ -1,67 +1,68 @@
 #version 460 core
 
-// Full-screen post effect played when our dash dies: a ring of refraction
-// that expands from the impact point, with chromatic aberration on the
-// ring, a short white flash and a soft vignette pulse.
+// Full-screen overlay played when our dash dies: a ring of light that
+// expands from the impact point with color-split edges (red outside, cyan
+// inside, like chromatic aberration) and a soft shadow just inside it, so it
+// reads like a refracting lens. Plus a short white flash and a vignette
+// pulse.
+//
+// It doesn't sample the frame: reading the frame back costs a GPU→CPU copy
+// and a new GL context on the web (CanvasKit), which made deaths stutter.
+// Drawing it on top is a single cheap full-screen pass.
 
 #include <flutter/runtime_effect.glsl>
 
 uniform vec2 uSize;      // output size in pixels
 uniform vec2 uCenter;    // impact point in pixels
 uniform float uProgress; // 0 → 1 over the life of the wave
-uniform float uStrength; // 1 = full death wave, smaller for light hits
-uniform sampler2D uScene;
+uniform float uStrength; // 1 = full death wave
 
 out vec4 fragColor;
 
+// Premultiplied "over".
+vec4 over(vec4 top, vec4 bottom) {
+  return top + bottom * (1.0 - top.a);
+}
+
 void main() {
   vec2 frag = FlutterFragCoord().xy;
-  vec2 uv = frag / uSize;
+  float scale = max(uSize.y / 1000.0, 0.5);
 
-  float aspect = uSize.x / uSize.y;
-  vec2 toPixel = frag - uCenter;
-  float dist = length(toPixel);
-  vec2 dir = dist > 0.0001 ? toPixel / dist : vec2(0.0);
-
+  float dist = length(frag - uCenter);
   float maxRadius = length(uSize) * 0.75;
-  // easeOutCubic so the wave starts fast and settles.
-  float p = 1.0 - pow(1.0 - uProgress, 3.0);
+  float p = 1.0 - pow(1.0 - uProgress, 3.0); // easeOutCubic
   float radius = p * maxRadius;
-  float width = mix(30.0, 140.0, p) * max(uSize.y / 1000.0, 0.5);
-  float fade = 1.0 - uProgress;
+  float width = mix(26.0, 110.0, p) * scale;
+  float fade = (1.0 - uProgress) * (1.0 - uProgress) * uStrength;
 
-  // 1 on the ring, 0 away from it, a little negative just inside so the
-  // ring looks like a lens (pushes out, then pulls in).
-  float x = (dist - radius) / width;
-  float ring = exp(-x * x * 4.0) * sign(x + 0.0001) * -1.0;
-  float amount = ring * fade * fade * uStrength * 0.045;
+  float x = (dist - radius) / width; // 0 on the ring
 
-  // Offsets are measured in screen heights, so the wave looks round.
-  vec2 toUv = uSize.y / uSize;
-  vec2 offset = dir * amount * toUv;
-  vec2 aberration = dir * toUv * (abs(amount) * 0.5 + 0.004 * fade * fade * uStrength);
-
-  vec4 base = texture(uScene, uv - offset);
-  vec4 red = texture(uScene, uv - offset - aberration);
-  vec4 blue = texture(uScene, uv - offset + aberration);
-  vec4 color = vec4(red.r, base.g, blue.b, base.a);
-  // At the edge of the game (the letterbox around it is transparent) the
-  // split channels would leave bright fringes, so fall back to the plain
-  // sample there.
-  color = mix(base, color, min(red.a, blue.a) * base.a);
-
-  // Bright rim on the ring.
-  float rim = exp(-x * x * 6.0) * fade * fade * uStrength;
-  color.rgb += vec3(1.0, 0.95, 0.85) * rim * 0.18 * color.a;
-
-  // White flash in the first frames.
-  float flash = pow(fade, 10.0) * uStrength;
-  color.rgb = mix(color.rgb, vec3(color.a), flash * 0.55);
+  vec4 color = vec4(0.0);
 
   // Vignette that pulses in and out.
-  vec2 c = uv - 0.5;
+  vec2 c = frag / uSize - 0.5;
+  float aspect = uSize.x / uSize.y;
   float vignette = smoothstep(0.35, 0.85, length(c * vec2(aspect, 1.0) / max(aspect, 1.0)));
-  color.rgb *= 1.0 - vignette * 0.35 * sin(uProgress * 3.14159) * uStrength;
+  float vig = vignette * 0.35 * sin(uProgress * 3.14159) * uStrength;
+  color = over(vec4(0.0, 0.0, 0.0, vig), color);
+
+  // Shadow just inside the ring.
+  float shadow = exp(-(x + 0.9) * (x + 0.9) * 5.0) * 0.16 * fade;
+  color = over(vec4(0.0, 0.02, 0.06, 1.0) * shadow, color);
+
+  // Color-split edges.
+  float red = exp(-(x - 0.45) * (x - 0.45) * 14.0) * 0.35 * fade;
+  float cyan = exp(-(x + 0.45) * (x + 0.45) * 14.0) * 0.35 * fade;
+  color = over(vec4(1.0, 0.25, 0.35, 1.0) * red, color);
+  color = over(vec4(0.2, 0.85, 1.0, 1.0) * cyan, color);
+
+  // Bright rim.
+  float rim = exp(-x * x * 10.0) * 0.6 * fade;
+  color = over(vec4(1.0, 0.97, 0.9, 1.0) * rim, color);
+
+  // White flash in the first frames.
+  float flash = pow(1.0 - uProgress, 10.0) * 0.55 * uStrength;
+  color = over(vec4(1.0) * flash, color);
 
   fragColor = color;
 }

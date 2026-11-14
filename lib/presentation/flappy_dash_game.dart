@@ -50,9 +50,15 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
     screenFx.update(dt);
   }
 
+  int _warmUpFrames = 2;
+
   @override
   void renderTree(Canvas canvas) {
     screenFx.render(canvas, size, super.renderTree);
+    if (_warmUpFrames > 0) {
+      _warmUpFrames--;
+      GameShaders.warmUp(canvas);
+    }
   }
 
   PlayingState getCurrentPlayingState({String? otherPlayerId}) =>
