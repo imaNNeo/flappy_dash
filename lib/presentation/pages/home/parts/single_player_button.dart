@@ -12,7 +12,7 @@ class SinglePlayerButton extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SvgPicture.asset("assets/images/dashes/flutter_dash.svg", height: 58),
+          const DashImage(size: 58, type: DashType.flutterDash),
           const SizedBox(width: 8),
           const OutlineText(
             Text(
