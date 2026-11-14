@@ -111,6 +111,9 @@ class FeatherBurst extends PositionComponent {
   void render(Canvas canvas) {
     super.render(canvas);
     final t = _time / _lifetime;
+    if (t >= 1) {
+      return;
+    }
 
     // Puff ring, first 0.35s.
     final puffT = (_time / 0.35).clamp(0.0, 1.0);

@@ -54,8 +54,15 @@ class JumpPuff extends PositionComponent {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
+    // Removal happens after this frame is drawn, so _time can already be
+    // past the lifetime here. Color.fromRGBO wraps a negative opacity to an
+    // almost opaque one, which flashed the puffs for a frame as they vanished.
     final t = _time / _lifetime;
-    _paint.color = Color.fromRGBO(255, 255, 255, 0.75 * (1 - t));
+    if (t >= 1) {
+      return;
+    }
+    final fade = 1 - t;
+    _paint.color = Color.fromRGBO(255, 255, 255, 0.75 * fade * fade);
     for (final b in _bubbles) {
       canvas.drawCircle(Offset(b.x, b.y), b.radius * (0.6 + 0.8 * t), _paint);
     }
