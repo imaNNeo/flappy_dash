@@ -89,6 +89,8 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
                 if (state.currentPlayingState.isGameOver)
                   const MultiplayerDiedOverlayWidget(),
                 if (state.currentPlayingState.isIdle)
+                  const MultiplayerDiedOverlayWidget(rehearsal: true),
+                if (state.currentPlayingState.isIdle)
                   const Align(alignment: Alignment(0, 0.2), child: TapToPlay()),
                 SafeArea(
                   child: Column(

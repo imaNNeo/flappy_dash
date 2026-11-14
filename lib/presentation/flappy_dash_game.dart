@@ -8,6 +8,7 @@ import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/component/dash_parallax_background.dart';
+import 'package:flappy_dash/presentation/component/fx/feather_burst.dart';
 import 'package:flappy_dash/presentation/component/fx/score_burst.dart';
 import 'package:flappy_dash/presentation/juice/game_shaders.dart';
 import 'package:flappy_dash/presentation/juice/screen_fx.dart';
@@ -40,7 +41,7 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
 
   @override
   Future<void> onLoad() async {
-    await GameShaders.load();
+    await Future.wait([GameShaders.load(), FeatherBurst.loadSprites()]);
     await super.onLoad();
   }
 
@@ -54,6 +55,9 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
 
   @override
   void renderTree(Canvas canvas) {
+    if (world.isLoaded && world.rootComponent.isLoaded) {
+      world.rootComponent.myDash.rehearseDeathUnderScene(canvas);
+    }
     screenFx.render(canvas, size, super.renderTree);
     if (_warmUpFrames > 0) {
       _warmUpFrames--;

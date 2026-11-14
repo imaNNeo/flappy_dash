@@ -122,15 +122,18 @@ class DashJuice {
     }
   }
 
-  final Paint _flashPaint = Paint()
-    ..colorFilter = const ColorFilter.mode(
-      Color(0xFFFFFFFF),
-      BlendMode.srcATop,
-    );
+  final Paint _flashPaint = Paint();
   final Paint _fadePaint = Paint();
 
   /// Draws the body with [drawBody], transformed around its center.
-  void renderBody(Canvas canvas, Vector2 size, void Function(Canvas) drawBody) {
+  /// [drawSilhouette] fills the body's outer shape with the given paint; the
+  /// hit flash is drawn with it, in white, on top of the body.
+  void renderBody(
+    Canvas canvas,
+    Vector2 size,
+    void Function(Canvas) drawBody,
+    void Function(Canvas, Paint) drawSilhouette,
+  ) {
     if (isGone) {
       return;
     }
@@ -162,20 +165,26 @@ class DashJuice {
     canvas.scale(scaleX, scaleY);
     canvas.translate(-cx, -cy);
 
-    final needsLayer = _flash > 0 || opacity < 1;
+    // Only for the fade out at the end of the tumble, and only as big as
+    // the body (with room for the wings): an unbounded layer is a
+    // whole-screen offscreen texture.
+    final needsLayer = opacity < 1;
     if (needsLayer) {
       _fadePaint.color = Color.fromRGBO(255, 255, 255, opacity);
-      canvas.saveLayer(null, _fadePaint);
+      canvas.saveLayer(
+        Rect.fromLTWH(-cx, -cy, size.x * 2, size.y * 2),
+        _fadePaint,
+      );
     }
     drawBody(canvas);
     if (_flash > 0) {
-      // Paint the body white, fading back to its colors.
-      canvas.saveLayer(
-        null,
+      // Paint the body white, fading back to its colors. Just its outer
+      // shape on top: drawing the whole body again into a color-filtered
+      // layer cost more than the rest of the death on the web.
+      drawSilhouette(
+        canvas,
         _flashPaint..color = Color.fromRGBO(255, 255, 255, _flash),
       );
-      drawBody(canvas);
-      canvas.restore();
     }
     if (needsLayer) {
       canvas.restore();

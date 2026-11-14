@@ -13,6 +13,7 @@ import 'package:flappy_dash/presentation/component/fx/jump_puff.dart';
 import 'package:flappy_dash/presentation/component/outlined_text_component.dart';
 import 'package:flappy_dash/presentation/component/pipe.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
+import 'package:flappy_dash/presentation/juice/screen_fx.dart';
 import 'package:flutter/material.dart';
 
 import 'auto_jump_dash.dart';
@@ -280,20 +281,51 @@ class Dash extends PositionComponent
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    juice.renderBody(canvas, size, _renderBody);
-    if (_rehearsingDeath) {
-      _deathRehearsalFrames--;
-      _rehearseDeath(canvas);
+    juice.renderBody(canvas, size, _renderBody, _renderSilhouette);
+  }
+
+  /// [FlappyDashGame] calls this before it draws the scene, on the screen
+  /// canvas. While our dash waits for the first tap, it draws the death
+  /// effects there, where the opaque background drawn next covers them.
+  /// See [_deathRehearsalFrames].
+  void rehearseDeathUnderScene(Canvas canvas) {
+    if (!_rehearsingDeath || !isLoaded) {
+      return;
     }
+    _deathRehearsalFrames--;
+    final camera = game.camera;
+    final topLeft = camera.localToGlobal(
+      absolutePositionOfAnchor(Anchor.topLeft),
+    );
+    final scale =
+        (camera.localToGlobal(absolutePosition + Vector2(100, 0)) -
+                camera.localToGlobal(absolutePosition))
+            .x /
+        100;
+    // Only where the background is (not over the letterbox bars).
+    final visible = camera.visibleWorldRect;
+    final visibleTopLeft = camera.localToGlobal(visible.topLeft.toVector2());
+    final visibleBottomRight = camera.localToGlobal(
+      visible.bottomRight.toVector2(),
+    );
+    canvas.save();
+    canvas.clipRect(
+      Rect.fromPoints(visibleTopLeft.toOffset(), visibleBottomRight.toOffset()),
+    );
+    canvas.translate(topLeft.x, topLeft.y);
+    canvas.scale(scale);
+    _rehearseDeath(canvas);
+    canvas.restore();
   }
 
   /// Frames left in which the death effects are drawn invisibly, once per
   /// app run. On the web each new kind of draw compiles a GPU program the
   /// first time it shows up, and the hit flash, the dizzy face, the
   /// feathers and the shockwave all show up at once on the first death,
-  /// which dropped frames. Drawing them here, in the same place in the
-  /// scene and almost transparent, moves those compiles to the first
-  /// frames of play.
+  /// which dropped frames. Drawing them first, at the dash's place and
+  /// scale, under the background, moves those compiles to the first frames
+  /// of play. Not in a translucent layer: the screen and an offscreen layer
+  /// clip with different GPU programs, so a layer misses some of them.
   static int _deathRehearsalFrames = 2;
 
   /// While our dash waits for the first tap: the scene is the real one, and
@@ -301,12 +333,11 @@ class Dash extends PositionComponent
   bool get _rehearsingDeath =>
       isMe && _deathRehearsalFrames > 0 && currentPlayingState.isIdle;
 
-  static final Paint _rehearsalPaint = Paint()..color = const Color(0x02FFFFFF);
-
   void _rehearseDeath(Canvas canvas) {
     final ghost = DashCharacter(type)..onDied();
     void drawGhost(Canvas canvas) => ghost.render(canvas, size.x, size.y);
-    canvas.saveLayer(null, _rehearsalPaint);
+    void drawGhostSilhouette(Canvas canvas, Paint paint) =>
+        ghost.renderSilhouette(canvas, size.x, size.y, paint);
     // The first frames of a real death: the flash starts fully white (an
     // opaque paint compiles to a different program than a translucent one),
     // squashed from a jump just before the hit, then plain.
@@ -317,18 +348,32 @@ class Dash extends PositionComponent
       }
       juice.onDie();
       juice.update(0, 0);
-      juice.renderBody(canvas, size, drawGhost);
+      juice.renderBody(canvas, size, drawGhost, drawGhostSilhouette);
       juice.update(1 / 60, 0);
-      juice.renderBody(canvas, size, drawGhost);
+      juice.renderBody(canvas, size, drawGhost, drawGhostSilhouette);
     }
+    // A moment later: the dizzy face has swung the wing down, which cuts
+    // it out of the drawing with clips, and the tumble has turned it.
+    ghost.animator.update(0.4);
+    final tumbling = DashJuice()
+      ..onDie()
+      ..update(0.2, 0);
+    tumbling.renderBody(canvas, size, drawGhost, drawGhostSilhouette);
     canvas.save();
     canvas.translate(size.x / 2, size.y / 2);
     FeatherBurst.rehearse(canvas, color);
     canvas.restore();
-    canvas.restore();
   }
 
-  void _renderBody(Canvas canvas) => character.render(canvas, size.x, size.y);
+  void _renderBody(Canvas canvas) => character.render(
+    canvas,
+    size.x,
+    size.y,
+    lowDetail: ScreenFx.drawingLensScene,
+  );
+
+  void _renderSilhouette(Canvas canvas, Paint paint) =>
+      character.renderSilhouette(canvas, size.x, size.y, paint);
 
   /// Multiplayer: the simulation says we died (there are no collision
   /// callbacks there).

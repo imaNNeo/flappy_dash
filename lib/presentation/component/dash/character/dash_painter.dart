@@ -110,16 +110,49 @@ class DashPainter {
   static const _bodyUnderWingCenter = Offset(78, 76);
   static const _bodyUnderWingRadius = 49.0;
 
+  /// The dash's outer shape (the outline layer and the beak), one path.
+  static final Path _silhouette = _dashLayers
+      .where(
+        (l) =>
+            l.$1 == _Layer.outline ||
+            l.$1 == _Layer.beak ||
+            l.$1 == _Layer.beakShade,
+      )
+      .map((l) => _parseSvgPath(l.$2))
+      .reduce((a, b) => Path.combine(PathOperation.union, a, b));
+
+  /// Fills the dash's outer shape with [paint], in the same square as
+  /// [paint]. One path, no clips or layers: cheap enough to flash the whole
+  /// dash white on top of [paint]'s drawing.
+  static void paintSilhouette(Canvas canvas, double size, Paint paint) {
+    canvas.save();
+    final s = size / canvasSize;
+    canvas.scale(s, s);
+    canvas.drawPath(_silhouette, paint);
+    canvas.restore();
+  }
+
   /// Paints the dash in the [size] x [size] square at the canvas origin.
+  ///
+  /// [lowDetail] draws it without any clips (the wing doesn't swing, the
+  /// eyes are just their whites and pupils), for copies that are blurred
+  /// anyway, like the one the death shockwave bends. Clips are what makes
+  /// the dash costly to draw again into an offscreen layer.
   static void paint(
     Canvas canvas,
     double size,
     DashPalette palette,
-    DashFace face,
-  ) {
+    DashFace face, {
+    bool lowDetail = false,
+  }) {
     canvas.save();
     final s = size / canvasSize;
     canvas.scale(s, s);
+    if (lowDetail) {
+      _paintLayers(canvas, palette, face, withFace: true, lowDetail: true);
+      canvas.restore();
+      return;
+    }
 
     // The wing is cut out of the original artwork, so it only swings down
     // (a down stroke) where the body behind it can be filled in.
@@ -158,9 +191,13 @@ class DashPainter {
     DashFace face, {
     required bool withFace,
     Rect? onlyIn,
+    bool lowDetail = false,
   }) {
     for (var i = 0; i < _layers.length; i++) {
-      if (withFace && i == _eyesAfter) {
+      if (withFace && lowDetail && i == _eyesAfter) {
+        _paintEyeLowDetail(canvas, palette, face, _farEye);
+        _paintEyeLowDetail(canvas, palette, face, _nearEye);
+      } else if (withFace && i == _eyesAfter) {
         _paintCheeks(canvas, face);
         _paintEye(canvas, palette, face, _farEye);
         _paintEye(canvas, palette, face, _nearEye);
@@ -192,6 +229,21 @@ class DashPainter {
       Rect.fromCenter(center: const Offset(74, 95), width: 16, height: 8),
       _fill,
     );
+  }
+
+  static void _paintEyeLowDetail(
+    Canvas canvas,
+    DashPalette palette,
+    DashFace face,
+    _Eye eye,
+  ) {
+    _fill.color = palette.eyeWhite;
+    canvas.drawPath(eye.white, _fill);
+    if (face.eyeShape == DashEyeShape.happy) {
+      return;
+    }
+    _fill.color = palette.outline;
+    canvas.drawOval(eye.pupil, _fill);
   }
 
   static void _paintEye(

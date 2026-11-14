@@ -139,17 +139,49 @@ class DashCharacter {
     animator.blink();
   }
 
+  /// Fills the dash's outer shape with [paint], where [render] draws it.
+  void renderSilhouette(
+    Canvas canvas,
+    double width,
+    double height,
+    Paint paint,
+  ) {
+    final size = width < height ? width : height;
+    canvas.save();
+    canvas.translate((width - size) / 2, (height - size) / 2);
+    DashPainter.paintSilhouette(canvas, size, paint);
+    canvas.restore();
+  }
+
   /// Draws the dash in the [width] x [height] box at the canvas origin
-  /// (the drawing is square, it's centered in the box).
-  void render(Canvas canvas, double width, double height) {
+  /// (the drawing is square, it's centered in the box). See
+  /// [DashPainter.paint] for [lowDetail].
+  void render(
+    Canvas canvas,
+    double width,
+    double height, {
+    bool lowDetail = false,
+  }) {
     final size = width < height ? width : height;
     if (width == height) {
-      DashPainter.paint(canvas, size, palette, animator.face);
+      DashPainter.paint(
+        canvas,
+        size,
+        palette,
+        animator.face,
+        lowDetail: lowDetail,
+      );
       return;
     }
     canvas.save();
     canvas.translate((width - size) / 2, (height - size) / 2);
-    DashPainter.paint(canvas, size, palette, animator.face);
+    DashPainter.paint(
+      canvas,
+      size,
+      palette,
+      animator.face,
+      lowDetail: lowDetail,
+    );
     canvas.restore();
   }
 }
