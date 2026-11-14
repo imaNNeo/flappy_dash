@@ -251,7 +251,11 @@ class NormalScore extends StatelessWidget {
       child: Center(
         child: Text(
           rank.toString(),
-          style: const TextStyle(color: AppColors.mainColor, fontSize: 24),
+          style: TextStyle(
+            color: AppColors.mainColor,
+            fontSize: size * 0.63,
+            height: 1,
+          ),
         ),
       ),
     );

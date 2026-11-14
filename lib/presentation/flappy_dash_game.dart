@@ -99,17 +99,6 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
     }
   }
 
-  void playerJumped(double x, double y, double velocityY) {
-    switch (gameMode) {
-      case SinglePlayerGameMode():
-        // Does nothing
-        break;
-      case MultiplayerGameMode():
-        multiplayerCubit.dispatchJumpEvent(x, y, velocityY);
-        break;
-    }
-  }
-
   @override
   void onRemove() {
     removeAll(children);

@@ -13,6 +13,7 @@ import 'package:flappy_dash/audio_helper.dart';
 import 'package:flappy_dash/data/remote/match_event_op_code.dart';
 import 'package:flappy_dash/domain/entities/dispatching_match_event.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
+import 'package:flappy_dash/domain/netcode/net_protocol.dart';
 import 'package:flappy_dash/domain/repositories/game_repository.dart';
 import 'package:flappy_dash/domain/repositories/multiplayer_repository.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
@@ -22,8 +23,11 @@ import 'package:nakama/nakama.dart';
 
 const _players = 20;
 const _matchSeconds = 120;
-// What the load bot measured per player: ~60 messages per second at 20 players.
-const _eventsPerSecond = 60;
+// With the server-authoritative netcode a player receives 20 snapshots per
+// second plus the score/death events (~8 per second at 20 players).
+const _snapshotsPerSecond = 20;
+const _scoresPerSecond = 8;
+const _eventsPerSecond = _snapshotsPerSecond + _scoresPerSecond;
 const _matchId = 'bench-match';
 
 String _id(int i) =>
@@ -56,6 +60,27 @@ Map<String, dynamic> _state(int phase, int scoreBoost) => {
   },
   'pipesPositions': [for (var i = 0; i < _players; i++) _random.nextDouble()],
 };
+
+MatchData _snapshot(int n) {
+  final data = ByteData(Snapshot.headerSize + _players * Snapshot.entrySize);
+  data.setUint8(0, 0);
+  data.setUint32(1, n * 50, Endian.little);
+  data.setUint8(5, _players);
+  for (var i = 0; i < _players; i++) {
+    final o = Snapshot.headerSize + i * Snapshot.entrySize;
+    data.setUint8(o, i);
+    data.setUint8(o + 1, 1);
+    data.setUint32(o + 4, n * 3, Endian.little);
+    data.setFloat32(o + 8, n * 8.0 + i, Endian.little);
+    data.setFloat32(o + 12, (i * 13 % 200) - 100.0, Endian.little);
+  }
+  return MatchData(
+    matchId: _matchId,
+    opCode: MatchEventOpCode.matchSnapshot.opCode,
+    data: data.buffer.asUint8List(),
+    reliable: true,
+  );
+}
 
 MatchData _data(MatchEventOpCode op, int sender, Map<String, dynamic> state) =>
     MatchData(
@@ -174,26 +199,18 @@ void main() {
 
     // Pre-build the raw messages so only the client-side work is timed.
     const total = _matchSeconds * _eventsPerSecond;
-    final ops = [
-      MatchEventOpCode.playerJumped,
-      MatchEventOpCode.playerJumped,
-      MatchEventOpCode.playerJumped,
-      MatchEventOpCode.playerJumped,
-      MatchEventOpCode.playerJumped,
-      MatchEventOpCode.playerJumped,
-      MatchEventOpCode.playerScored,
-      MatchEventOpCode.playerCorrectPosition,
-    ];
     final raw = [
       for (var i = 0; i < total; i++)
-        (
-          ops[i % ops.length],
-          _data(
-            ops[i % ops.length],
-            1 + i % (_players - 1),
-            _state(1, (i + 1) ~/ ops.length),
-          ),
-        ),
+        i % _eventsPerSecond < _snapshotsPerSecond
+            ? (MatchEventOpCode.matchSnapshot, _snapshot(i))
+            : (
+                MatchEventOpCode.playerScored,
+                _data(
+                  MatchEventOpCode.playerScored,
+                  1 + i % (_players - 1),
+                  _state(1, i ~/ _eventsPerSecond),
+                ),
+              ),
     ];
 
     final perSecondMs = <double>[];

@@ -17,7 +17,10 @@ class _CurrentPlayerScoreBox extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(width: 8),
-            ScoreTrophy(size: 24, rank: data.rank),
+            // Only the top 3 get a trophy.
+            data.rank <= 3
+                ? ScoreTrophy(size: 24, rank: data.rank)
+                : NormalScore(size: 24, rank: data.rank),
             const SizedBox(width: 8),
             DashImage(size: 28, type: dashType),
             const SizedBox(width: 4),

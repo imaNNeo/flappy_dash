@@ -1,14 +1,10 @@
-import 'dart:ui';
-
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flame/effects.dart';
 import 'package:flame/extensions.dart';
 import 'package:flappy_dash/domain/entities/dash_type.dart';
 import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
-import 'package:flappy_dash/presentation/component/flappy_dash_root_component.dart';
 import 'package:flappy_dash/presentation/component/hidden_coin.dart';
 import 'package:flappy_dash/presentation/component/outlined_text_component.dart';
 import 'package:flappy_dash/presentation/component/pipe.dart';
@@ -51,9 +47,13 @@ class Dash extends PositionComponent
   final double _jumpForce = -500;
   final double speed;
 
-  late double _multiplayerCorrectPositionAfter;
+  /// In multiplayer the dash doesn't move on its own: our own dash follows
+  /// the DashPredictor, the others follow their RemoteDashInterpolator.
+  bool get _isNetworked => game.gameMode is MultiplayerGameMode;
 
-  UpdateDashStateEffect? _smoothUpdatingPositionEffect;
+  /// The state of another player's dash at the moment we're drawing it
+  /// (interpolated, so a bit behind the match state).
+  PlayingState? remotePlayingState;
 
   bool _isNameVisible = true;
 
@@ -81,18 +81,20 @@ class Dash extends PositionComponent
     _dashSprite = await game.loadSprite(type.flamePngAssetName);
     final radius = size.x / 2;
     final center = size / 2;
-    if (isMe) {
+    // Collisions in multiplayer are part of the shared simulation
+    // (dash_physics.dart), not Flame's collision detection.
+    if (isMe && !_isNetworked) {
       add(
         CircleHitbox(
           radius: radius * 0.75,
           position: center * 1.1,
           anchor: Anchor.center,
-          collisionType: isMe ? CollisionType.active : CollisionType.inactive,
+          collisionType: CollisionType.active,
         ),
       );
-      if (autoJump) {
-        add(_autoJumpDash = AutoJumpDash());
-      }
+    }
+    if (isMe && autoJump) {
+      add(_autoJumpDash = AutoJumpDash());
     }
     add(
       _nameComponent = OutlinedTextComponent(
@@ -107,37 +109,27 @@ class Dash extends PositionComponent
         ),
       ),
     );
-    _resetCorrectPositionAfter();
   }
 
-  void _resetCorrectPositionAfter() {
-    if (game.gameMode is! MultiplayerGameMode) {
-      return;
-    }
-    _multiplayerCorrectPositionAfter =
-        (game.gameMode as MultiplayerGameMode).gameConfig.correctPositionEvery *
-        FlappyDashRootComponent.gameSpeedMultiplier;
-  }
-
-  PlayingState get currentPlayingState =>
-      game.getCurrentPlayingState(otherPlayerId: isMe ? null : playerId);
+  PlayingState get currentPlayingState => isMe
+      ? game.getCurrentPlayingState()
+      : remotePlayingState ??
+            game.getCurrentPlayingState(otherPlayerId: playerId);
 
   @override
   void update(double dt) {
     super.update(dt);
-    if (currentPlayingState.isNotPlaying) {
+    if (_isNetworked || currentPlayingState.isNotPlaying) {
       return;
     }
-    if (isMe) {
-      _updatePositionNormally(dt);
-    } else {
-      if (_smoothUpdatingPositionEffect == null) {
-        _updatePositionNormally(dt);
-      }
-    }
-
+    _updatePositionNormally(dt);
     _checkIfDashIsOutOfBounds();
-    _checkToDispatchMyPosition(dt);
+  }
+
+  /// Multiplayer: where the simulation says the dash is.
+  void setNetworkedState(double x, double y, double velocityY) {
+    position.setValues(x, y);
+    _velocityY = velocityY;
   }
 
   void _updatePositionNormally(double dt) {
@@ -153,22 +145,6 @@ class Dash extends PositionComponent
     if (position.y.abs() > (game.size.y / 2) + 20) {
       game.gameOver(x, y, _velocityY);
     }
-  }
-
-  void _checkToDispatchMyPosition(double dt) {
-    if (!isMe) {
-      return;
-    }
-    if (game.gameMode is! MultiplayerGameMode) {
-      return;
-    }
-
-    _multiplayerCorrectPositionAfter -= dt;
-    if (_multiplayerCorrectPositionAfter > 0) {
-      return;
-    }
-    game.multiplayerCubit.dispatchCorrectPosition(x, y, _velocityY);
-    _resetCorrectPositionAfter();
   }
 
   void jump() {
@@ -187,24 +163,9 @@ class Dash extends PositionComponent
     if (!visibleOnIdle && playingState.isIdle) {
       return;
     }
+    // In multiplayer, other dashes are placed on the copy of the looping
+    // world nearest to ours (MultiplayerController), so no mirroring needed.
     super.renderTree(canvas);
-    if (game.gameMode is MultiplayerGameMode && !isMe) {
-      final worldWidth = game.worldWidth;
-      final visibleWidth = game.camera.visibleWorldRect.width;
-      if (x < visibleWidth) {
-        // mirror for the right side
-        canvas.save();
-        canvas.translate(worldWidth, 0);
-        super.renderTree(canvas);
-        canvas.restore();
-      } else if (x > worldWidth - visibleWidth) {
-        // mirror for the left side
-        canvas.save();
-        canvas.translate(-worldWidth, 0);
-        super.renderTree(canvas);
-        canvas.restore();
-      }
-    }
   }
 
   @override
@@ -213,42 +174,12 @@ class Dash extends PositionComponent
     _dashSprite.render(canvas, size: size);
   }
 
+  /// Multiplayer: the simulation says we died (there are no collision
+  /// callbacks there).
+  void onDiedInSimulation() => _autoJumpDash?.onDashDied();
+
   void resetVelocity() {
     _velocityY = 0;
-  }
-
-  void updateState(
-    double positionX,
-    double positionY,
-    double velocityY, {
-    double duration = 0.15,
-  }) {
-    assert(game.gameMode is MultiplayerGameMode && !isMe);
-    final xDiff = (positionX - x).abs();
-    if (xDiff > 200 || duration == 0) {
-      x = positionX;
-      y = positionY;
-      _velocityY = velocityY;
-    } else {
-      final scaledDuration =
-          duration * FlappyDashRootComponent.gameSpeedMultiplier;
-      final newX = positionX + (speed * scaledDuration);
-      final newVelocity = velocityY + gravity * scaledDuration;
-      final newY = positionY + (newVelocity * scaledDuration);
-      _smoothUpdatingPositionEffect?.removeFromParent();
-      add(
-        _smoothUpdatingPositionEffect = UpdateDashStateEffect(
-          EffectController(duration: scaledDuration),
-          positionX: newX,
-          positionY: newY,
-          velocityY: newVelocity,
-          onComplete: () {
-            _smoothUpdatingPositionEffect?.removeFromParent();
-            _smoothUpdatingPositionEffect = null;
-          },
-        ),
-      );
-    }
   }
 
   @override
@@ -264,39 +195,5 @@ class Dash extends PositionComponent
       game.gameOver(x, y, _velocityY);
       _autoJumpDash?.onDashDied();
     }
-  }
-}
-
-class UpdateDashStateEffect extends ComponentEffect<Dash> {
-  UpdateDashStateEffect(
-    super.controller, {
-    required this.positionX,
-    required this.positionY,
-    required this.velocityY,
-    super.onComplete,
-  });
-
-  final double positionX;
-  final double positionY;
-  final double velocityY;
-
-  late final double initialX;
-  late final double initialY;
-  late final double initialVelocityY;
-
-  @override
-  void onMount() {
-    super.onMount();
-    initialX = target.x;
-    initialY = target.y;
-    initialVelocityY = target.velocityY;
-  }
-
-  @override
-  void apply(double progress) {
-    final newX = lerpDouble(initialX, positionX, progress)!;
-    final newY = lerpDouble(initialY, positionY, progress)!;
-    final newVelocityY = lerpDouble(initialVelocityY, velocityY, progress)!;
-    target.updateState(newX, newY, newVelocityY, duration: 0);
   }
 }

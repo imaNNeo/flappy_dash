@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:equatable/equatable.dart';
 import 'package:flame/components.dart';
 import 'package:flame/palette.dart';
 import 'package:flappy_dash/domain/entities/dash_type.dart';
@@ -8,6 +7,7 @@ import 'package:flappy_dash/domain/entities/debug/debug_message.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
 import 'package:flappy_dash/domain/entities/player_state.dart';
 import 'package:flappy_dash/domain/extensions/string_extension.dart';
+import 'package:flappy_dash/domain/netcode/remote_dash_interpolator.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/component/dash/dash.dart';
@@ -103,16 +103,20 @@ class MultiplayerController extends Component
           speed: game.gameMode.gameConfig.dashMoveSpeed,
         );
         add(dash);
-        dash.position.x = playerState.lastKnownX;
+        dash.position.setValues(playerState.lastKnownX, playerState.lastKnownY);
         _otherDashes[playerState.userId] = _OtherDashBundle(
           dash: dash,
-          playerState: playerState,
+          interpolator: RemoteDashInterpolator(),
         );
       }
     }
   }
 
   void _onNewEvent(MatchEvent event) {
+    if (event is MatchSnapshotEvent) {
+      _onSnapshot(event);
+      return;
+    }
     final senderId = event.sender?.userId;
     if (senderId == null) {
       // We don't care about events without a sender id (server events)
@@ -128,63 +132,21 @@ class MultiplayerController extends Component
       return;
     }
     switch (event) {
-      case PlayerStartedEvent():
-        final dash = _otherDashes[event.sender!.userId]!.dash;
-        dash.updateState(
-          event.dashX,
-          event.dashY,
-          event.dashVelocityY,
-          duration: 0.0,
-        );
-        dash.jump();
-        break;
-      case PlayerJumpedEvent():
-        final dash = _otherDashes[event.sender!.userId]!.dash;
-        dash.updateState(
-          event.dashX,
-          event.dashY,
-          event.dashVelocityY,
-          duration: 0.0,
-        );
-        dash.jump();
-        break;
-      case PlayerDiedEvent():
-        // Die animation? (state is automatically updated)
-        final dash = _otherDashes[event.sender!.userId]!.dash;
-        dash.updateState(
-          event.dashX,
-          event.dashY,
-          event.dashVelocityY,
-          duration: 0.0,
-        );
-        break;
       case PlayerWillSpawnAtEvent():
         final player = _cubit.state.matchState!.players[event.sender!.userId]!;
         final spawnsAt = player.spawnsAgainAt;
         final spawnsAfter =
             spawnsAt.difference(DateTime.now()).inMilliseconds / 1000;
-        final newPos = Vector2(player.lastKnownX, player.lastKnownY);
         _spawnPortalAndPlayer(
           playerId: event.sender!.userId,
-          position: newPos,
+          position: Vector2(player.lastKnownX, player.lastKnownY),
           spawnsAfter:
               spawnsAfter * FlappyDashRootComponent.gameSpeedMultiplier,
         );
         break;
-      case PlayerCorrectPositionEvent():
-        // We just mutate the position of the dash
-        final dash = _otherDashes[event.sender!.userId]!.dash;
-        if (_cubit
-            .state
-            .matchState!
-            .players[event.sender!.userId]!
-            .playingState
-            .isNotPlaying) {
-          return;
-        }
-        dash.updateState(event.dashX, event.dashY, event.dashVelocityY);
-        break;
-      // We don't care about these events at the moment
+      // Positions come from the snapshots; these only update the match state.
+      case PlayerStartedEvent():
+      case PlayerDiedEvent():
       case PlayerIsIdleEvent():
       case PlayerKickedFromTheLobbyEvent():
       case PlayerScoredEvent():
@@ -195,7 +157,45 @@ class MultiplayerController extends Component
       case MatchWaitingTimeIncreasedEvent():
       case MatchWelcomeEvent():
       case MatchPongEvent():
+      case MatchSnapshotEvent():
         break;
+    }
+  }
+
+  void _onSnapshot(MatchSnapshotEvent event) {
+    final roster = _cubit.state.matchState?.roster;
+    if (roster == null) {
+      return;
+    }
+    for (final entry in event.snapshot.entries) {
+      if (entry.rosterIndex >= roster.length) {
+        continue;
+      }
+      final bundle = _otherDashes[roster[entry.rosterIndex]];
+      bundle?.interpolator.addSnapshotEntry(entry);
+    }
+  }
+
+  /// The world loops every [FlappyDashGame.worldWidth]. Of all the copies of
+  /// [x], the one nearest to our own dash.
+  double _nearestCopyX(double x) {
+    final worldWidth = game.worldWidth;
+    final myX = parent.myDashX;
+    return x + ((myX - x) / worldWidth).round() * worldWidth;
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    for (final bundle in _otherDashes.values) {
+      final interpolator = bundle.interpolator;
+      interpolator.advance(dt);
+      final state = interpolator.current();
+      if (state == null) {
+        continue;
+      }
+      bundle.dash.remotePlayingState = state.playingState;
+      bundle.dash.setNetworkedState(_nearestCopyX(state.x), state.y, 0);
     }
   }
 
@@ -205,7 +205,6 @@ class MultiplayerController extends Component
     required double spawnsAfter,
   }) async {
     final dash = _otherDashes[playerId]!.dash;
-    dash.updateState(position.x, position.y, 0.0, duration: 0.0);
     dash.scale = Vector2.all(0.0);
 
     // It's okay to show the other dash while it's idle after spawning,
@@ -226,7 +225,7 @@ class MultiplayerController extends Component
     );
     add(
       SpawningPortal(
-        position: position,
+        position: Vector2(_nearestCopyX(position.x), position.y),
         size: Vector2.all(dash.size.x),
         color: AppColors.getDashColor(DashType.fromUserId(playerId))
             .darken(0.2),
@@ -261,12 +260,9 @@ class MultiplayerController extends Component
   }
 }
 
-class _OtherDashBundle with Equatable {
+class _OtherDashBundle {
   final Dash dash;
-  final PlayerState playerState;
+  final RemoteDashInterpolator interpolator;
 
-  _OtherDashBundle({required this.dash, required this.playerState});
-
-  @override
-  List<Object?> get props => [dash, playerState];
+  _OtherDashBundle({required this.dash, required this.interpolator});
 }
