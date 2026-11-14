@@ -55,7 +55,14 @@ class FeatherBurst extends PositionComponent {
 
     for (var i = 0; i < count; i++) {
       final angle = _random.nextDouble() * pi * 2;
-      final speed = (180 + _random.nextDouble() * 380) * scaleFactor;
+      // Every third feather is a small, slower one that hangs around the
+      // impact, so the burst reads as a cloud and not just a ring.
+      final small = i % 3 == 2;
+      final speed =
+          (small
+              ? 90 + _random.nextDouble() * 200
+              : 180 + _random.nextDouble() * 380) *
+          scaleFactor;
       _feathers.add(
         _Feather(
           x: 0,
@@ -66,7 +73,11 @@ class FeatherBurst extends PositionComponent {
           spin: (_random.nextDouble() - 0.5) * 14,
           swayPhase: _random.nextDouble() * pi * 2,
           swaySpeed: 4 + _random.nextDouble() * 4,
-          size: (0.7 + _random.nextDouble() * 0.7) * scaleFactor,
+          size:
+              (small
+                  ? 0.4 + _random.nextDouble() * 0.3
+                  : 0.7 + _random.nextDouble() * 0.7) *
+              scaleFactor,
           light: _random.nextBool(),
         ),
       );

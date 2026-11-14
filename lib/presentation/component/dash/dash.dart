@@ -204,7 +204,7 @@ class Dash extends PositionComponent
         FeatherBurst(
           position: position.clone(),
           color: color,
-          count: isMe ? 20 : 12,
+          count: isMe ? 44 : 22,
           scaleFactor: isMe ? 1 : 0.8,
           priority: priority + 1,
         ),
