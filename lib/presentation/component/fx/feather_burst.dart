@@ -29,6 +29,7 @@ class FeatherBurst extends PositionComponent {
   late final Paint _featherPaint;
   late final Paint _lightFeatherPaint;
   late final Paint _quillPaint;
+  late final Paint _outlinePaint;
   final Paint _puffPaint = Paint();
 
   static final Path _featherPath = _buildFeatherPath();
@@ -45,9 +46,32 @@ class FeatherBurst extends PositionComponent {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    _init();
+  }
+
+  /// Draws a burst, early and late in its life, without adding it to the
+  /// game. The caller makes it invisible (e.g. in a near-transparent layer);
+  /// it only makes the GPU compile what a real burst needs ahead of time.
+  static void rehearse(Canvas canvas, Color color) {
+    final burst = FeatherBurst(position: Vector2.zero(), color: color).._init();
+    // The same moments a real burst goes through: fully opaque at first,
+    // mid-flight, then fading.
+    for (final dt in [0.0, 1 / 60, 0.3, 1.0]) {
+      burst.update(dt);
+      burst.render(canvas);
+    }
+  }
+
+  void _init() {
     _featherPaint = Paint()..color = color;
+    // Two strong shades, no pale ones (pale feathers vanish against the
+    // sky), each with a thin dark outline so they read on any background.
     _lightFeatherPaint = Paint()
-      ..color = Color.lerp(color, const Color(0xFFFFFFFF), 0.6)!;
+      ..color = Color.lerp(color, const Color(0xFF0A4D8C), 0.45)!;
+    _outlinePaint = Paint()
+      ..color = Color.lerp(color, const Color(0xFF000000), 0.55)!
+      ..style = PaintingStyle.stroke
+      ..strokeJoin = StrokeJoin.round;
     _quillPaint = Paint()
       ..color = const Color(0x66FFFFFF)
       ..strokeWidth = 1.2
@@ -75,8 +99,8 @@ class FeatherBurst extends PositionComponent {
           swaySpeed: 4 + _random.nextDouble() * 4,
           size:
               (small
-                  ? 0.4 + _random.nextDouble() * 0.3
-                  : 0.7 + _random.nextDouble() * 0.7) *
+                  ? 0.65 + _random.nextDouble() * 0.5
+                  : 1.1 + _random.nextDouble() * 1.1) *
               scaleFactor,
           light: _random.nextBool(),
         ),
@@ -148,11 +172,15 @@ class FeatherBurst extends PositionComponent {
       alpha: alpha,
     );
     _quillPaint.color = Color.fromRGBO(255, 255, 255, 0.5 * alpha);
+    _outlinePaint.color = _outlinePaint.color.withValues(alpha: alpha);
     for (final f in _feathers) {
       canvas.save();
       canvas.translate(f.x, f.y);
       canvas.rotate(f.rotation);
       canvas.scale(f.size);
+      // About 2.2 px wide whatever the feather's size.
+      _outlinePaint.strokeWidth = 2.2 / f.size;
+      canvas.drawPath(_featherPath, _outlinePaint);
       canvas.drawPath(
         _featherPath,
         f.light ? _lightFeatherPaint : _featherPaint,

@@ -84,13 +84,23 @@ class ScreenFx {
       // programs it needs (each kind of draw under the ring clip, the blur)
       // compile while the game loads instead of on the first death.
       _lensWarmUpFrames--;
-      final warmWave = _Shockwave(
-        Offset(size.x / 2, size.y / 2),
-        min(size.x, size.y) / 3,
-        1,
-        1,
+      final warmWave =
+          _warmUpWave ??
+          _Shockwave(
+            Offset(size.x / 2, size.y / 2),
+            min(size.x, size.y) / 3,
+            1,
+            1,
+          );
+      // The real lens (same layer paint, so the same GPU programs) at the
+      // start of a wave, inside a layer that is almost transparent.
+      canvas.saveLayer(
+        Rect.fromCircle(center: warmWave.center, radius: warmWave.radius * 2),
+        _warmUpLayerPaint,
       );
-      _renderLens(canvas, scene, warmWave, 0.3, _warmUpLayerPaint);
+      _renderLens(canvas, scene, warmWave, 0, _blurLayerPaint);
+      _renderLens(canvas, scene, warmWave, 0.05, _blurLayerPaint);
+      canvas.restore();
     } else {
       final progress = (wave.elapsed / wave.duration).clamp(0.0, 1.0);
       if (_lensAllowed) {
@@ -103,6 +113,16 @@ class ScreenFx {
 
   int _lensWarmUpFrames = 2;
 
+  /// Runs the invisible lens warm-up again for the next frames, now that
+  /// the scene holds what a real death shows (pipes, the dash).
+  /// [center] and [radius] are where a death there would put the wave.
+  void rehearseLens(Offset center, double radius) {
+    _lensWarmUpFrames = max(_lensWarmUpFrames, 1);
+    _warmUpWave = _Shockwave(center, radius, 1, 1);
+  }
+
+  _Shockwave? _warmUpWave;
+
   // Same curve as the rim in shockwave.frag: fast out, then settles.
   static double _waveRadius(double maxRadius, double progress) {
     final eased = 1 - pow(1 - progress, 4).toDouble();
@@ -114,8 +134,7 @@ class ScreenFx {
     ..imageFilter = ui.ImageFilter.blur(sigmaX: 5, sigmaY: 5);
 
   final ui.Paint _warmUpLayerPaint = ui.Paint()
-    ..color = const Color(0x02000000)
-    ..imageFilter = ui.ImageFilter.blur(sigmaX: 5, sigmaY: 5);
+    ..color = const Color(0x02000000);
 
   void _renderLens(
     ui.Canvas canvas,
@@ -198,17 +217,15 @@ class ScreenFx {
     // Smooth-ish noise from a few sines (cheaper than Perlin, no allocations).
     double noise(double seed) =>
         sin(_time * 47 + seed) * 0.6 + sin(_time * 83 + seed * 2.3) * 0.4;
-    final dx = _maxShakeOffset * shake * noise(1.7);
-    final dy = _maxShakeOffset * shake * noise(5.1);
-    // No rotation: a rotated canvas turns the camera's clip into an
-    // anti-aliased rotated clip, and on the web every kind of draw then
-    // needs a new GPU program (a burst of compiles, a visible hitch).
+    // Whole pixels, no rotation and no zoom: the camera clips the world to
+    // its viewport, and a clip edge that isn't on a pixel boundary (or is
+    // rotated) becomes an anti-aliased clip. On the web every kind of draw
+    // then needs a new GPU program, a burst of compiles and a visible hitch
+    // on the first death.
+    final dx = (_maxShakeOffset * shake * noise(1.7)).roundToDouble();
+    final dy = (_maxShakeOffset * shake * noise(5.1)).roundToDouble();
     canvas.save();
-    canvas.translate(size.x / 2 + dx, size.y / 2 + dy);
-    // Zoom in a touch so the shaken edges don't show the letterbox.
-    final zoom = 1 + 0.04 * shake;
-    canvas.scale(zoom);
-    canvas.translate(-size.x / 2, -size.y / 2);
+    canvas.translate(dx, dy);
     draw(canvas);
     canvas.restore();
   }
