@@ -185,7 +185,10 @@ class PendingMatchBox extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 52),
+                              SizedBox(
+                                width: 52,
+                                child: BotControlsWidget(state: state),
+                              ),
                             ],
                           );
                         },

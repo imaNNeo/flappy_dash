@@ -309,6 +309,20 @@ class NakamaDataSource {
     return ServerConfigEntity.fromJson(jsonDecode(response));
   }
 
+  /// Whether the server lets this user add bots to matches (everybody on a
+  /// dev server, only the admins in production). The server checks again on
+  /// every request; this only decides whether to show the controls.
+  Future<bool> canManageBots() async {
+    final response = await client.rpc(
+      session: await _ensureSession(),
+      id: 'can_manage_bots',
+    );
+    if (response == null || response.isBlank) {
+      return false;
+    }
+    return jsonDecode(response)['canManageBots'] == true;
+  }
+
   Future<MatchOverviewEntity> getLastMatchOverview() async {
     final response = await client.rpc(
       session: await _ensureSession(),
