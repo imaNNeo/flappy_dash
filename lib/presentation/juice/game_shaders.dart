@@ -68,17 +68,6 @@ class GameShaders {
       canvas.drawRect(rect, paint..shader = portal);
     }
     paint.shader = null;
-    // The dash's white hit flash is a color-filtered layer.
-    canvas.saveLayer(
-      rect,
-      Paint()
-        ..colorFilter = const ColorFilter.mode(
-          Color(0xFFFFFFFF),
-          BlendMode.srcATop,
-        ),
-    );
-    canvas.drawRect(rect, Paint()..color = const Color(0x01000000));
-    canvas.restore();
   }
 
   static Paint? _warmUpPaint;

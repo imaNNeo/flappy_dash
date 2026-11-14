@@ -4,7 +4,10 @@ import 'package:flappy_dash/presentation/widget/game_over_backdrop.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MultiplayerDiedOverlayWidget extends StatelessWidget {
-  const MultiplayerDiedOverlayWidget({super.key});
+  const MultiplayerDiedOverlayWidget({super.key, this.rehearsal = false});
+
+  /// See [GameOverBackdrop.rehearsal].
+  final bool rehearsal;
 
   @override
   Widget build(BuildContext context) {
@@ -14,6 +17,7 @@ class MultiplayerDiedOverlayWidget extends StatelessWidget {
           previous.spawnRemainingSeconds != current.spawnRemainingSeconds,
       builder: (context, state) {
         return GameOverBackdrop(
+          rehearsal: rehearsal,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

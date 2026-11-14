@@ -79,6 +79,8 @@ class _SinglePlayerGamePageState extends State<SinglePlayerGamePage> {
               ),
               if (state.currentPlayingState.isGameOver) const GameOverWidget(),
               if (state.currentPlayingState.isIdle)
+                const GameOverWidget(rehearsal: true),
+              if (state.currentPlayingState.isIdle)
                 const Align(alignment: Alignment(0, 0.2), child: TapToPlay()),
               if (state.currentPlayingState.isNotGameOver)
                 SafeArea(child: TopScore(currentScore: state.currentScore)),

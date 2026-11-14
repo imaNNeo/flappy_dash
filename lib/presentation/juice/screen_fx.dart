@@ -70,18 +70,30 @@ class ScreenFx {
   void render(ui.Canvas canvas, Vector2 size, void Function(ui.Canvas) draw) {
     final wave = _wave;
     final warmingUp = wave == null && _lensWarmUpFrames > 0;
-    if ((wave == null && !warmingUp) || size.x <= 0 || size.y <= 0) {
+    final lens = warmingUp || (wave != null && _lensAllowed);
+    if (!lens || size.x <= 0 || size.y <= 0) {
       _renderShaken(canvas, size, draw);
+      if (wave != null) {
+        _renderRim(canvas, wave, _progress(wave));
+      }
       return;
     }
+    _renderShaken(canvas, size, draw);
+    // The copy the lens bends is blurred, so it's recorded with the dashes
+    // drawn without detail (no clips), which keeps replaying it into the
+    // lens layer cheap. See [drawingLensScene].
     final recorder = ui.PictureRecorder();
-    _renderShaken(ui.Canvas(recorder), size, draw);
-    final scene = recorder.endRecording();
-    canvas.drawPicture(scene);
+    drawingLensScene = true;
+    try {
+      _renderShaken(ui.Canvas(recorder), size, draw);
+    } finally {
+      drawingLensScene = false;
+    }
+    final lensScene = recorder.endRecording();
 
     if (wave == null) {
       // Runs the lens over the real scene, almost invisible, so the GPU
-      // programs it needs (each kind of draw under the ring clip, the blur)
+      // programs it needs (the scene in a scaled, masked layer, the blur)
       // compile while the game loads instead of on the first death.
       _lensWarmUpFrames--;
       final warmWave =
@@ -98,20 +110,25 @@ class ScreenFx {
         Rect.fromCircle(center: warmWave.center, radius: warmWave.radius * 2),
         _warmUpLayerPaint,
       );
-      _renderLens(canvas, scene, warmWave, 0, _blurLayerPaint);
-      _renderLens(canvas, scene, warmWave, 0.05, _blurLayerPaint);
+      _renderLens(canvas, lensScene, warmWave, 0, _blurLayerPaint);
+      _renderLens(canvas, lensScene, warmWave, 0.05, _blurLayerPaint);
       canvas.restore();
     } else {
-      final progress = (wave.elapsed / wave.duration).clamp(0.0, 1.0);
-      if (_lensAllowed) {
-        _renderLens(canvas, scene, wave, progress, _blurLayerPaint);
-      }
+      final progress = _progress(wave);
+      _renderLens(canvas, lensScene, wave, progress, _blurLayerPaint);
       _renderRim(canvas, wave, progress);
     }
-    scene.dispose();
+    lensScene.dispose();
   }
 
+  static double _progress(_Shockwave wave) =>
+      (wave.elapsed / wave.duration).clamp(0.0, 1.0);
+
   int _lensWarmUpFrames = 2;
+
+  /// True while the scene is recorded for the lens: components can draw a
+  /// cheaper version of themselves, since that copy ends up blurred.
+  static bool drawingLensScene = false;
 
   /// Runs the invisible lens warm-up again for the next frames, now that
   /// the scene holds what a real death shows (pipes, the dash).
@@ -157,25 +174,46 @@ class ScreenFx {
     final inner = max(0.0, radius - bandWidth);
     final outer = radius + bandWidth;
 
-    canvas.saveLayer(
-      Rect.fromCircle(center: center, radius: outer + 8),
-      layerPaint,
-    );
+    final bounds = Rect.fromCircle(center: center, radius: outer + 8);
+    canvas.saveLayer(bounds, layerPaint);
     // One magnified copy of the scene, seen only through the band: what
     // shows at the wave front comes from `radius - push`. The blur on the
     // layer softens the band's edges into a smooth bend.
     final scale = radius / max(1.0, radius - push);
-    final ring = ui.Path()
-      ..fillType = ui.PathFillType.evenOdd
-      ..addOval(Rect.fromCircle(center: center, radius: outer))
-      ..addOval(Rect.fromCircle(center: center, radius: inner));
-    canvas.clipPath(ring);
+    canvas.save();
     canvas.translate(center.dx, center.dy);
     canvas.scale(scale);
     canvas.translate(-center.dx, -center.dy);
     canvas.drawPicture(scene);
     canvas.restore();
+    // Keep only the band, with a gradient instead of a ring-shaped clip. A
+    // path clip is rasterized into a mask every frame, and every kind of
+    // draw under it needs its own GPU program (compiled on the first death).
+    // Always five distinct stops: the GPU program depends on how many
+    // intervals the gradient has, and on whether two stops coincide.
+    const soft = 0.004;
+    final edge = (inner / outer).clamp(soft, 1 - 3 * soft);
+    _bandMaskPaint.shader = ui.Gradient.radial(center, outer, _bandMaskColors, [
+      0,
+      edge,
+      edge + soft,
+      1 - soft,
+      1,
+    ]);
+    // drawPaint fills the whole layer with no edges to anti-alias.
+    canvas.drawPaint(_bandMaskPaint);
+    canvas.restore();
   }
+
+  static const _bandMaskColors = [
+    Color(0x00000000),
+    Color(0x00000000),
+    Color(0xFF000000),
+    Color(0xFF000000),
+    Color(0x00000000),
+  ];
+
+  final ui.Paint _bandMaskPaint = ui.Paint()..blendMode = BlendMode.dstIn;
 
   void _renderRim(ui.Canvas canvas, _Shockwave wave, double progress) {
     final program = GameShaders.shockwave;

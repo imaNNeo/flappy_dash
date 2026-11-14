@@ -6,13 +6,17 @@ import 'package:flappy_dash/presentation/widget/game_over_backdrop.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class GameOverWidget extends StatelessWidget {
-  const GameOverWidget({super.key});
+  const GameOverWidget({super.key, this.rehearsal = false});
+
+  /// See [GameOverBackdrop.rehearsal].
+  final bool rehearsal;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SingleplayerGameCubit, SingleplayerGameState>(
       builder: (context, state) {
         return GameOverBackdrop(
+          rehearsal: rehearsal,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
