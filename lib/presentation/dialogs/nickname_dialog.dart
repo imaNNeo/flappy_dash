@@ -1,5 +1,8 @@
 import 'package:flappy_dash/domain/extensions/user_extension.dart';
 import 'package:flappy_dash/presentation/bloc/account/account_cubit.dart';
+import 'package:flappy_dash/presentation/app_style.dart';
+import 'package:flappy_dash/presentation/widget/big_button.dart';
+import 'package:flappy_dash/presentation/widget/game_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -34,59 +37,88 @@ class _NicknameDialogState extends State<NicknameDialog> {
     super.initState();
   }
 
+  bool _saving = false;
+
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      contentPadding: EdgeInsets.zero,
-      backgroundColor: Colors.transparent,
-      content: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(16)),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(18.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Your Nickname',
-                style: TextStyle(fontFamily: 'Roboto', fontSize: 28),
+    return GameDialog(
+      title: 'Your Nickname',
+      maxWidth: 380,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              controller: _textEditingController,
+              autofocus: true,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => _onSaveClicked(),
+              style: const TextStyle(
+                color: AppColors.whiteTextColor,
+                fontSize: 22,
               ),
-              const SizedBox(height: 24),
-              TextField(
-                controller: _textEditingController,
-                decoration: const InputDecoration(
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black, width: 1.0),
+              cursorColor: AppColors.mainColor,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.black26,
+                counterStyle: const TextStyle(color: Colors.white54),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: AppColors.mainColor,
+                    width: 2,
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black, width: 1.0),
-                  ),
-                  hintText: 'Nickname',
                 ),
-                maxLength: 12,
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Colors.white24),
+                ),
+                hintText: 'Nickname',
+                hintStyle: const TextStyle(color: Colors.white38),
               ),
-              const SizedBox(height: 16),
-              SizedBox(
+              maxLength: 12,
+            ),
+            const SizedBox(height: 12),
+            Center(
+              child: BigButton(
+                height: 58,
                 width: 240,
-                child: FilledButton.tonal(
-                  onPressed: _onSaveClicked,
-                  child: const Text('SAVE'),
+                strokeColor: Colors.white,
+                bgColor: AppColors.blueButtonBgColor,
+                showLoading: _saving,
+                onPressed: _saving ? null : _onSaveClicked,
+                child: const Text(
+                  'SAVE',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 26,
+                    letterSpacing: 2,
+                  ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  void _onSaveClicked() {
-    final accountCubit = context.read<AccountCubit>();
-    final newName = _textEditingController.text;
-    accountCubit.updateUserDisplayName(newName);
-    Navigator.of(context).pop(newName);
+  void _onSaveClicked() async {
+    final newName = _textEditingController.text.trim();
+    if (newName.isEmpty) {
+      return;
+    }
+    setState(() => _saving = true);
+    try {
+      await context.read<AccountCubit>().updateUserDisplayName(newName);
+    } catch (_) {
+      // The name is saved again next time; don't keep the player stuck here.
+    }
+    if (mounted) {
+      Navigator.of(context).pop(newName);
+    }
   }
 
   @override

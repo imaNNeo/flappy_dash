@@ -8,6 +8,7 @@ import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flappy_dash/presentation/presentation_utils.dart';
+import 'package:flappy_dash/presentation/widget/blurred_background.dart';
 import 'package:flappy_dash/presentation/widget/game_back_button.dart';
 import 'package:flappy_dash/presentation/widget/multiplayer_scoreboard.dart';
 import 'package:flappy_dash/presentation/widget/tap_to_play.dart';
@@ -82,7 +83,7 @@ class _MultiPlayerGamePageState extends State<MultiPlayerGamePage> {
                   GameWidget(
                     game: _flappyDashGame!,
                     backgroundBuilder: (_) {
-                      return Container(color: AppColors.backgroundColor);
+                      return const GameLetterboxBackground();
                     },
                   ),
                 if (state.currentPlayingState.isGameOver)
@@ -153,9 +154,22 @@ class _RemainingPlayingTimer extends StatelessWidget {
           previous.matchPlayingRemainingSeconds !=
           current.matchPlayingRemainingSeconds,
       builder: (context, state) {
-        return Text(
-          PresentationUtils.formatSeconds(state.matchPlayingRemainingSeconds),
-          style: const TextStyle(color: Colors.black, fontSize: 18, height: 1),
+        return Container(
+          margin: const EdgeInsets.only(top: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.35),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            PresentationUtils.formatSeconds(state.matchPlayingRemainingSeconds),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              height: 1,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
+          ),
         );
       },
     );

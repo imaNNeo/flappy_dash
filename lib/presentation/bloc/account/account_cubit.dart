@@ -25,7 +25,7 @@ class AccountCubit extends Cubit<AccountState> {
         });
   }
 
-  void updateUserDisplayName(String newUserDisplayName) async {
+  Future<void> updateUserDisplayName(String newUserDisplayName) async {
     await _gameRepository.updateUserDisplayName(newUserDisplayName);
   }
 

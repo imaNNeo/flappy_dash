@@ -1,6 +1,7 @@
 import 'package:flappy_dash/domain/entities/dash_type.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/dialogs/nickname_dialog.dart';
+import 'package:flappy_dash/presentation/widget/game_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -48,76 +49,39 @@ class RawScoresDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const closeIconSize = 38.0;
-    return AlertDialog(
-      contentPadding: EdgeInsets.zero,
-      backgroundColor: Colors.transparent,
-      content: Container(
-        width: width,
-        decoration: BoxDecoration(
-          color: AppColors.dialogBgColor,
-          borderRadius: const BorderRadius.all(Radius.circular(16)),
-          border: Border.all(color: Colors.black, width: 6),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black,
-              spreadRadius: 0.1,
-              blurRadius: 0,
-              offset: Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const SizedBox(width: closeIconSize),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: AppColors.whiteTextColor,
-                    fontSize: 20,
-                    fontFamily: 'Roboto',
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: SvgPicture.asset(
-                    'assets/icons/ic_close.svg',
-                    width: closeIconSize,
-                    height: closeIconSize,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: height,
-              child: ListView.separated(
-                padding: const EdgeInsets.only(top: 18, bottom: 12),
-                itemBuilder: (context, index) {
-                  final record = scores[index];
-
-                  return LeaderboardRow(
-                    rank: record.rank,
-                    name: record.name,
-                    score: record.score,
-                    isMine: record.isMe,
-                    allowEditDisplayName: allowEditDisplayName,
-                    onMyProfileTap: allowEditDisplayName
-                        ? () => NicknameDialog.show(context)
-                        : null,
-                  );
-                },
-                separatorBuilder: (context, index) =>
-                    Container(height: 1, color: Colors.white10),
-                itemCount: scores.length,
+    return GameDialog(
+      title: title,
+      maxWidth: width,
+      maxHeight: height + 60,
+      child: scores.isEmpty
+          ? const Padding(
+              padding: EdgeInsets.all(32),
+              child: Text(
+                'No scores yet',
+                style: TextStyle(color: Colors.white60, fontSize: 20),
               ),
+            )
+          : ListView.separated(
+              shrinkWrap: true,
+              padding: const EdgeInsets.only(top: 4, bottom: 12),
+              itemBuilder: (context, index) {
+                final record = scores[index];
+
+                return LeaderboardRow(
+                  rank: record.rank,
+                  name: record.name,
+                  score: record.score,
+                  isMine: record.isMe,
+                  allowEditDisplayName: allowEditDisplayName,
+                  onMyProfileTap: allowEditDisplayName
+                      ? () => NicknameDialog.show(context)
+                      : null,
+                );
+              },
+              separatorBuilder: (context, index) =>
+                  Container(height: 1, color: Colors.white10),
+              itemCount: scores.length,
             ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -142,43 +106,56 @@ class LeaderboardRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact = MediaQuery.sizeOf(context).width < 480;
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: isMine ? onMyProfileTap : null,
         child: Container(
           color: isMine ? Colors.white10 : Colors.transparent,
-          height: 64,
-          padding: const EdgeInsets.symmetric(horizontal: 18),
+          height: compact ? 54 : 64,
+          padding: EdgeInsets.symmetric(horizontal: compact ? 12 : 18),
           child: Row(
             children: [
               rank <= 3
-                  ? ScoreTrophy(size: 38, rank: rank)
-                  : NormalScore(size: 38, rank: rank),
-              const SizedBox(width: 16),
-              Text(
-                name,
-                style: TextStyle(
-                  color: isMine ? Colors.white : AppColors.whiteTextColor2,
-                  fontSize: 28,
+                  ? ScoreTrophy(size: compact ? 32 : 38, rank: rank)
+                  : NormalScore(size: compact ? 32 : 38, rank: rank),
+              SizedBox(width: compact ? 10 : 16),
+              Expanded(
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: isMine
+                              ? Colors.white
+                              : AppColors.whiteTextColor2,
+                          fontSize: compact ? 22 : 28,
+                        ),
+                      ),
+                    ),
+                    if (isMine && allowEditDisplayName) ...[
+                      const SizedBox(width: 4),
+                      const Align(
+                        alignment: Alignment(0, 0.3),
+                        child: Text(
+                          '(edit)',
+                          style: TextStyle(color: AppColors.blueColor),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
-              if (isMine && allowEditDisplayName) ...[
-                const SizedBox(width: 4),
-                const Align(
-                  alignment: Alignment(0, 0.3),
-                  child: Text(
-                    '(edit)',
-                    style: TextStyle(color: AppColors.blueColor),
-                  ),
-                ),
-              ],
-              Expanded(child: Container()),
+              const SizedBox(width: 8),
               Text(
                 score.toString(),
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.blueColor,
-                  fontSize: 36,
+                  fontSize: compact ? 28 : 36,
                 ),
               ),
             ],

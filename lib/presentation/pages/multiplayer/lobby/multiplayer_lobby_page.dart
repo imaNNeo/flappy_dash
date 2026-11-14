@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flappy_dash/domain/app_constants.dart';
 import 'package:flappy_dash/domain/entities/match_event.dart';
@@ -67,12 +68,7 @@ class _MultiPlayerLobbyPageContentState extends State<MultiPlayerLobbyPage> {
   @override
   Widget build(BuildContext context) {
     final screenSize = ScreenSize.fromContext(context);
-    final boxVerticalSpacing = switch (screenSize) {
-      ScreenSize.extraSmall => 18.0,
-      ScreenSize.small => 28.0,
-      ScreenSize.medium => 38.0,
-      ScreenSize.large || ScreenSize.extraLarge => 48.0,
-    };
+    final shortLandscape = context.isShortLandscape;
     final boxHorizontalPadding = switch (screenSize) {
       ScreenSize.extraSmall => 10.0,
       ScreenSize.small => 12.0,
@@ -85,25 +81,50 @@ class _MultiPlayerLobbyPageContentState extends State<MultiPlayerLobbyPage> {
       ScreenSize.medium => 22.0,
       ScreenSize.large || ScreenSize.extraLarge => 48.0,
     };
-    final appTitleTopPadding = switch (screenSize) {
-      ScreenSize.extraSmall || ScreenSize.small => 92.0,
-      ScreenSize.medium => 102.0,
-      ScreenSize.large || ScreenSize.extraLarge => 18.0,
-    };
-
     final lastWinnerBadgeHeight = switch (screenSize) {
-      ScreenSize.extraSmall || ScreenSize.small => 54.0,
+      ScreenSize.extraSmall => 46.0,
+      ScreenSize.small => 54.0,
       ScreenSize.medium => 58.0,
       ScreenSize.large || ScreenSize.extraLarge => 64.0,
     };
 
-    final boxExtraTopMarginForWinnerBadge = switch (screenSize) {
-      ScreenSize.extraSmall => lastWinnerBadgeHeight * 0.7,
-      ScreenSize.small => lastWinnerBadgeHeight * 0.5,
-      ScreenSize.medium => lastWinnerBadgeHeight * 0.2,
-      ScreenSize.large => 0.1,
-      ScreenSize.extraLarge => 0,
-    };
+    final topBar = Padding(
+      padding: const EdgeInsets.only(
+        top: PresentationConstants.defaultPadding / 2,
+        right: PresentationConstants.defaultPadding,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const GameBackButton(),
+          const Spacer(),
+          const ProfileOverlay(),
+        ],
+      ),
+    );
+
+    final title = FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Padding(
+        // Room for the "Multi Player" text that hangs below the title.
+        padding: EdgeInsets.only(
+          bottom: switch (screenSize) {
+            ScreenSize.extraSmall => 22.0,
+            ScreenSize.small => 26.0,
+            ScreenSize.medium => 30.0,
+            ScreenSize.large || ScreenSize.extraLarge => 44.0,
+          },
+          right: 24,
+        ),
+        child: GameTitle(screenSize: screenSize, showMultiplayerText: true),
+      ),
+    );
+
+    final box = PendingMatchBox(
+      horizontalPadding: boxHorizontalPadding,
+      lastWinnerHeight: lastWinnerBadgeHeight,
+      margin: EdgeInsets.zero,
+    );
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -112,52 +133,97 @@ class _MultiPlayerLobbyPageContentState extends State<MultiPlayerLobbyPage> {
         children: [
           const BlurredBackground(),
           SafeArea(
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(height: appTitleTopPadding),
-                  GameTitle(screenSize: screenSize, showMultiplayerText: true),
-                  SizedBox(
-                    height:
-                        (boxVerticalSpacing * 1.5) +
-                        boxExtraTopMarginForWinnerBadge,
-                  ),
-                  Expanded(
-                    child: PendingMatchBox(
-                      horizontalPadding: boxHorizontalPadding,
-                      lastWinnerHeight: lastWinnerBadgeHeight,
-                      margin: EdgeInsets.symmetric(
-                        horizontal: boxHorizontalMargin,
+            child: shortLandscape
+                // Wide and short: title on the left, lobby on the right, so
+                // the JOIN button is never pushed off the bottom.
+                ? Column(
+                    children: [
+                      topBar,
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 4,
+                                child: Column(
+                                  children: [
+                                    Expanded(
+                                      child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8),
+                                          child: title,
+                                        ),
+                                      ),
+                                    ),
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: WatchOnYoutubeWidget(
+                                        screenSize: screenSize,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                flex: 5,
+                                child: Align(
+                                  alignment: Alignment.topCenter,
+                                  child: ConstrainedBox(
+                                    constraints: const BoxConstraints(
+                                      maxWidth: 560,
+                                    ),
+                                    child: box,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      topBar,
+                      Flexible(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: title,
+                        ),
+                      ),
+                      SizedBox(height: lastWinnerBadgeHeight * 0.2),
+                      Expanded(
+                        flex: 3,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: boxHorizontalMargin,
+                          ),
+                          child: Center(
+                            child: ConstrainedBox(
+                              constraints: screenSize == ScreenSize.extraLarge
+                                  ? const BoxConstraints(
+                                      maxWidth: 900,
+                                      maxHeight: 680,
+                                    )
+                                  : const BoxConstraints(
+                                      maxWidth: 680,
+                                      maxHeight: 560,
+                                    ),
+                              child: box,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: WatchOnYoutubeWidget(screenSize: screenSize),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                   ),
-                  SizedBox(height: boxVerticalSpacing),
-                  WatchOnYoutubeWidget(screenSize: screenSize),
-                  const SizedBox(height: 16),
-                ],
-              ),
-            ),
-          ),
-          SafeArea(
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  top: PresentationConstants.defaultPadding,
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const GameBackButton(),
-                    Expanded(child: Container(height: 0)),
-                    const ProfileOverlay(),
-                    const SizedBox(width: PresentationConstants.defaultPadding),
-                  ],
-                ),
-              ),
-            ),
           ),
         ],
       ),

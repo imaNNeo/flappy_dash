@@ -5,12 +5,12 @@ class TransparentContentBox extends StatelessWidget {
   const TransparentContentBox({
     super.key,
     required this.child,
-    this.width = 680,
+    this.width,
     this.margin = const EdgeInsets.symmetric(horizontal: 48),
   });
 
   final Widget child;
-  final double width;
+  final double? width;
   final EdgeInsets margin;
 
   @override
