@@ -19,7 +19,6 @@ class ScreenFx {
   double _time = 0;
 
   static const _maxShakeOffset = 22.0;
-  static const _maxShakeAngle = 0.035;
   static const _traumaDecayPerSecond = 1.6;
 
   _Shockwave? _wave;
@@ -88,10 +87,11 @@ class ScreenFx {
         sin(_time * 47 + seed) * 0.6 + sin(_time * 83 + seed * 2.3) * 0.4;
     final dx = _maxShakeOffset * shake * noise(1.7);
     final dy = _maxShakeOffset * shake * noise(5.1);
-    final angle = _maxShakeAngle * shake * noise(9.3);
+    // No rotation: a rotated canvas turns the camera's clip into an
+    // anti-aliased rotated clip, and on the web every kind of draw then
+    // needs a new GPU program (a burst of compiles, a visible hitch).
     canvas.save();
     canvas.translate(size.x / 2 + dx, size.y / 2 + dy);
-    canvas.rotate(angle);
     // Zoom in a touch so the shaken edges don't show the letterbox.
     final zoom = 1 + 0.04 * shake;
     canvas.scale(zoom);

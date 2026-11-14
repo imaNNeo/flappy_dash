@@ -28,6 +28,17 @@ class GameShaders {
   /// game loads instead of on the first score or death (a visible hitch,
   /// especially on the web). Call it from the first frames' render.
   static void warmUp(Canvas canvas) {
+    // Once as drawn on the screen, once under a fractional scale like the
+    // game world's (which draws with anti-aliased edges, another program).
+    _warmUp(canvas);
+    canvas.save();
+    canvas.translate(0.5, 0.5);
+    canvas.scale(0.7);
+    _warmUp(canvas);
+    canvas.restore();
+  }
+
+  static void _warmUp(Canvas canvas) {
     _warmUpPaint ??= Paint();
     final paint = _warmUpPaint!;
     // Every shader is fully transparent at these inputs (progress 1, a
