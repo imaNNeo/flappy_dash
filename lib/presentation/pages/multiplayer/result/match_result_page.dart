@@ -19,6 +19,7 @@ import 'package:flappy_dash/presentation/widget/loading_overlay.dart';
 import 'package:flappy_dash/presentation/widget/multiplayer_scoreboard.dart';
 import 'package:flappy_dash/presentation/widget/outline_text.dart';
 import 'package:flappy_dash/service_locator.dart';
+import 'package:flappy_dash/presentation/widget/fit_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -78,11 +79,12 @@ class _MatchResultPageContentState extends State<_MatchResultPageContent> {
       },
       builder: (context, state) {
         final screenSize = ScreenSize.fromContext(context);
+        final shortLandscape = context.isShortLandscape;
 
         final topPadding = switch (screenSize) {
-          ScreenSize.extraSmall || ScreenSize.small => 48.0,
-          ScreenSize.medium => 48.0,
-          ScreenSize.large || ScreenSize.extraLarge => 48.0,
+          ScreenSize.extraSmall || ScreenSize.small => 8.0,
+          ScreenSize.medium => 16.0,
+          ScreenSize.large || ScreenSize.extraLarge => 32.0,
         };
 
         final titleFontSize = switch (screenSize) {
@@ -120,187 +122,211 @@ class _MatchResultPageContentState extends State<_MatchResultPageContent> {
               if (state.matchResult != null) ...[
                 const BlurredBackground(),
                 Container(color: AppColors.blackOverlay),
-                Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child: Padding(
-                        padding: EdgeInsets.only(top: topPadding),
+                SafeArea(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(
+                          top: topPadding,
+                          right: PresentationConstants.defaultPadding,
+                        ),
                         child: Row(
                           children: [
                             GameBackButton(
                               svgIcon: 'ic_home.svg',
                               overrideOnPressed: () => context.go('/'),
                             ),
-                            Expanded(child: Container(height: 1)),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 24.0),
-                              child: currentUserData != null
-                                  ? _CurrentPlayerScoreBox(
-                                      data: currentUserData,
-                                    )
-                                  : const SizedBox(),
-                            ),
+                            const Spacer(),
+                            if (currentUserData != null)
+                              Flexible(
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerRight,
+                                  child: _CurrentPlayerScoreBox(
+                                    data: currentUserData,
+                                  ),
+                                ),
+                              ),
                           ],
                         ),
+                      ).animate().fadeIn(
+                        duration: const Duration(milliseconds: 500),
+                        delay: const Duration(milliseconds: 1600),
+                        curve: Curves.decelerate,
                       ),
-                    ).animate().fadeIn(
-                      duration: const Duration(milliseconds: 500),
-                      delay: const Duration(milliseconds: 1600),
-                      curve: Curves.decelerate,
-                    ),
-                    Align(
-                      alignment: const Alignment(0, -0.2),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Round Finished!',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: titleFontSize,
-                            ),
-                          ).animate().slideY(
-                            duration: const Duration(milliseconds: 500),
-                            begin: -10.0,
-                            end: 0.0,
-                            delay: const Duration(milliseconds: 1600),
-                            curve: Curves.decelerate,
+                      // Title, podium and "All Scores" scale down together
+                      // when the screen is short.
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: PresentationConstants.defaultPadding,
+                            vertical: 8,
                           ),
-                          const SizedBox(height: 48),
-                          _TrophiesRow(
-                            screenSize: screenSize,
-                            matchResult: state.matchResult!,
-                          ),
-                          const SizedBox(height: 8),
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const SizedBox(
-                                width: 640,
-                                child: Divider(
-                                  color: Colors.white38,
-                                  thickness: 0.5,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              AppOutlinedButton(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: switch (screenSize) {
-                                    ScreenSize.extraSmall ||
-                                    ScreenSize.small => 8.0,
-                                    ScreenSize.medium => 10.0,
-                                    ScreenSize.large ||
-                                    ScreenSize.extraLarge => 14.0,
-                                  },
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SvgPicture.asset(
-                                      'assets/icons/ic_menu.svg',
-                                      height: 24,
-                                      width: 24,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    const Text(
-                                      'All Scores',
-                                      style: TextStyle(
-                                        color: Color(0xFF83BEFF),
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                onPressed: () {
-                                  final rawScores = state.matchResult!.scores
-                                      .asMap()
-                                      .entries
-                                      .map((entry) {
-                                        final record = entry.value;
-                                        final index = entry.key;
-                                        final rank = index + 1;
-                                        return (
-                                          name: record.user.showingName,
-                                          isMe: record.user.id == myId,
-                                          dashType: DashType.fromUserId(
-                                            record.user.id,
-                                          ),
-                                          score: record.score,
-                                          rank: rank,
-                                        );
-                                      })
-                                      .toList();
-                                  RawScoresDialog.show(
-                                    context,
-                                    scores: rawScores,
-                                    allowEditDisplayName: false,
-                                  );
-                                },
-                              ),
-                            ],
-                          ).animate().fadeIn(
-                            duration: const Duration(milliseconds: 500),
-                            delay: const Duration(milliseconds: 1500),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          BigButton(
-                            bgColor: AppColors.blueButtonBgColor,
-                            strokeColor: Colors.white,
-                            onPressed: context
-                                .read<MatchResultCubit>()
-                                .playAgainClicked,
-                            child: const Text(
-                              'PLAY AGAIN',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 26,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          AppOutlinedButton(
-                            strokeColor: Colors.transparent,
-                            onPressed: _shareScore,
-                            child: Row(
+                          child: FitContent(
+                            widthFraction: 0.7,
+                            heightFraction: 0.9,
+                            child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                SvgPicture.asset(
-                                  'assets/icons/ic_share.svg',
-                                  height: 22,
-                                  width: 22,
-                                ),
-                                const SizedBox(width: 8),
-                                const Text(
-                                  'Share score',
+                                Text(
+                                  'Round Finished!',
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 22,
+                                    fontSize: titleFontSize,
                                   ),
+                                ).animate().slideY(
+                                  duration: const Duration(milliseconds: 500),
+                                  begin: -10.0,
+                                  end: 0.0,
+                                  delay: const Duration(milliseconds: 1600),
+                                  curve: Curves.decelerate,
+                                ),
+                                SizedBox(height: shortLandscape ? 16 : 48),
+                                _TrophiesRow(
+                                  screenSize: screenSize,
+                                  matchResult: state.matchResult!,
+                                ),
+                                const SizedBox(height: 8),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SizedBox(
+                                      width: switch (screenSize) {
+                                        ScreenSize.extraSmall ||
+                                        ScreenSize.small => 300.0,
+                                        ScreenSize.medium => 480.0,
+                                        ScreenSize.large ||
+                                        ScreenSize.extraLarge => 640.0,
+                                      },
+                                      child: Divider(
+                                        color: Colors.white38,
+                                        thickness: 0.5,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    AppOutlinedButton(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: switch (screenSize) {
+                                          ScreenSize.extraSmall ||
+                                          ScreenSize.small => 8.0,
+                                          ScreenSize.medium => 10.0,
+                                          ScreenSize.large ||
+                                          ScreenSize.extraLarge => 14.0,
+                                        },
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          SvgPicture.asset(
+                                            'assets/icons/ic_menu.svg',
+                                            height: 24,
+                                            width: 24,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          const Text(
+                                            'All Scores',
+                                            style: TextStyle(
+                                              color: Color(0xFF83BEFF),
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      onPressed: () {
+                                        final rawScores = state
+                                            .matchResult!
+                                            .scores
+                                            .asMap()
+                                            .entries
+                                            .map((entry) {
+                                              final record = entry.value;
+                                              final index = entry.key;
+                                              final rank = index + 1;
+                                              return (
+                                                name: record.user.showingName,
+                                                isMe: record.user.id == myId,
+                                                dashType: DashType.fromUserId(
+                                                  record.user.id,
+                                                ),
+                                                score: record.score,
+                                                rank: rank,
+                                              );
+                                            })
+                                            .toList();
+                                        RawScoresDialog.show(
+                                          context,
+                                          scores: rawScores,
+                                          allowEditDisplayName: false,
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ).animate().fadeIn(
+                                  duration: const Duration(milliseconds: 500),
+                                  delay: const Duration(milliseconds: 1500),
                                 ),
                               ],
                             ),
                           ),
-                          SizedBox(height: bottomPadding),
-                        ],
+                        ),
                       ),
-                    ).animate().slideY(
-                      duration: const Duration(milliseconds: 500),
-                      begin: 1.0,
-                      end: 0.0,
-                      delay: const Duration(milliseconds: 1600),
-                      curve: Curves.decelerate,
-                    ),
-                  ],
+                      Padding(
+                        padding: EdgeInsets.only(bottom: bottomPadding),
+                        child: Flex(
+                          direction: shortLandscape
+                              ? Axis.horizontal
+                              : Axis.vertical,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            BigButton(
+                              bgColor: AppColors.blueButtonBgColor,
+                              strokeColor: Colors.white,
+                              onPressed: context
+                                  .read<MatchResultCubit>()
+                                  .playAgainClicked,
+                              child: const Text(
+                                'PLAY AGAIN',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 26,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16, height: 12),
+                            AppOutlinedButton(
+                              strokeColor: Colors.transparent,
+                              onPressed: _shareScore,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SvgPicture.asset(
+                                    'assets/icons/ic_share.svg',
+                                    height: 22,
+                                    width: 22,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text(
+                                    'Share score',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ).animate().slideY(
+                        duration: const Duration(milliseconds: 500),
+                        begin: 1.0,
+                        end: 0.0,
+                        delay: const Duration(milliseconds: 1600),
+                        curve: Curves.decelerate,
+                      ),
+                    ],
+                  ),
                 ),
               ],
               if (state.error.isNotEmpty)

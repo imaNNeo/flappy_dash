@@ -10,8 +10,8 @@ class _TrophiesRow extends StatelessWidget {
   Widget build(BuildContext context) {
     Animate.restartOnHotReload = true;
     final bigTrophyWidth = switch (screenSize) {
-      ScreenSize.extraSmall => 80.0,
-      ScreenSize.small => 120.0,
+      ScreenSize.extraSmall => 100.0,
+      ScreenSize.small => 130.0,
       ScreenSize.medium => 160.0,
       ScreenSize.large => 200.0,
       ScreenSize.extraLarge => 260.0,

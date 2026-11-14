@@ -51,7 +51,7 @@ class _AnimatedLastMatchWidgetState extends State<_AnimatedLastMatchWidget> {
   Widget build(BuildContext context) {
     final topScore = widget.lastMatch?.scores.firstOrNull;
     if (topScore == null) {
-      return Container();
+      return const SizedBox.shrink();
     }
 
     final width = widget.width;

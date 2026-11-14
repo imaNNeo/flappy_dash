@@ -8,6 +8,7 @@ import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/dialogs/leaderboard_dialog.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flappy_dash/presentation/widget/best_score_overlay.dart';
+import 'package:flappy_dash/presentation/widget/blurred_background.dart';
 import 'package:flappy_dash/presentation/widget/game_back_button.dart';
 import 'package:flappy_dash/presentation/widget/profile_overlay.dart';
 import 'package:flutter/material.dart';
@@ -73,7 +74,7 @@ class _SinglePlayerGamePageState extends State<SinglePlayerGamePage> {
               GameWidget(
                 game: _flappyDashGame,
                 backgroundBuilder: (_) {
-                  return Container(color: AppColors.backgroundColor);
+                  return const GameLetterboxBackground();
                 },
               ),
               if (state.currentPlayingState.isGameOver) const GameOverWidget(),

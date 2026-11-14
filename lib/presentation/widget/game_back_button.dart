@@ -24,6 +24,7 @@ class GameBackButton extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(left: backIconSize * 0.4),
       child: IconButton(
+        tooltip: svgIcon == 'ic_home.svg' ? 'Home' : 'Back',
         padding: EdgeInsets.all(backIconSize * 0.5),
         icon: SvgPicture.asset(
           'assets/icons/$svgIcon',

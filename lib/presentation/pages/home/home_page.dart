@@ -13,6 +13,7 @@ import 'package:flappy_dash/presentation/widget/outline_text.dart';
 import 'package:flappy_dash/presentation/widget/profile_overlay.dart';
 import 'package:flappy_dash/presentation/widget/watch_on_youtube_widget.dart';
 import 'package:flappy_dash/service_locator.dart';
+import 'package:flappy_dash/presentation/widget/fit_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -71,6 +72,7 @@ class _HomePageContentState extends State<HomePageContent> {
         }
       },
       builder: (context, state) {
+        final shortLandscape = context.isShortLandscape;
         return Scaffold(
           resizeToAvoidBottomInset: false,
           body: Stack(
@@ -78,51 +80,54 @@ class _HomePageContentState extends State<HomePageContent> {
             children: [
               const BlurredBackground(),
               SafeArea(
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(flex: 2, child: Container()),
-                      GameTitle(screenSize: screenSize),
-                      SizedBox(height: titleBottomSpace),
-                      SinglePlayerButton(
-                        onPressed: () => context.push('/single_player'),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: PresentationConstants.defaultPadding / 2,
+                        right: PresentationConstants.defaultPadding,
                       ),
-                      const SizedBox(height: 18),
-                      MultiPlayerButton(
-                        onPressed: context
-                            .read<HomeCubit>()
-                            .onMultiPlayerButtonPressed,
-                        showLoading: state.multiPlayerMatchIdLoading,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          GithubButton(screenSize: screenSize),
+                          const Spacer(),
+                          const ProfileOverlay(),
+                        ],
                       ),
-                      const SizedBox(height: 8),
-                      Expanded(flex: 3, child: Container()),
-                      WatchOnYoutubeWidget(screenSize: screenSize),
-                      const SizedBox(height: 16),
-                    ],
-                  ),
-                ),
-              ),
-              SafeArea(
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      top: PresentationConstants.defaultPadding,
                     ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        GithubButton(screenSize: screenSize),
-                        Expanded(child: Container(height: 0)),
-                        const ProfileOverlay(),
-                        const SizedBox(
-                          width: PresentationConstants.defaultPadding,
+                    // Title and the play buttons always fit: on short
+                    // screens they scale down instead of running off-screen.
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: PresentationConstants.defaultPadding,
+                          vertical: 8,
                         ),
-                      ],
+                        child: FitContent(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              GameTitle(screenSize: screenSize),
+                              SizedBox(height: titleBottomSpace),
+                              SinglePlayerButton(
+                                onPressed: () => context.push('/single_player'),
+                              ),
+                              SizedBox(height: shortLandscape ? 14 : 20),
+                              MultiPlayerButton(
+                                onPressed: context
+                                    .read<HomeCubit>()
+                                    .onMultiPlayerButtonPressed,
+                                showLoading: state.multiPlayerMatchIdLoading,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    WatchOnYoutubeWidget(screenSize: screenSize),
+                    SizedBox(height: shortLandscape ? 4 : 16),
+                  ],
                 ),
               ),
               const Align(
