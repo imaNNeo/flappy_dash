@@ -95,6 +95,7 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
   }
 
   void gameOver(double x, double y, double velocityY) async {
+    print('FXMARK death');
     _playDeathEffects();
     switch (gameMode) {
       case SinglePlayerGameMode():
@@ -108,6 +109,7 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
   }
 
   void increaseScore(double x, double y, double velocityY) {
+    print('FXMARK score');
     _playScoreEffects();
     switch (gameMode) {
       case SinglePlayerGameMode():
@@ -126,8 +128,13 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
     }
     dash.onDied();
     screenFx.shake(0.75);
+    // A ring about two dashes wide around the dash, measured on screen.
     final screenPosition = camera.localToGlobal(dash.position);
-    screenFx.shockwave(screenPosition.toOffset());
+    final screenEdge = camera.localToGlobal(dash.position + Vector2(170, 0));
+    screenFx.shockwave(
+      screenPosition.toOffset(),
+      radius: (screenEdge - screenPosition).length,
+    );
   }
 
   void _playScoreEffects() {

@@ -29,9 +29,15 @@ class ScreenFx {
     _trauma = min(1, _trauma + amount);
   }
 
-  /// [center] is in screen (canvas) pixels.
-  void shockwave(Offset center, {double strength = 1, double duration = 0.7}) {
-    _wave = _Shockwave(center, strength, duration);
+  /// A small ring around [center]; both [center] and [radius] are in
+  /// screen (canvas) pixels.
+  void shockwave(
+    Offset center, {
+    required double radius,
+    double strength = 1,
+    double duration = 0.45,
+  }) {
+    _wave = _Shockwave(center, radius, strength, duration);
   }
 
   bool get isShaking => _trauma > 0;
@@ -57,17 +63,23 @@ class ScreenFx {
     }
     final shader = _shader ??= program.fragmentShader();
     final progress = (wave.elapsed / wave.duration).clamp(0.0, 1.0);
+    final side = wave.radius * 2;
     shader
-      ..setFloat(0, size.x)
-      ..setFloat(1, size.y)
-      ..setFloat(2, wave.center.dx)
-      ..setFloat(3, wave.center.dy)
-      ..setFloat(4, progress)
-      ..setFloat(5, wave.strength);
+      ..setFloat(0, side)
+      ..setFloat(1, side)
+      ..setFloat(2, progress)
+      ..setFloat(3, wave.strength);
+    // Only the square around the ring is drawn.
+    canvas.save();
+    canvas.translate(
+      wave.center.dx - wave.radius,
+      wave.center.dy - wave.radius,
+    );
     canvas.drawRect(
-      ui.Rect.fromLTWH(0, 0, size.x, size.y),
+      ui.Rect.fromLTWH(0, 0, side, side),
       _paint..shader = shader,
     );
+    canvas.restore();
   }
 
   final ui.Paint _paint = ui.Paint();
@@ -102,9 +114,10 @@ class ScreenFx {
 }
 
 class _Shockwave {
-  _Shockwave(this.center, this.strength, this.duration);
+  _Shockwave(this.center, this.radius, this.strength, this.duration);
 
   final Offset center;
+  final double radius;
   final double strength;
   final double duration;
   double elapsed = 0;
