@@ -16,6 +16,7 @@ import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flutter/material.dart';
 
 import 'auto_jump_dash.dart';
+import 'character/dash_character.dart';
 import 'dash_juice.dart';
 
 class Dash extends PositionComponent
@@ -28,6 +29,7 @@ class Dash extends PositionComponent
     this.autoJump = false,
     super.priority,
   }) : type = DashType.fromUserId(playerId),
+       character = DashCharacter(DashType.fromUserId(playerId)),
        super(
          position: Vector2(0, 0),
          size: Vector2.all(80.0),
@@ -38,7 +40,9 @@ class Dash extends PositionComponent
   final String displayName;
   final bool isMe;
   final DashType type;
-  late final Sprite _dashSprite;
+
+  /// The drawing and the emotions of this dash.
+  final DashCharacter character;
   OutlinedTextComponent? _nameComponent;
 
   /// Cosmetic body motion (tilt, squash and stretch, death tumble).
@@ -93,7 +97,6 @@ class Dash extends PositionComponent
   Future<void> onLoad() async {
     await super.onLoad();
     visibleOnIdle = isMe;
-    _dashSprite = await game.loadSprite(type.flamePngAssetName);
     final radius = size.x / 2;
     final center = size / 2;
     // Collisions in multiplayer are part of the shared simulation
@@ -134,12 +137,13 @@ class Dash extends PositionComponent
   @override
   void update(double dt) {
     super.update(dt);
+    final playingState = currentPlayingState;
     _updateJuice(dt);
-    if (_isNetworked || currentPlayingState.isNotPlaying) {
-      return;
+    if (!_isNetworked && playingState.isPlaying) {
+      _updatePositionNormally(dt);
+      _checkIfDashIsOutOfBounds();
     }
-    _updatePositionNormally(dt);
-    _checkIfDashIsOutOfBounds();
+    character.update(dt, y: position.y, state: playingState);
   }
 
   void _updateJuice(double dt) {
@@ -272,7 +276,7 @@ class Dash extends PositionComponent
     juice.renderBody(canvas, size, _renderBody);
   }
 
-  void _renderBody(Canvas canvas) => _dashSprite.render(canvas, size: size);
+  void _renderBody(Canvas canvas) => character.render(canvas, size.x, size.y);
 
   /// Multiplayer: the simulation says we died (there are no collision
   /// callbacks there).
@@ -290,6 +294,7 @@ class Dash extends PositionComponent
     }
     if (other is HiddenCoin) {
       game.increaseScore(x, y, _velocityY);
+      character.onScored();
       other.removeFromParent();
     } else if (other is Pipe) {
       game.gameOver(x, y, _velocityY);

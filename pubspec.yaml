@@ -84,7 +84,6 @@ flutter:
   assets:
     - assets/images/
     - assets/images/background/
-    - assets/images/dashes/
     - assets/images/trophies/
     - assets/audio/
     - assets/icons/

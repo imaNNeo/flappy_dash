@@ -311,6 +311,7 @@ class FlappyDashRootComponent extends Component
         switch (result) {
           case DashStepResult.scored:
             game.increaseScore(_dash.x, _dash.y, _dash.velocityY);
+            _dash.character.onScored();
             break;
           case DashStepResult.died:
             _onMyDashDied();

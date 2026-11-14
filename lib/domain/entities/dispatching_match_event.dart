@@ -85,3 +85,32 @@ class DispatchingPlayerInputEvent extends DispatchingMatchEvent {
   @override
   String get debugName => 'PlayerInput';
 }
+
+/// Asks the server to add a bot to the waiting match. The server ignores it
+/// unless this user may manage bots (see [NakamaDataSource.canManageBots]).
+class DispatchingBotAddEvent extends DispatchingMatchEvent {
+  DispatchingBotAddEvent();
+
+  @override
+  List<int> toBytes() => [];
+
+  @override
+  String debugExtraInfo() => '';
+
+  @override
+  String get debugName => 'BotAdd';
+}
+
+/// Asks the server to remove the last added bot from the waiting match.
+class DispatchingBotRemoveEvent extends DispatchingMatchEvent {
+  DispatchingBotRemoveEvent();
+
+  @override
+  List<int> toBytes() => [];
+
+  @override
+  String debugExtraInfo() => '';
+
+  @override
+  String get debugName => 'BotRemove';
+}

@@ -31,21 +31,4 @@ enum DashType {
     DashType.sunnyDash => 'Sunny Dash',
     DashType.violetDash => 'Violet Dash',
   };
-
-  String get _fileName => switch (this) {
-    DashType.flutterDash => 'flutter_dash',
-    DashType.limeDash => 'lime_dash',
-    DashType.peachyDash => 'peachy_dash',
-    DashType.roseDash => 'rose_dash',
-    DashType.sandDash => 'sand_dash',
-    DashType.scarletDash => 'scarlet_dash',
-    DashType.skyDash => 'sky_dash',
-    DashType.mintyDash => 'minty_dash',
-    DashType.sunnyDash => 'sunny_dash',
-    DashType.violetDash => 'violet_dash',
-  };
-
-  String get flamePngAssetName => 'dashes/$_fileName.png';
-
-  String get pngAssetName => 'assets/images/dashes/$_fileName.png';
 }

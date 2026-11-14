@@ -4,7 +4,9 @@ import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart
 import 'package:flappy_dash/presentation/extensions/build_context_extension.dart';
 import 'package:flappy_dash/presentation/responsive/screen_size.dart';
 import 'package:flappy_dash/presentation/widget/app_version_widget.dart';
+import 'package:flappy_dash/domain/entities/dash_type.dart';
 import 'package:flappy_dash/presentation/widget/big_button.dart';
+import 'package:flappy_dash/presentation/widget/dash_image.dart';
 import 'package:flappy_dash/presentation/widget/blurred_background.dart';
 import 'package:flappy_dash/presentation/widget/game_title.dart';
 import 'package:flappy_dash/presentation/widget/github_button.dart';
@@ -16,7 +18,6 @@ import 'package:flappy_dash/service_locator.dart';
 import 'package:flappy_dash/presentation/widget/fit_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import 'cubit/home_cubit.dart';

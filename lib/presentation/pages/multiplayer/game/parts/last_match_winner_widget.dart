@@ -87,7 +87,11 @@ class _AnimatedLastMatchWidgetState extends State<_AnimatedLastMatchWidget> {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    DashImage(size: width * 0.2, type: dashType),
+                    DashImage(
+                      size: width * 0.2,
+                      type: dashType,
+                      expression: DashExpression.happy,
+                    ),
                     SizedBox(width: width * 0.03),
                     Text(
                       playerName.isNotBlank ? playerName : dashType.name,

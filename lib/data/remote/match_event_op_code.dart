@@ -23,7 +23,9 @@ enum MatchEventOpCode {
   playerKickedFromTheLobby(206),
   playerDisplayNameUpdated(208),
   playerWillSpawnsAt(209),
-  playerInput(210);
+  playerInput(210),
+  botAdd(211),
+  botRemove(212);
 
   final int opCode;
 
@@ -55,7 +57,9 @@ enum MatchEventOpCode {
     MatchEventOpCode.playerWillSpawnsAt => PlayerWillSpawnAtEvent(data),
     MatchEventOpCode.matchPing ||
     MatchEventOpCode.playerDisplayNameUpdated ||
-    MatchEventOpCode.playerInput => throw UnimplementedError(
+    MatchEventOpCode.playerInput ||
+    MatchEventOpCode.botAdd ||
+    MatchEventOpCode.botRemove => throw UnimplementedError(
       'It is not an incoming event',
     ),
   };
@@ -68,5 +72,7 @@ enum MatchEventOpCode {
           MatchEventOpCode.playerDisplayNameUpdated,
         DispatchingPlayerInputEvent() => MatchEventOpCode.playerInput,
         DispatchingPingEvent() => MatchEventOpCode.matchPing,
+        DispatchingBotAddEvent() => MatchEventOpCode.botAdd,
+        DispatchingBotRemoveEvent() => MatchEventOpCode.botRemove,
       };
 }

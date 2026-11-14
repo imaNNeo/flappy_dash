@@ -63,7 +63,13 @@ class _LargeRankTrophy extends StatelessWidget {
                       width: trophyWidth * 0.17,
                       height: trophyWidth * 0.17,
                     )
-                  : DashImage(size: trophyWidth * 0.17, type: data!.dashType),
+                  : DashImage(
+                      size: trophyWidth * 0.17,
+                      type: data!.dashType,
+                      expression: rank == 1
+                          ? DashExpression.excited
+                          : DashExpression.happy,
+                    ),
               SizedBox(width: trophyWidth * 0.02),
               OutlineText(
                 Text(
