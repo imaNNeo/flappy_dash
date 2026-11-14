@@ -15,6 +15,14 @@ class PipePair extends PositionComponent with HasGameReference<FlappyDashGame> {
   final double gap;
   final double pipeWidth;
 
+  /// Cosmetic jelly wobble when a dash flies through (doesn't touch the
+  /// hitboxes).
+  void wobble() {
+    for (final pipe in children.whereType<Pipe>()) {
+      pipe.wobble();
+    }
+  }
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();

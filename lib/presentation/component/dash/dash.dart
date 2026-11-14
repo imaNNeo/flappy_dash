@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
@@ -6,12 +8,15 @@ import 'package:flappy_dash/domain/entities/game_mode.dart';
 import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/app_style.dart';
 import 'package:flappy_dash/presentation/component/hidden_coin.dart';
+import 'package:flappy_dash/presentation/component/fx/feather_burst.dart';
+import 'package:flappy_dash/presentation/component/fx/jump_puff.dart';
 import 'package:flappy_dash/presentation/component/outlined_text_component.dart';
 import 'package:flappy_dash/presentation/component/pipe.dart';
 import 'package:flappy_dash/presentation/flappy_dash_game.dart';
 import 'package:flutter/material.dart';
 
 import 'auto_jump_dash.dart';
+import 'dash_juice.dart';
 
 class Dash extends PositionComponent
     with CollisionCallbacks, HasGameReference<FlappyDashGame> {
@@ -35,6 +40,16 @@ class Dash extends PositionComponent
   final DashType type;
   late final Sprite _dashSprite;
   OutlinedTextComponent? _nameComponent;
+
+  /// Cosmetic body motion (tilt, squash and stretch, death tumble).
+  final DashJuice juice = DashJuice();
+
+  Color get color => AppColors.getDashColor(type);
+
+  // Remote dashes only get positions, so their velocity for the tilt is
+  // measured from how they move.
+  double _visualVelocityY = 0;
+  double? _lastY;
 
   double _velocityY = 0;
 
@@ -119,6 +134,7 @@ class Dash extends PositionComponent
   @override
   void update(double dt) {
     super.update(dt);
+    _updateJuice(dt);
     if (_isNetworked || currentPlayingState.isNotPlaying) {
       return;
     }
@@ -126,8 +142,86 @@ class Dash extends PositionComponent
     _checkIfDashIsOutOfBounds();
   }
 
+  void _updateJuice(double dt) {
+    final playingState = currentPlayingState;
+    if (isMe) {
+      _visualVelocityY = _velocityY;
+    } else if (dt > 0) {
+      final lastY = _lastY;
+      if (lastY != null && playingState.isPlaying) {
+        final measured = ((y - lastY) / dt).clamp(-900.0, 1400.0);
+        // A sudden switch to climbing is a jump.
+        if (measured < -250 && _visualVelocityY > -100) {
+          onJumped();
+        }
+        _visualVelocityY += (measured - _visualVelocityY) * min(1, dt * 20);
+      } else {
+        _visualVelocityY = 0;
+      }
+      _lastY = y;
+      if (playingState.isGameOver && _previousState == PlayingState.playing) {
+        onDied();
+      }
+    }
+    if (_previousState == PlayingState.gameOver &&
+        playingState.isNotGameOver &&
+        juice.isDead) {
+      onRespawned();
+    }
+    _previousState = playingState;
+    juice.idle = playingState.isIdle;
+    juice.update(dt, _visualVelocityY);
+  }
+
+  PlayingState? _previousState;
+
+  /// Cosmetic hooks (no effect on the simulation).
+  void onJumped() {
+    juice.onJump();
+    final parent = this.parent;
+    if (parent != null && isMounted) {
+      parent.add(JumpPuff(position: position.clone(), priority: priority - 1));
+    }
+  }
+
+  void onScored() => juice.onScore();
+
+  void onDied() {
+    if (juice.isDead) {
+      return;
+    }
+    juice.onDie();
+    if (!isMe) {
+      isNameVisible = false;
+    }
+    final parent = this.parent;
+    if (parent != null && isMounted) {
+      parent.add(
+        FeatherBurst(
+          position: position.clone(),
+          color: color,
+          count: isMe ? 20 : 12,
+          scaleFactor: isMe ? 1 : 0.8,
+          priority: priority + 1,
+        ),
+      );
+    }
+  }
+
+  void onRespawned() {
+    juice.onRespawn();
+    if (!isMe) {
+      isNameVisible = true;
+    }
+  }
+
   /// Multiplayer: where the simulation says the dash is.
   void setNetworkedState(double x, double y, double velocityY) {
+    // Our own predicted dash: a jump shows up as the velocity switching to
+    // the jump force.
+    if (isMe && velocityY < _velocityY - 300 && velocityY < 0) {
+      onJumped();
+    }
     position.setValues(x, y);
     _velocityY = velocityY;
   }
@@ -152,12 +246,16 @@ class Dash extends PositionComponent
       return;
     }
     _velocityY = _jumpForce;
+    onJumped();
   }
 
   @override
   void renderTree(Canvas canvas) {
     final playingState = currentPlayingState;
-    if (!isMe && playingState.isNotPlaying && playingState.isNotIdle) {
+    if (!isMe &&
+        playingState.isNotPlaying &&
+        playingState.isNotIdle &&
+        !juice.isTumbling) {
       return;
     }
     if (!visibleOnIdle && playingState.isIdle) {
@@ -171,8 +269,10 @@ class Dash extends PositionComponent
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    _dashSprite.render(canvas, size: size);
+    juice.renderBody(canvas, size, _renderBody);
   }
+
+  void _renderBody(Canvas canvas) => _dashSprite.render(canvas, size: size);
 
   /// Multiplayer: the simulation says we died (there are no collision
   /// callbacks there).

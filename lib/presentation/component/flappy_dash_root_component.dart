@@ -54,6 +54,24 @@ class FlappyDashRootComponent extends Component
 
   DashPredictor? get predictor => _predictor;
 
+  Dash get myDash => _dash;
+
+  /// Cosmetic: makes the pipe pair the dash just flew through jiggle.
+  void wobblePipeAt(double dashX) {
+    PipePair? nearest;
+    var nearestDistance = double.infinity;
+    for (final pipe in children.whereType<PipePair>()) {
+      final distance = (pipe.x - dashX).abs();
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearest = pipe;
+      }
+    }
+    if (nearest != null && nearestDistance < 200) {
+      nearest.wobble();
+    }
+  }
+
   /// Our dash's x in the unwrapped world (see dash_physics.dart).
   double get myDashX => _dash.x;
 

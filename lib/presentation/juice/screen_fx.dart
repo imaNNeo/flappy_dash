@@ -1,0 +1,137 @@
+import 'dart:math';
+import 'dart:ui' as ui;
+
+import 'package:flame/components.dart';
+import 'package:flutter/painting.dart';
+
+import 'game_shaders.dart';
+
+/// Whole-screen effects: trauma based screen shake and the shockwave post
+/// effect. [FlappyDashGame.renderTree] calls [render].
+///
+/// The shockwave renders the frame into an image and draws it back through
+/// [GameShaders.shockwave], so it only runs while a wave is playing (well
+/// under a second); every other frame is drawn directly.
+class ScreenFx {
+  /// 0..1, decays over time. Shake is trauma², so small hits barely move the
+  /// screen and big ones really kick.
+  double _trauma = 0;
+  double _time = 0;
+
+  static const _maxShakeOffset = 22.0;
+  static const _maxShakeAngle = 0.035;
+  static const _traumaDecayPerSecond = 1.6;
+
+  _Shockwave? _wave;
+
+  ui.FragmentShader? _shader;
+
+  void shake(double amount) {
+    _trauma = min(1, _trauma + amount);
+  }
+
+  /// [center] is in screen (canvas) pixels.
+  void shockwave(Offset center, {double strength = 1, double duration = 0.7}) {
+    _wave = _Shockwave(center, strength, duration);
+  }
+
+  bool get isShaking => _trauma > 0;
+
+  void update(double dt) {
+    _time += dt;
+    _trauma = max(0, _trauma - _traumaDecayPerSecond * dt);
+    final wave = _wave;
+    if (wave != null) {
+      wave.elapsed += dt;
+      if (wave.elapsed >= wave.duration) {
+        _wave = null;
+      }
+    }
+  }
+
+  void render(ui.Canvas canvas, Vector2 size, void Function(ui.Canvas) draw) {
+    final wave = _wave;
+    final program = GameShaders.shockwave;
+    if (wave != null && program != null && size.x > 0 && size.y > 0) {
+      _renderWithShockwave(canvas, size, draw, wave, program);
+      return;
+    }
+    _renderShaken(canvas, size, draw);
+  }
+
+  void _renderShaken(
+    ui.Canvas canvas,
+    Vector2 size,
+    void Function(ui.Canvas) draw,
+  ) {
+    if (_trauma <= 0) {
+      draw(canvas);
+      return;
+    }
+    final shake = _trauma * _trauma;
+    // Smooth-ish noise from a few sines (cheaper than Perlin, no allocations).
+    double noise(double seed) =>
+        sin(_time * 47 + seed) * 0.6 + sin(_time * 83 + seed * 2.3) * 0.4;
+    final dx = _maxShakeOffset * shake * noise(1.7);
+    final dy = _maxShakeOffset * shake * noise(5.1);
+    final angle = _maxShakeAngle * shake * noise(9.3);
+    canvas.save();
+    canvas.translate(size.x / 2 + dx, size.y / 2 + dy);
+    canvas.rotate(angle);
+    // Zoom in a touch so the shaken edges don't show the letterbox.
+    final zoom = 1 + 0.04 * shake;
+    canvas.scale(zoom);
+    canvas.translate(-size.x / 2, -size.y / 2);
+    draw(canvas);
+    canvas.restore();
+  }
+
+  void _renderWithShockwave(
+    ui.Canvas canvas,
+    Vector2 size,
+    void Function(ui.Canvas) draw,
+    _Shockwave wave,
+    ui.FragmentProgram program,
+  ) {
+    // Render at up to 2x: sharp enough while it moves, and cheaper than 3x.
+    final pixelRatio = min(
+      2.0,
+      ui.PlatformDispatcher.instance.views.first.devicePixelRatio,
+    );
+    final width = (size.x * pixelRatio).ceil();
+    final height = (size.y * pixelRatio).ceil();
+
+    final recorder = ui.PictureRecorder();
+    final inner = ui.Canvas(recorder);
+    inner.scale(pixelRatio);
+    _renderShaken(inner, size, draw);
+    final picture = recorder.endRecording();
+    final image = picture.toImageSync(width, height);
+    picture.dispose();
+
+    final shader = _shader ??= program.fragmentShader();
+    final progress = (wave.elapsed / wave.duration).clamp(0.0, 1.0);
+    shader
+      ..setFloat(0, size.x)
+      ..setFloat(1, size.y)
+      ..setFloat(2, wave.center.dx)
+      ..setFloat(3, wave.center.dy)
+      ..setFloat(4, progress)
+      ..setFloat(5, wave.strength)
+      ..setImageSampler(0, image);
+    canvas.drawRect(
+      ui.Rect.fromLTWH(0, 0, size.x, size.y),
+      ui.Paint()..shader = shader,
+    );
+    image.dispose();
+  }
+}
+
+class _Shockwave {
+  _Shockwave(this.center, this.strength, this.duration);
+
+  final Offset center;
+  final double strength;
+  final double duration;
+  double elapsed = 0;
+}
