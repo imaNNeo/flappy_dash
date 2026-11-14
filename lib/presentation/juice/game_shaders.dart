@@ -49,10 +49,8 @@ class GameShaders {
       shockwave
         ..setFloat(0, 100)
         ..setFloat(1, 100)
-        ..setFloat(2, 50)
-        ..setFloat(3, 50)
-        ..setFloat(4, 1)
-        ..setFloat(5, 0);
+        ..setFloat(2, 1)
+        ..setFloat(3, 0);
       canvas.drawRect(rect, paint..shader = shockwave);
     }
     final burst = GameShaders.scoreBurst?.fragmentShader();

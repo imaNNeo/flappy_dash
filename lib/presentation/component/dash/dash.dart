@@ -137,6 +137,13 @@ class Dash extends PositionComponent
   @override
   void update(double dt) {
     super.update(dt);
+    if (_rehearsingDeath) {
+      // The shockwave replays the frame, dash included, under its own clip:
+      // run its warm-up in the same frames as the dash's rehearsal.
+      final center = game.camera.localToGlobal(position);
+      final edge = game.camera.localToGlobal(position + Vector2(170, 0));
+      game.screenFx.rehearseLens(center.toOffset(), (edge - center).length);
+    }
     final playingState = currentPlayingState;
     _updateJuice(dt);
     if (!_isNetworked && playingState.isPlaying) {
@@ -204,7 +211,7 @@ class Dash extends PositionComponent
         FeatherBurst(
           position: position.clone(),
           color: color,
-          count: isMe ? 20 : 12,
+          count: isMe ? 44 : 22,
           scaleFactor: isMe ? 1 : 0.8,
           priority: priority + 1,
         ),
@@ -274,6 +281,51 @@ class Dash extends PositionComponent
   void render(Canvas canvas) {
     super.render(canvas);
     juice.renderBody(canvas, size, _renderBody);
+    if (_rehearsingDeath) {
+      _deathRehearsalFrames--;
+      _rehearseDeath(canvas);
+    }
+  }
+
+  /// Frames left in which the death effects are drawn invisibly, once per
+  /// app run. On the web each new kind of draw compiles a GPU program the
+  /// first time it shows up, and the hit flash, the dizzy face, the
+  /// feathers and the shockwave all show up at once on the first death,
+  /// which dropped frames. Drawing them here, in the same place in the
+  /// scene and almost transparent, moves those compiles to the first
+  /// frames of play.
+  static int _deathRehearsalFrames = 2;
+
+  /// While our dash waits for the first tap: the scene is the real one, and
+  /// a short hitch there is harmless (in play it would cost a jump).
+  bool get _rehearsingDeath =>
+      isMe && _deathRehearsalFrames > 0 && currentPlayingState.isIdle;
+
+  static final Paint _rehearsalPaint = Paint()..color = const Color(0x02FFFFFF);
+
+  void _rehearseDeath(Canvas canvas) {
+    final ghost = DashCharacter(type)..onDied();
+    void drawGhost(Canvas canvas) => ghost.render(canvas, size.x, size.y);
+    canvas.saveLayer(null, _rehearsalPaint);
+    // The first frames of a real death: the flash starts fully white (an
+    // opaque paint compiles to a different program than a translucent one),
+    // squashed from a jump just before the hit, then plain.
+    for (final squashed in [true, false]) {
+      final juice = DashJuice();
+      if (squashed) {
+        juice.onJump();
+      }
+      juice.onDie();
+      juice.update(0, 0);
+      juice.renderBody(canvas, size, drawGhost);
+      juice.update(1 / 60, 0);
+      juice.renderBody(canvas, size, drawGhost);
+    }
+    canvas.save();
+    canvas.translate(size.x / 2, size.y / 2);
+    FeatherBurst.rehearse(canvas, color);
+    canvas.restore();
+    canvas.restore();
   }
 
   void _renderBody(Canvas canvas) => character.render(canvas, size.x, size.y);

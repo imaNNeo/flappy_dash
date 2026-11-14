@@ -126,8 +126,13 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
     }
     dash.onDied();
     screenFx.shake(0.75);
+    // A ring about two dashes wide around the dash, measured on screen.
     final screenPosition = camera.localToGlobal(dash.position);
-    screenFx.shockwave(screenPosition.toOffset());
+    final screenEdge = camera.localToGlobal(dash.position + Vector2(170, 0));
+    screenFx.shockwave(
+      screenPosition.toOffset(),
+      radius: (screenEdge - screenPosition).length,
+    );
   }
 
   void _playScoreEffects() {
