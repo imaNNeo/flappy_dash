@@ -144,12 +144,14 @@ class MultiplayerController extends Component
               spawnsAfter * FlappyDashRootComponent.gameSpeedMultiplier,
         );
         break;
+      case PlayerScoredEvent():
+        _otherDashes[senderId]!.dash.character.onScored();
+        break;
       // Positions come from the snapshots; these only update the match state.
       case PlayerStartedEvent():
       case PlayerDiedEvent():
       case PlayerIsIdleEvent():
       case PlayerKickedFromTheLobbyEvent():
-      case PlayerScoredEvent():
       case PlayerJoinedTheLobby():
       case MatchFinishedEvent():
       case MatchStartedEvent():

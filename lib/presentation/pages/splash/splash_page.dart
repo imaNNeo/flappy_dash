@@ -1,4 +1,6 @@
+import 'package:flappy_dash/domain/entities/dash_type.dart';
 import 'package:flappy_dash/presentation/extensions/build_context_extension.dart';
+import 'package:flappy_dash/presentation/widget/dash_image.dart';
 import 'package:flappy_dash/presentation/widget/app_version_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -57,11 +59,7 @@ class _SplashPageState extends State<SplashPage> {
                   children: [
                     Expanded(child: Container()),
                     if (kDebugMode) Text(state.initializationError),
-                    Image.asset(
-                      'assets/images/dash.png',
-                      width: 124,
-                      height: 124,
-                    ),
+                    const DashImage(size: 124, type: DashType.flutterDash),
                     const Expanded(
                       child: Column(
                         children: [

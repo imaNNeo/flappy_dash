@@ -20,7 +20,7 @@ class MultiPlayerButton extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SvgPicture.asset("assets/images/multi_dash.svg", height: 58),
+          const MultiDashImage(height: 58),
           const SizedBox(width: 8),
           const GradientText(
             'Multi Player',
