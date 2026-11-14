@@ -8,6 +8,9 @@ import 'package:flappy_dash/domain/entities/playing_state.dart';
 import 'package:flappy_dash/presentation/bloc/leaderboard/leaderboard_cubit.dart';
 import 'package:flappy_dash/presentation/bloc/multiplayer/multiplayer_cubit.dart';
 import 'package:flappy_dash/presentation/component/dash_parallax_background.dart';
+import 'package:flappy_dash/presentation/component/fx/score_burst.dart';
+import 'package:flappy_dash/presentation/juice/game_shaders.dart';
+import 'package:flappy_dash/presentation/juice/screen_fx.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -31,6 +34,32 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
   final SingleplayerGameCubit singleplayerCubit;
   final MultiplayerCubit multiplayerCubit;
   final LeaderboardCubit leaderboardCubit;
+
+  /// Screen shake and the death shockwave (cosmetic only).
+  final ScreenFx screenFx = ScreenFx();
+
+  @override
+  Future<void> onLoad() async {
+    await GameShaders.load();
+    await super.onLoad();
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    screenFx.update(dt);
+  }
+
+  int _warmUpFrames = 2;
+
+  @override
+  void renderTree(Canvas canvas) {
+    screenFx.render(canvas, size, super.renderTree);
+    if (_warmUpFrames > 0) {
+      _warmUpFrames--;
+      GameShaders.warmUp(canvas);
+    }
+  }
 
   PlayingState getCurrentPlayingState({String? otherPlayerId}) =>
       switch (gameMode) {
@@ -66,6 +95,7 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
   }
 
   void gameOver(double x, double y, double velocityY) async {
+    _playDeathEffects();
     switch (gameMode) {
       case SinglePlayerGameMode():
         await singleplayerCubit.gameOver();
@@ -78,6 +108,7 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
   }
 
   void increaseScore(double x, double y, double velocityY) {
+    _playScoreEffects();
     switch (gameMode) {
       case SinglePlayerGameMode():
         singleplayerCubit.increaseScore();
@@ -86,6 +117,32 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
         multiplayerCubit.increaseScore(x, y, velocityY);
         break;
     }
+  }
+
+  void _playDeathEffects() {
+    final dash = world.rootComponent.myDash;
+    if (dash.juice.isDead) {
+      return;
+    }
+    dash.onDied();
+    screenFx.shake(0.75);
+    final screenPosition = camera.localToGlobal(dash.position);
+    screenFx.shockwave(screenPosition.toOffset());
+  }
+
+  void _playScoreEffects() {
+    final root = world.rootComponent;
+    final dash = root.myDash;
+    dash.onScored();
+    root.add(
+      ScoreBurst(
+        position: dash.position + Vector2(10, 0),
+        color: dash.color,
+        priority: 11,
+      ),
+    );
+    root.wobblePipeAt(dash.x);
+    screenFx.shake(0.12);
   }
 
   void onGameStarted() {

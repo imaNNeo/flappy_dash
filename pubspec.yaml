@@ -88,6 +88,11 @@ flutter:
     - assets/audio/
     - assets/icons/
 
+  shaders:
+    - shaders/shockwave.frag
+    - shaders/score_burst.frag
+    - shaders/portal.frag
+
   fonts:
     - family: Chewy
       fonts:
