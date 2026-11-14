@@ -12,6 +12,9 @@ class PlayerState with Equatable {
   final PlayingState playingState;
   final DateTime spawnsAgainAt;
 
+  /// A server-side bot (it has no presence and plays on the server).
+  final bool isBot;
+
   PlayerState({
     required this.userId,
     required this.displayName,
@@ -22,6 +25,7 @@ class PlayerState with Equatable {
     required this.score,
     required this.playingState,
     required this.spawnsAgainAt,
+    this.isBot = false,
   });
 
   PlayerState copyWith({int? score}) => PlayerState(
@@ -34,6 +38,7 @@ class PlayerState with Equatable {
     score: score ?? this.score,
     playingState: playingState,
     spawnsAgainAt: spawnsAgainAt,
+    isBot: isBot,
   );
 
   factory PlayerState.fromJson(Map<String, dynamic> json) => PlayerState(
@@ -46,6 +51,7 @@ class PlayerState with Equatable {
     score: json['score'],
     playingState: PlayingState.values[json['playingState']],
     spawnsAgainAt: DateTime.fromMillisecondsSinceEpoch(json['spawnsAgainAt']),
+    isBot: json['isBot'] == true,
   );
 
   @override
@@ -59,5 +65,6 @@ class PlayerState with Equatable {
     score,
     playingState,
     spawnsAgainAt,
+    isBot,
   ];
 }

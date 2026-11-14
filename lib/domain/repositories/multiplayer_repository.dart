@@ -54,6 +54,14 @@ class MultiplayerRepository {
   Future<MatchResultEntity> getMatchResult(String matchId) =>
       _nakamaDataSource.getMatchResult(matchId);
 
+  Future<bool> canManageBots() => _nakamaDataSource.canManageBots();
+
+  void addBot(String matchId) =>
+      sendDispatchingEvent(matchId, DispatchingBotAddEvent());
+
+  void removeBot(String matchId) =>
+      sendDispatchingEvent(matchId, DispatchingBotRemoveEvent());
+
   Future<MatchOverviewEntity> getLastMatchOverview() =>
       _nakamaDataSource.getLastMatchOverview();
 }
