@@ -95,7 +95,6 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
   }
 
   void gameOver(double x, double y, double velocityY) async {
-    print('FXMARK death');
     _playDeathEffects();
     switch (gameMode) {
       case SinglePlayerGameMode():
@@ -109,7 +108,6 @@ class FlappyDashGame extends FlameGame<FlappyDashWorld>
   }
 
   void increaseScore(double x, double y, double velocityY) {
-    print('FXMARK score');
     _playScoreEffects();
     switch (gameMode) {
       case SinglePlayerGameMode():

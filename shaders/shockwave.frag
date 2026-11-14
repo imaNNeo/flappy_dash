@@ -1,13 +1,12 @@
 #version 460 core
 
-// A small, quick shockwave ring around the dash when it dies (in the spirit
-// of Celeste's death burst): a crisp white ring that snaps outward and
-// thins, with red/cyan color-split edges, a soft shadow just inside it and a
-// bright pop at the center in the first frames.
+// The rim of the death shockwave: a faint, thin highlight on the wave front
+// with a soft shadow just inside it, like the edge of a lens. The bending
+// and blurring of the scene behind it is done in ScreenFx; this only adds
+// the edge so the wave reads clearly.
 //
 // It's drawn in a square around the impact point only (uSize is that
-// square), on top of the frame. It never reads the frame back, which on the
-// web costs a GPU→CPU copy every frame.
+// square).
 
 #include <flutter/runtime_effect.glsl>
 
@@ -38,23 +37,13 @@ void main() {
 
   vec4 color = vec4(0.0);
 
-  // Shadow just inside the ring, like a lens edge.
-  float shadow = exp(-(x + 1.6) * (x + 1.6) * 3.0) * 0.18 * fade;
+  // Soft shadow just inside the front.
+  float shadow = exp(-(x + 1.8) * (x + 1.8) * 2.5) * 0.10 * fade;
   color = over(vec4(0.0, 0.02, 0.06, 1.0) * shadow, color);
 
-  // Color-split edges.
-  float red = exp(-(x - 0.9) * (x - 0.9) * 6.0) * 0.45 * fade;
-  float cyan = exp(-(x + 0.9) * (x + 0.9) * 6.0) * 0.45 * fade;
-  color = over(vec4(1.0, 0.25, 0.4, 1.0) * red, color);
-  color = over(vec4(0.25, 0.85, 1.0, 1.0) * cyan, color);
-
-  // The crisp white ring.
-  float ring = smoothstep(1.0, 0.55, abs(x)) * fade;
-  color = over(vec4(1.0) * ring, color);
-
-  // A bright pop at the center for the first frames.
-  float pop = exp(-pow(dist / (maxRadius * 0.35), 2.0)) * pow(1.0 - uProgress, 6.0) * uStrength;
-  color = over(vec4(1.0) * pop, color);
+  // Faint highlight on the front.
+  float rim = smoothstep(1.0, 0.3, abs(x)) * 0.22 * fade;
+  color = over(vec4(1.0) * rim, color);
 
   fragColor = color;
 }

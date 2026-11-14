@@ -6,12 +6,16 @@ import 'package:flutter/painting.dart';
 
 import 'game_shaders.dart';
 
-/// Whole-screen effects: trauma based screen shake and the shockwave
-/// overlay. [FlappyDashGame.renderTree] calls [render].
+/// Whole-screen effects: trauma based screen shake and the death
+/// shockwave. [FlappyDashGame.renderTree] calls [render].
 ///
-/// The shockwave is drawn on top of the frame with [GameShaders.shockwave];
-/// it never reads the frame back (on the web that is a GPU→CPU copy that
-/// stalls every frame it's used).
+/// The shockwave bends and blurs what's behind it like a lens. It can't read
+/// the frame back to do that (on the web, `toImageSync` is a GPU→CPU copy
+/// every frame, and it made deaths stutter), so it records the frame as a
+/// picture and replays it inside thin rings, each magnified a little around
+/// the impact point. Together they push the scene outward along the wave
+/// front; a fixed blur on top smooths the rings into one soft band.
+/// [GameShaders.shockwave] adds the faint rim on the wave front.
 class ScreenFx {
   /// 0..1, decays over time. Shake is trauma², so small hits barely move the
   /// screen and big ones really kick.
@@ -55,14 +59,115 @@ class ScreenFx {
   }
 
   void render(ui.Canvas canvas, Vector2 size, void Function(ui.Canvas) draw) {
-    _renderShaken(canvas, size, draw);
     final wave = _wave;
+    final warmingUp = wave == null && _lensWarmUpFrames > 0;
+    if ((wave == null && !warmingUp) || size.x <= 0 || size.y <= 0) {
+      _renderShaken(canvas, size, draw);
+      return;
+    }
+    final recorder = ui.PictureRecorder();
+    _renderShaken(ui.Canvas(recorder), size, draw);
+    final scene = recorder.endRecording();
+    canvas.drawPicture(scene);
+
+    if (wave == null) {
+      // Runs the lens over the real scene, almost invisible, so the GPU
+      // programs it needs (each kind of draw under the ring clip, the blur)
+      // compile while the game loads instead of on the first death.
+      _lensWarmUpFrames--;
+      final warmWave = _Shockwave(
+        Offset(size.x / 2, size.y / 2),
+        min(size.x, size.y) / 3,
+        1,
+        1,
+      );
+      _renderLens(canvas, scene, warmWave, 0.3, _warmUpLayerPaint);
+    } else {
+      final progress = (wave.elapsed / wave.duration).clamp(0.0, 1.0);
+      _renderLens(canvas, scene, wave, progress, _blurLayerPaint);
+      _renderRim(canvas, wave, progress);
+    }
+    scene.dispose();
+  }
+
+  int _lensWarmUpFrames = 2;
+
+  static const _lensSlices = 4;
+
+  // Same curve as the rim in shockwave.frag: fast out, then settles.
+  static double _waveRadius(double maxRadius, double progress) {
+    final eased = 1 - pow(1 - progress, 4).toDouble();
+    return (0.15 + 0.85 * eased) * maxRadius * 0.92;
+  }
+
+  final ui.Paint _blurLayerPaint = ui.Paint()
+    // A fixed blur radius: animating it would build a new blur per radius.
+    ..imageFilter = ui.ImageFilter.blur(sigmaX: 5, sigmaY: 5);
+
+  final ui.Paint _warmUpLayerPaint = ui.Paint()
+    ..color = const Color(0x02000000)
+    ..imageFilter = ui.ImageFilter.blur(sigmaX: 5, sigmaY: 5);
+
+  void _renderLens(
+    ui.Canvas canvas,
+    ui.Picture scene,
+    _Shockwave wave,
+    double progress,
+    ui.Paint layerPaint,
+  ) {
+    final maxRadius = wave.radius;
+    final radius = _waveRadius(maxRadius, progress);
+    final fade = (1 - progress) * wave.strength;
+    // The band the wave bends, wide at first and thinning out.
+    final bandWidth = (0.34 - 0.24 * progress) * maxRadius;
+    // How far the middle of the band is pushed outward.
+    final push = 0.22 * maxRadius * fade;
+    if (push < 0.3) {
+      return;
+    }
+    final center = wave.center;
+    final inner = max(0.0, radius - bandWidth);
+    final outer = radius + bandWidth;
+    final sliceWidth = (outer - inner) / _lensSlices;
+
+    canvas.saveLayer(
+      Rect.fromCircle(center: center, radius: outer + 8),
+      layerPaint,
+    );
+    for (var i = 0; i < _lensSlices; i++) {
+      final from = inner + i * sliceWidth;
+      final to = from + sliceWidth;
+      final middle = (from + to) / 2;
+      // -1 at the inner edge of the band, 1 at the outer edge.
+      final t = (middle - radius) / bandWidth;
+      final displacement = push * (1 - t * t);
+      if (middle - displacement <= 1) {
+        continue;
+      }
+      // What shows at `middle` comes from `middle - displacement`: the scene
+      // scaled up around the center.
+      final scale = middle / (middle - displacement);
+      final ring = ui.Path()
+        ..fillType = ui.PathFillType.evenOdd
+        ..addOval(Rect.fromCircle(center: center, radius: to))
+        ..addOval(Rect.fromCircle(center: center, radius: from));
+      canvas.save();
+      canvas.clipPath(ring);
+      canvas.translate(center.dx, center.dy);
+      canvas.scale(scale);
+      canvas.translate(-center.dx, -center.dy);
+      canvas.drawPicture(scene);
+      canvas.restore();
+    }
+    canvas.restore();
+  }
+
+  void _renderRim(ui.Canvas canvas, _Shockwave wave, double progress) {
     final program = GameShaders.shockwave;
-    if (wave == null || program == null || size.x <= 0 || size.y <= 0) {
+    if (program == null) {
       return;
     }
     final shader = _shader ??= program.fragmentShader();
-    final progress = (wave.elapsed / wave.duration).clamp(0.0, 1.0);
     final side = wave.radius * 2;
     shader
       ..setFloat(0, side)
