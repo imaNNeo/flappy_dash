@@ -23,13 +23,16 @@ class NakamaDataSource {
     'NAKAMA_SSL',
     defaultValue: !kDebugMode,
   );
+  // In production both gRPC (apps) and HTTP/websocket (web) go to 443: the
+  // server's reverse proxy routes gRPC by content type, so the API can sit
+  // behind Cloudflare, which only proxies standard HTTPS ports.
   static const _grpcPort = int.fromEnvironment(
     'NAKAMA_GRPC_PORT',
-    defaultValue: kDebugMode ? 8349 : 7349,
+    defaultValue: kDebugMode ? 8349 : 443,
   );
   static const _httpPort = int.fromEnvironment(
     'NAKAMA_HTTP_PORT',
-    defaultValue: kDebugMode ? 8350 : 7350,
+    defaultValue: kDebugMode ? 8350 : 443,
   );
   final client = getNakamaClient(
     host: _host,
