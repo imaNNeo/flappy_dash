@@ -12,9 +12,9 @@ import 'game_shaders.dart';
 /// The shockwave bends and blurs what's behind it like a lens. It can't read
 /// the frame back to do that (on the web, `toImageSync` is a GPU→CPU copy
 /// every frame, and it made deaths stutter), so it records the frame as a
-/// picture and replays it inside thin rings, each magnified a little around
-/// the impact point. Together they push the scene outward along the wave
-/// front; a fixed blur on top smooths the rings into one soft band.
+/// picture and replays it once, magnified a little around the impact point
+/// and seen only through the band of the wave, under a fixed blur. That
+/// pushes the scene outward along the wave front as one soft band.
 /// [GameShaders.shockwave] adds the faint rim on the wave front.
 class ScreenFx {
   /// 0..1, decays over time. Shake is trauma², so small hits barely move the
@@ -46,8 +46,17 @@ class ScreenFx {
 
   bool get isShaking => _trauma > 0;
 
+  /// Smoothed frame time. The lens replays the whole frame once more, so on
+  /// a device that already struggles it is skipped (the rim still shows).
+  double _averageDt = 1 / 60;
+
+  bool get _lensAllowed => _averageDt < 1 / 40;
+
   void update(double dt) {
     _time += dt;
+    if (_wave == null && dt > 0 && dt < 0.5) {
+      _averageDt += (dt - _averageDt) * 0.05;
+    }
     _trauma = max(0, _trauma - _traumaDecayPerSecond * dt);
     final wave = _wave;
     if (wave != null) {
@@ -84,15 +93,15 @@ class ScreenFx {
       _renderLens(canvas, scene, warmWave, 0.3, _warmUpLayerPaint);
     } else {
       final progress = (wave.elapsed / wave.duration).clamp(0.0, 1.0);
-      _renderLens(canvas, scene, wave, progress, _blurLayerPaint);
+      if (_lensAllowed) {
+        _renderLens(canvas, scene, wave, progress, _blurLayerPaint);
+      }
       _renderRim(canvas, wave, progress);
     }
     scene.dispose();
   }
 
   int _lensWarmUpFrames = 2;
-
-  static const _lensSlices = 4;
 
   // Same curve as the rim in shockwave.frag: fast out, then settles.
   static double _waveRadius(double maxRadius, double progress) {
@@ -128,37 +137,24 @@ class ScreenFx {
     final center = wave.center;
     final inner = max(0.0, radius - bandWidth);
     final outer = radius + bandWidth;
-    final sliceWidth = (outer - inner) / _lensSlices;
 
     canvas.saveLayer(
       Rect.fromCircle(center: center, radius: outer + 8),
       layerPaint,
     );
-    for (var i = 0; i < _lensSlices; i++) {
-      final from = inner + i * sliceWidth;
-      final to = from + sliceWidth;
-      final middle = (from + to) / 2;
-      // -1 at the inner edge of the band, 1 at the outer edge.
-      final t = (middle - radius) / bandWidth;
-      final displacement = push * (1 - t * t);
-      if (middle - displacement <= 1) {
-        continue;
-      }
-      // What shows at `middle` comes from `middle - displacement`: the scene
-      // scaled up around the center.
-      final scale = middle / (middle - displacement);
-      final ring = ui.Path()
-        ..fillType = ui.PathFillType.evenOdd
-        ..addOval(Rect.fromCircle(center: center, radius: to))
-        ..addOval(Rect.fromCircle(center: center, radius: from));
-      canvas.save();
-      canvas.clipPath(ring);
-      canvas.translate(center.dx, center.dy);
-      canvas.scale(scale);
-      canvas.translate(-center.dx, -center.dy);
-      canvas.drawPicture(scene);
-      canvas.restore();
-    }
+    // One magnified copy of the scene, seen only through the band: what
+    // shows at the wave front comes from `radius - push`. The blur on the
+    // layer softens the band's edges into a smooth bend.
+    final scale = radius / max(1.0, radius - push);
+    final ring = ui.Path()
+      ..fillType = ui.PathFillType.evenOdd
+      ..addOval(Rect.fromCircle(center: center, radius: outer))
+      ..addOval(Rect.fromCircle(center: center, radius: inner));
+    canvas.clipPath(ring);
+    canvas.translate(center.dx, center.dy);
+    canvas.scale(scale);
+    canvas.translate(-center.dx, -center.dy);
+    canvas.drawPicture(scene);
     canvas.restore();
   }
 
