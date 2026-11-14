@@ -118,7 +118,7 @@ void main() {
         animator.update(_dt);
         lowest = min(lowest, animator.face.wingAngle);
       }
-      expect(lowest, lessThan(-0.3));
+      expect(lowest, lessThan(-0.2));
       for (var i = 0; i < 120; i++) {
         animator.update(_dt);
       }

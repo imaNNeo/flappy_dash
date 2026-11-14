@@ -12,13 +12,13 @@ enum DashExpression {
   /// Just flapped: focused brows.
   determined,
 
-  /// Just scored: ^ ^ eyes, open beak, pink cheeks.
+  /// Just scored: ^ ^ eyes, pink cheeks, wing up.
   excited,
 
   /// Content smile (menus, the winner on the results page).
   happy,
 
-  /// Falling fast: wide eyes, tiny pupils, a sweat drop.
+  /// Falling fast: tiny pupils, raised brows, a sweat drop.
   scared,
 
   /// Crashed: X X eyes.
@@ -84,7 +84,7 @@ class DashFaceAnimator {
 
   /// A wing stroke (a jump).
   void flap() {
-    _wingVelocity = -13;
+    _wingVelocity = -7;
   }
 
   final DashFace _target = DashFace();
@@ -107,11 +107,9 @@ class DashFaceAnimator {
     double ease(double from, double to) => from + (to - from) * t;
     face
       ..eyeShape = _target.eyeShape
-      ..eyeScale = ease(face.eyeScale, _target.eyeScale)
       ..pupilScale = ease(face.pupilScale, _target.pupilScale)
       ..browLift = ease(face.browLift, _target.browLift)
       ..browTilt = ease(face.browTilt, _target.browTilt)
-      ..beakOpen = ease(face.beakOpen, _target.beakOpen)
       ..blush = ease(face.blush, _target.blush)
       ..sweat = ease(face.sweat, _target.sweat);
     face.look = Offset(
@@ -159,12 +157,10 @@ class DashFaceAnimator {
     target
       ..eyeShape = DashEyeShape.open
       ..eyeOpen = 1
-      ..eyeScale = 1
       ..pupilScale = 1
       ..look = lookTarget
       ..browLift = 0
       ..browTilt = 0
-      ..beakOpen = 0
       ..blush = 0
       ..sweat = 0
       ..wingAngle = 0;
@@ -180,9 +176,7 @@ class DashFaceAnimator {
         target
           ..eyeShape = DashEyeShape.happy
           ..browLift = 3
-          ..beakOpen = 0.9
-          ..blush = 1
-          ..wingAngle = 0.25;
+          ..blush = 1;
       case DashExpression.happy:
         target
           ..eyeShape = DashEyeShape.happy
@@ -190,21 +184,17 @@ class DashFaceAnimator {
           ..blush = 0.7;
       case DashExpression.scared:
         target
-          ..eyeScale = 1.12
           ..pupilScale = 0.6
           ..browLift = 4
           ..browTilt = 0.35
-          ..beakOpen = 0.45
-          ..sweat = 1
-          ..wingAngle = 0.5;
+          ..sweat = 1;
       case DashExpression.dizzy:
         target
           ..eyeShape = DashEyeShape.dizzy
           ..look = Offset.zero
           ..browLift = 2
           ..browTilt = 0.2
-          ..beakOpen = 0.55
-          ..wingAngle = -0.3;
+          ..wingAngle = -0.15;
     }
   }
 }

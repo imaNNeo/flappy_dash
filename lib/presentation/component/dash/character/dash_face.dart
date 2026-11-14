@@ -25,9 +25,6 @@ class DashFace {
   /// 1 is fully open, 0 is closed (blinking).
   double eyeOpen = 1;
 
-  /// Scales the eye whites (1 is normal, > 1 is wide open).
-  double eyeScale = 1;
-
   /// Scales the pupils (< 1 is tiny scared pupils).
   double pupilScale = 1;
 
@@ -41,27 +38,23 @@ class DashFace {
   /// (worried), negative lowers it (determined / angry).
   double browTilt = 0;
 
-  /// 0 is closed, 1 is wide open.
-  double beakOpen = 0;
-
   /// 0..1, the pink cheeks.
   double blush = 0;
 
   /// 0..1, a sweat drop on the forehead.
   double sweat = 0;
 
-  /// The front wing's rotation in radians (positive raises it).
+  /// The front wing's rotation in radians: negative swings it down (a wing
+  /// stroke), up to [DashPainter.maxWingSwing]; positive values are ignored.
   double wingAngle = 0;
 
   void copyFrom(DashFace other) {
     eyeShape = other.eyeShape;
     eyeOpen = other.eyeOpen;
-    eyeScale = other.eyeScale;
     pupilScale = other.pupilScale;
     look = other.look;
     browLift = other.browLift;
     browTilt = other.browTilt;
-    beakOpen = other.beakOpen;
     blush = other.blush;
     sweat = other.sweat;
     wingAngle = other.wingAngle;
