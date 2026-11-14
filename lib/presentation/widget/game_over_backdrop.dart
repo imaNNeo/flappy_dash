@@ -13,7 +13,7 @@ class GameOverBackdrop extends StatelessWidget {
 
   final Widget child;
 
-  static const delay = Duration(milliseconds: 650);
+  static const delay = Duration(milliseconds: 1400);
   static const fadeDuration = Duration(milliseconds: 350);
 
   @override
