@@ -52,6 +52,29 @@
 </head>
 <body>
   <script src="assets/packages/flutter_soloud/web/init_soloud.js" defer></script>
-  <script src="flutter_bootstrap.js" async></script>
+  <script>
+    // One account for every game on games.imanneo.dev (its shared Nakama server, imaNNeo/games nakama/).
+    // Framed by the portal's play page, the game asks it for this browser's guest id first and signs in
+    // with it (the app keeps its device id in SharedPreferences: localStorage "flutter.deviceId"), so
+    // Flappy Dash and the other games there share one account. Elsewhere it starts as before.
+    (function () {
+      var PORTAL = 'https://games.imanneo.dev', started = false;
+      function start() {
+        if (started) return; started = true;
+        window.removeEventListener('message', answer);
+        var s = document.createElement('script'); s.src = 'flutter_bootstrap.js'; s.async = true; document.body.appendChild(s);
+      }
+      function answer(ev) {
+        if (ev.origin !== PORTAL || !ev.data || ev.data.type !== 'imanneo.account') return;
+        var id = String(ev.data.deviceId || '');
+        if (id.length >= 10 && id.length <= 128) try { localStorage.setItem('flutter.deviceId', JSON.stringify(id)); } catch (e) {}
+        start();
+      }
+      if (window.parent === window) return start();
+      window.addEventListener('message', answer);
+      try { window.parent.postMessage({ type: 'imanneo.account.hello' }, PORTAL); } catch (e) {}
+      setTimeout(start, 800); // not on the portal, or no answer: as before
+    })();
+  </script>
 </body>
 </html>
