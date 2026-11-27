@@ -370,7 +370,7 @@ class _MatchResultPageContentState extends State<_MatchResultPageContent> {
 
 How far can you go? Try Flappy Dash now! 🚀
 
-🔗 play.flappydash.com
+🔗 games.imanneo.dev/play/flappy-dash/
 ''';
 
     ShareDialog.share(
