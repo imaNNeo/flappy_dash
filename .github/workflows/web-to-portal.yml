@@ -56,7 +56,8 @@ jobs:
 
       - name: Read the version
         id: version
-        run: echo "name=$(grep -m1 '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//')" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "name=$(grep -m1 '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//')" >> "$GITHUB_OUTPUT"
 
       # The portal's game-web-pr workflow turns this branch into a pull request and merges it.
       - name: Push the build to the portal's flappy-dash-web-update branch
