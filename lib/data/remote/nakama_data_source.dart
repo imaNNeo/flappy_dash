@@ -17,15 +17,16 @@ class NakamaDataSource {
   // with e.g. --dart-define=NAKAMA_HOST=127.0.0.1 --dart-define=NAKAMA_SSL=false
   static const _host = String.fromEnvironment(
     'NAKAMA_HOST',
-    defaultValue: kDebugMode ? 'localhost' : 'api.flappydash.com',
+    defaultValue: kDebugMode ? 'localhost' : 'nakama.imanneo.dev',
   );
   static const _ssl = bool.fromEnvironment(
     'NAKAMA_SSL',
     defaultValue: !kDebugMode,
   );
-  // In production both gRPC (apps) and HTTP/websocket (web) go to 443: the
-  // server's reverse proxy routes gRPC by content type, so the API can sit
-  // behind Cloudflare, which only proxies standard HTTPS ports.
+  // In production both gRPC (apps) and HTTP/websocket (web) go to 443 of the
+  // shared Nakama every game on games.imanneo.dev uses (imaNNeo/games nakama/):
+  // its reverse proxy routes gRPC by content type. Apps before 0.0.8 still use
+  // the old address api.flappydash.com, a second name for the same server.
   static const _grpcPort = int.fromEnvironment(
     'NAKAMA_GRPC_PORT',
     defaultValue: kDebugMode ? 8349 : 443,

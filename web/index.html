@@ -30,17 +30,17 @@
   <!-- Other meta tags -->
   <meta property="og:title" content="Flappy Dash">
   <meta property="og:description" content="Flappy Dash brings the classic Flappy Bird gameplay with a twist! Control Flutter’s Dash mascot and compete with friends in real-time multiplayer for the highest score.">
-  <meta property="og:image" content="https://play.flappydash.com/assets/social-preview.png">
+  <meta property="og:image" content="https://games.imanneo.dev/games/flappy-dash/assets/social-preview.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://play.flappydash.com">
+  <meta property="og:url" content="https://games.imanneo.dev/play/flappy-dash/">
 
   <!-- Twitter Card meta tags -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Flappy Dash">
   <meta name="twitter:description" content="Flappy Dash brings the classic Flappy Bird gameplay with a twist! Control Flutter’s Dash mascot and compete with friends in real-time multiplayer for the highest score.">
-  <meta name="twitter:image" content="https://play.flappydash.com/assets/social-preview.png">
+  <meta name="twitter:image" content="https://games.imanneo.dev/games/flappy-dash/assets/social-preview.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
@@ -48,17 +48,22 @@
   <title>flappy_dash</title>
   <link rel="manifest" href="manifest.json">
   <!-- Umami player analytics (cookieless) -->
-  <script defer src="https://stats.app2pack.dev/script.js" data-website-id="92ee569b-7158-4316-ba05-79984d2afe19" data-domains="play.flappydash.com"></script>
+  <script defer src="https://stats.app2pack.dev/script.js" data-website-id="92ee569b-7158-4316-ba05-79984d2afe19" data-domains="play.flappydash.com,games.imanneo.dev"></script>
 </head>
 <body>
   <script src="assets/packages/flutter_soloud/web/init_soloud.js" defer></script>
   <script>
     // One account for every game on games.imanneo.dev (its shared Nakama server, imaNNeo/games nakama/).
-    // Framed by the portal's play page, the game asks it for this browser's guest id first and signs in
-    // with it (the app keeps its device id in SharedPreferences: localStorage "flutter.deviceId"), so
-    // Flappy Dash and the other games there share one account. Elsewhere it starts as before.
+    // The app keeps its device id in SharedPreferences (localStorage "flutter.deviceId"). Served from
+    // games.imanneo.dev/games/flappy-dash/, it shares that site's storage, so it takes the site's guest id
+    // ("imanneo.deviceId", made here if this browser has none yet) and every game there is one account.
+    // Framed by the portal from another address, it asks the play page for the id instead.
     (function () {
-      var PORTAL = 'https://games.imanneo.dev', started = false;
+      var PORTAL = 'https://games.imanneo.dev', KEY = 'imanneo.deviceId', started = false;
+      function use(id) {
+        id = String(id || '');
+        if (id.length >= 10 && id.length <= 128) try { localStorage.setItem('flutter.deviceId', JSON.stringify(id)); } catch (e) {}
+      }
       function start() {
         if (started) return; started = true;
         window.removeEventListener('message', answer);
@@ -66,9 +71,20 @@
       }
       function answer(ev) {
         if (ev.origin !== PORTAL || !ev.data || ev.data.type !== 'imanneo.account') return;
-        var id = String(ev.data.deviceId || '');
-        if (id.length >= 10 && id.length <= 128) try { localStorage.setItem('flutter.deviceId', JSON.stringify(id)); } catch (e) {}
+        use(ev.data.deviceId);
         start();
+      }
+      if (location.origin === PORTAL) {
+        try {
+          var id = localStorage.getItem(KEY);
+          if (!id) {
+            var old = JSON.parse(localStorage.getItem('flutter.deviceId') || 'null');
+            id = old || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+            localStorage.setItem(KEY, id);
+          }
+          use(id);
+        } catch (e) {}
+        return start();
       }
       if (window.parent === window) return start();
       window.addEventListener('message', answer);
